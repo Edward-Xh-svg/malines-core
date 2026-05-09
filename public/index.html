@@ -11,7 +11,6 @@
 
     <title>Malines Community | مجتمع الألعاب الجيوسياسية</title>
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -36,10 +35,6 @@
 
             --border-subtle: rgba(148, 163, 184, 0.1);
             --border-hover: rgba(99, 102, 241, 0.3);
-
-            --success: #10b981;
-            --warning: #f59e0b;
-            --error: #ef4444;
 
             --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
@@ -77,7 +72,6 @@
             min-height: 100vh;
         }
 
-        /* Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -92,13 +86,11 @@
             background: var(--accent-secondary);
         }
 
-        /* Selection */
         ::selection {
             background: rgba(99, 102, 241, 0.3);
             color: var(--text-primary);
         }
 
-        /* Background Canvas */
         #bg-canvas {
             position: fixed;
             top: 0;
@@ -109,7 +101,6 @@
             pointer-events: none;
         }
 
-        /* Navigation */
         .navbar {
             position: fixed;
             top: 0;
@@ -229,7 +220,6 @@
             box-shadow: 0 6px 25px rgba(99, 102, 241, 0.5);
         }
 
-        /* Mobile Menu */
         .mobile-menu-btn {
             display: none;
             background: none;
@@ -240,7 +230,6 @@
             padding: 0.5rem;
         }
 
-        /* Hero Section */
         .hero {
             position: relative;
             min-height: 100vh;
@@ -378,37 +367,6 @@
             font-size: 1.2rem;
         }
 
-        /* Stats Bar */
-        .stats-bar {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            justify-content: center;
-            gap: 3rem;
-            margin-top: 4rem;
-            padding: 2rem;
-            animation: fadeInUp 0.6s ease 0.4s forwards;
-            opacity: 0;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--accent-primary);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .stat-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: 0.25rem;
-        }
-
-        /* Features Section */
         .features {
             position: relative;
             z-index: 2;
@@ -513,7 +471,6 @@
             line-height: 1.7;
         }
 
-        /* Games Showcase */
         .games-section {
             position: relative;
             z-index: 2;
@@ -597,7 +554,6 @@
             line-height: 1.6;
         }
 
-        /* CTA Section */
         .cta-section {
             position: relative;
             z-index: 2;
@@ -651,7 +607,6 @@
             margin-right: auto;
         }
 
-        /* Footer */
         .footer {
             position: relative;
             z-index: 2;
@@ -794,7 +749,6 @@
             transform: translateY(-3px);
         }
 
-        /* Animations */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -817,7 +771,6 @@
             transform: translateY(0);
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .navbar {
                 padding: 1rem;
@@ -863,11 +816,6 @@
                 padding: 7rem 1.5rem 3rem;
             }
 
-            .stats-bar {
-                flex-direction: column;
-                gap: 1.5rem;
-            }
-
             .features {
                 padding: 4rem 1.5rem;
             }
@@ -883,7 +831,6 @@
             }
         }
 
-        /* Loading Screen */
         .loading-screen {
             position: fixed;
             top: 0;
@@ -918,15 +865,12 @@
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
     <div class="loading-screen" id="loading">
         <div class="loading-spinner"></div>
     </div>
 
-    <!-- Background Canvas -->
     <canvas id="bg-canvas"></canvas>
 
-    <!-- Navigation -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <a href="/" class="logo">
@@ -939,19 +883,18 @@
                 <li><a href="#features">المميزات</a></li>
                 <li><a href="#games">الألعاب</a></li>
                 <li><a href="#about">عن المجتمع</a></li>
-                <li><a href="/wiki" class="nav-cta">📰 منصة الأخبار</a></li>
+                <li><a href="/wiki" class="nav-cta">منصة الأخبار</a></li>
             </ul>
 
             <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="hero-content">
             <div class="hero-badge">
                 <span class="pulse"></span>
-                المجتمع الأكبر للألعاب الجيوسياسية
+                مجتمع متخصص في الألعاب الجيوسياسية
             </div>
 
             <h1 class="hero-title">
@@ -966,36 +909,20 @@
 
             <div class="hero-actions">
                 <a href="/wiki" class="btn btn-primary">
-                    <span class="btn-icon">📰</span>
+                    <span class="btn-icon">&#9654;</span>
                     تصفح منصة الأخبار
                 </a>
                 <a href="#features" class="btn btn-secondary">
-                    <span class="btn-icon">↓</span>
+                    <span class="btn-icon">&#8595;</span>
                     استكشف المزيد
                 </a>
-            </div>
-
-            <div class="stats-bar">
-                <div class="stat-item">
-                    <div class="stat-value" data-count="1500">0</div>
-                    <div class="stat-label">عضو نشط</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" data-count="50">0</div>
-                    <div class="stat-label">لعبة متوفرة</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" data-count="24">0</div>
-                    <div class="stat-label">دعم على مدار الساعة</div>
-                </div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
     <section class="features" id="features">
         <div class="section-header animate-on-scroll">
-            <div class="section-tag">✨ لماذا نحن؟</div>
+            <div class="section-tag">لماذا نحن؟</div>
             <h2 class="section-title">مميزات مجتمع Malines</h2>
             <p class="section-desc">
                 نقدم لك تجربة فريدة في عالم الألعاب الجيوسياسية مع مميزات حصرية
@@ -1004,7 +931,7 @@
 
         <div class="features-grid">
             <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">🌍</div>
+                <div class="feature-icon">&#127758;</div>
                 <h3 class="feature-title">ألعاب جيوسياسية متنوعة</h3>
                 <p class="feature-desc">
                     مجموعة واسعة من الألعاب الاستراتيجية التي تغطي مختلف العصور والسيناريوهات الجيوسياسية حول العالم.
@@ -1012,7 +939,7 @@
             </div>
 
             <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">🤝</div>
+                <div class="feature-icon">&#129309;</div>
                 <h3 class="feature-title">مجتمع نشط ومتعاون</h3>
                 <p class="feature-desc">
                     تواصل مع لاعبين من مختلف أنحاء العالم، شكّل تحالفات، وناقش الاستراتيجيات في بيئة ودية.
@@ -1020,7 +947,7 @@
             </div>
 
             <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">📊</div>
+                <div class="feature-icon">&#128202;</div>
                 <h3 class="feature-title">إحصائيات وتحليلات متقدمة</h3>
                 <p class="feature-desc">
                     تتبع أدائك مع لوحات تحكم تفاعلية وتحليلات دقيقة لتحسين استراتيجيتك في كل مباراة.
@@ -1028,7 +955,7 @@
             </div>
 
             <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">🏆</div>
+                <div class="feature-icon">&#127942;</div>
                 <h3 class="feature-title">بطولات وفعاليات دورية</h3>
                 <p class="feature-desc">
                     شارك في بطولات أسبوعية وشهرية مع جوائز قيمة، واختبر مهاراتك ضد أفضل اللاعبين.
@@ -1036,7 +963,7 @@
             </div>
 
             <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">📚</div>
+                <div class="feature-icon">&#128214;</div>
                 <h3 class="feature-title">ويكي ومصادر تعليمية</h3>
                 <p class="feature-desc">
                     مكتبة شاملة من الدلائل والشروحات والموارد التعليمية لتطوير فهمك العميق للألعاب الاستراتيجية.
@@ -1044,7 +971,7 @@
             </div>
 
             <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">🔒</div>
+                <div class="feature-icon">&#128274;</div>
                 <h3 class="feature-title">بيئة آمنة ومنظمة</h3>
                 <p class="feature-desc">
                     نظام إدارة متقدم يضمن بيئة لعب عادلة وآمنة لجميع الأعضاء مع حماية من الغش والمخالفات.
@@ -1053,11 +980,10 @@
         </div>
     </section>
 
-    <!-- Games Section -->
     <section class="games-section" id="games">
         <div class="games-container">
             <div class="section-header animate-on-scroll">
-                <div class="section-tag">🎮 الألعاب</div>
+                <div class="section-tag">الألعاب</div>
                 <h2 class="section-title">أبرز الألعاب الجيوسياسية</h2>
                 <p class="section-desc">
                     اكتشف مجموعتنا المختارة من أفضل الألعاب الاستراتيجية
@@ -1066,7 +992,7 @@
 
             <div class="games-grid">
                 <div class="game-card animate-on-scroll">
-                    <div class="game-image">⚔️</div>
+                    <div class="game-image">&#9874;</div>
                     <div class="game-content">
                         <span class="game-tag">استراتيجية عسكرية</span>
                         <h3 class="game-title">حروب الإمبراطوريات</h3>
@@ -1077,7 +1003,7 @@
                 </div>
 
                 <div class="game-card animate-on-scroll">
-                    <div class="game-image">🌐</div>
+                    <div class="game-image">&#127760;</div>
                     <div class="game-content">
                         <span class="game-tag">جيوسياسية حديثة</span>
                         <h3 class="game-title">النظام العالمي</h3>
@@ -1088,7 +1014,7 @@
                 </div>
 
                 <div class="game-card animate-on-scroll">
-                    <div class="game-image">⚓</div>
+                    <div class="game-image">&#9875;</div>
                     <div class="game-content">
                         <span class="game-tag">بحرية واستعمارية</span>
                         <h3 class="game-title">عصر الاستكشاف</h3>
@@ -1099,7 +1025,7 @@
                 </div>
 
                 <div class="game-card animate-on-scroll">
-                    <div class="game-image">🏛️</div>
+                    <div class="game-image">&#127963;</div>
                     <div class="game-content">
                         <span class="game-tag">سياسة داخلية</span>
                         <h3 class="game-title">البرلمان</h3>
@@ -1112,7 +1038,6 @@
         </div>
     </section>
 
-    <!-- CTA Section -->
     <section class="cta-section" id="about">
         <div class="cta-container animate-on-scroll">
             <div class="cta-content">
@@ -1121,14 +1046,13 @@
                     سواء كنت لاعباً مبتدئاً أو محترفاً، مجتمعنا يوفر لك كل ما تحتاجه للاستمتاع بالألعاب الجيوسياسية
                 </p>
                 <a href="/wiki" class="btn btn-primary">
-                    <span class="btn-icon">📰</span>
+                    <span class="btn-icon">&#9654;</span>
                     تصفح منصة الأخبار
                 </a>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="footer-container">
             <div class="footer-grid">
@@ -1165,59 +1089,53 @@
                 <div class="footer-col">
                     <h4 class="footer-title">تواصل معنا</h4>
                     <ul class="footer-links">
-                        <li><a href="mailto:malines@ivanova.sbs">📧 malines@ivanova.sbs</a></li>
-                        <li><a href="#">💬 Discord</a></li>
-                        <li><a href="#">🐦 Twitter</a></li>
-                        <li><a href="https://github.com/malines-core" target="_blank">🐙 GitHub</a></li>
+                        <li><a href="mailto:malines@ivanova.sbs">malines@ivanova.sbs</a></li>
+                        <li><a href="#">Discord</a></li>
+                        <li><a href="#">Twitter</a></li>
+                        <li><a href="https://github.com/malines-core" target="_blank">GitHub</a></li>
                     </ul>
                 </div>
             </div>
 
             <div class="footer-bottom">
                 <div class="footer-copyright">
-                    © 2024 Malines Community. جميع الحقوق محفوظة.
+                    2024 Malines Community. جميع الحقوق محفوظة.
                 </div>
 
                 <div class="footer-contact">
-                    <span>📧</span>
                     <span>التواصل الرسمي:</span>
                     <a href="mailto:malines@ivanova.sbs">malines@ivanova.sbs</a>
                 </div>
 
                 <div class="social-links">
-                    <a href="#" class="social-link" title="Discord">💬</a>
-                    <a href="#" class="social-link" title="Twitter">🐦</a>
-                    <a href="https://github.com/malines-core" target="_blank" class="social-link" title="GitHub">🐙</a>
+                    <a href="#" class="social-link" title="Discord">D</a>
+                    <a href="#" class="social-link" title="Twitter">T</a>
+                    <a href="https://github.com/malines-core" target="_blank" class="social-link" title="GitHub">G</a>
                 </div>
             </div>
         </div>
     </footer>
 
     <script>
-        // Loading Screen
         window.addEventListener('load', () => {
             setTimeout(() => {
                 document.getElementById('loading').classList.add('hidden');
             }, 500);
         });
 
-        // Navbar Scroll Effect
         const navbar = document.getElementById('navbar');
         let lastScroll = 0;
 
         window.addEventListener('scroll', () => {
             const currentScroll = window.pageYOffset;
-
             if (currentScroll > 50) {
                 navbar.classList.add('scrolled');
             } else {
                 navbar.classList.remove('scrolled');
             }
-
             lastScroll = currentScroll;
         });
 
-        // Mobile Menu
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const navLinks = document.getElementById('navLinks');
 
@@ -1226,7 +1144,6 @@
             mobileMenuBtn.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
         });
 
-        // Close mobile menu on link click
         document.querySelectorAll('.nav-links a').forEach(link => {
             link.addEventListener('click', () => {
                 navLinks.classList.remove('active');
@@ -1234,7 +1151,6 @@
             });
         });
 
-        // Smooth Scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -1248,7 +1164,6 @@
             });
         });
 
-        // Scroll Animations
         const observerOptions = {
             threshold: 0.1,
             rootMargin: '0px 0px -50px 0px'
@@ -1266,44 +1181,6 @@
             observer.observe(el);
         });
 
-        // Animated Counter
-        function animateCounter(element, target, duration = 2000) {
-            let start = 0;
-            const increment = target / (duration / 16);
-
-            function updateCounter() {
-                start += increment;
-                if (start < target) {
-                    element.textContent = Math.floor(start).toLocaleString();
-                    requestAnimationFrame(updateCounter);
-                } else {
-                    element.textContent = target.toLocaleString();
-                }
-            }
-
-            updateCounter();
-        }
-
-        // Trigger counters when stats section is visible
-        const statsObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const counters = entry.target.querySelectorAll('.stat-value');
-                    counters.forEach(counter => {
-                        const target = parseInt(counter.getAttribute('data-count'));
-                        animateCounter(counter, target);
-                    });
-                    statsObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.5 });
-
-        const statsBar = document.querySelector('.stats-bar');
-        if (statsBar) {
-            statsObserver.observe(statsBar);
-        }
-
-        // Background Canvas Animation
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
 
@@ -1336,7 +1213,6 @@
                 if (this.x < 0 || this.x > width) this.vx *= -1;
                 if (this.y < 0 || this.y > height) this.vy *= -1;
 
-                // Mouse interaction
                 if (mouse.x !== null && mouse.y !== null) {
                     const dx = mouse.x - this.x;
                     const dy = mouse.y - this.y;
@@ -1349,7 +1225,6 @@
                     }
                 }
 
-                // Limit velocity
                 const maxVelocity = 2;
                 const velocity = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
                 if (velocity > maxVelocity) {
@@ -1406,7 +1281,6 @@
             requestAnimationFrame(animate);
         }
 
-        // Mouse tracking
         window.addEventListener('mousemove', (e) => {
             mouse.x = e.clientX;
             mouse.y = e.clientY;
@@ -1417,7 +1291,6 @@
             mouse.y = null;
         });
 
-        // Initialize
         resize();
         initParticles();
         animate();
@@ -1425,13 +1298,6 @@
         window.addEventListener('resize', () => {
             resize();
             initParticles();
-        });
-
-        // Performance: Pause animation when tab is hidden
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                // Animation will continue but we could optimize here if needed
-            }
         });
     </script>
 </body>
