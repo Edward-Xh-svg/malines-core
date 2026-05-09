@@ -7,27 +7,35 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #050505; color: #a3a3a3; font-family: 'Cairo', sans-serif; }
-        .article { border-bottom: 1px solid #1a1a1a; padding: 50px 0; }
-        .content { 
+        body { background: #050505; color: #d4d4d4; font-family: 'Cairo', sans-serif; }
+        .article-box { border-bottom: 1px solid #1a1a1a; padding: 60px 0; }
+        .content-text { 
             font-family: 'JetBrains Mono', monospace; 
             white-space: pre-wrap; 
             background: #0a0a0a; 
-            padding: 20px; 
-            border-right: 3px solid #7f1d1d; 
+            padding: 25px; 
+            border-right: 4px solid #7f1d1d;
+            line-height: 1.8;
         }
     </style>
 </head>
 <body>
-    <div id="app" class="max-w-4xl mx-auto px-6">
-        <div v-for="art in fullArticles" :key="art.id" class="article">
-            <h1 class="text-4xl font-black text-white mb-6 uppercase">{{ art.title }}</h1>
+    <div id="app" class="max-w-4xl mx-auto px-6 py-10">
+        <div v-if="articles.length === 0" class="text-center py-20 opacity-20 uppercase tracking-[0.5em]">
+            No Data Found / Checking Terminal...
+        </div>
+
+        <div v-for="art in articles" :key="art.id" class="article-box">
+            <h1 class="text-5xl font-black text-white mb-8 uppercase tracking-tighter">{{ art.title }}</h1>
             
-            <img :src="'/png/' + art.id + '.png'" 
-                 @error="(e) => e.target.src = '/PNG/' + art.id + '.png'"
-                 class="w-full mb-8 grayscale hover:grayscale-0 transition duration-500">
+            <div class="mb-10 bg-black p-1 border border-white/5">
+                <img :src="'/png/' + art.id + '.png'" 
+                     @error="(e) => { e.target.src = '/PNG/' + art.id + '.png'; e.target.onerror = () => e.target.style.display='none' }"
+                     class="w-full grayscale hover:grayscale-0 transition duration-700">
+            </div>
             
-            <pre class="content">{{ art.content }}</pre>
+            <pre v-if="art.content" class="content-text">{{ art.content }}</pre>
+            <div v-else class="animate-pulse text-xs text-red-900">جاري فك التشفير...</div>
         </div>
     </div>
 
@@ -35,21 +43,26 @@
         const { createApp, ref, onMounted } = Vue;
         createApp({
             setup() {
-                const fullArticles = ref([]);
+                const articles = ref([]);
                 
                 onMounted(async () => {
-                    const res = await fetch('/api/articles');
-                    const list = await res.json();
-                    
-                    for (let item of list) {
-                        const textRes = await fetch(`/txt/${item.id}.txt`);
-                        if (textRes.ok) {
-                            item.content = await textRes.text();
-                            fullArticles.value.push(item);
-                        }
-                    }
+                    try {
+                        const res = await fetch('/api/articles');
+                        const list = await res.json();
+                        articles.value = list;
+
+                        // جلب محتوى كل مقال بهدوء بعد تحميل القائمة
+                        list.forEach(async (item, index) => {
+                            try {
+                                const textRes = await fetch(`/txt/${item.id}.txt`);
+                                if (textRes.ok) {
+                                    articles.value[index].content = await textRes.text();
+                                }
+                            } catch (e) { console.error("Error file:", item.id); }
+                        });
+                    } catch (e) { console.error("Connection Failed"); }
                 });
-                return { fullArticles };
+                return { articles };
             }
         }).mount('#app');
     </script>
