@@ -3,64 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Malines Wiki | الأرشيف المركزي</title>
+    <title>Malines Wiki | الأرشيف</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --bg: #050505; --surface: #0d0d0d; --accent: #7f1d1d; --border: #1f1f1f; }
-        body { background: var(--bg); color: #d4d4d4; font-family: 'Segoe UI', system-ui, sans-serif; }
-        .sidebar { background: var(--surface); border-left: 1px solid var(--border); }
-        .nav-btn { transition: 0.2s; border-right: 3px solid transparent; }
-        .nav-btn.active { background: #1a1a1a; border-right-color: var(--accent); color: white; }
-        pre { white-space: pre-wrap; font-family: inherit; line-height: 1.8; }
-        /* تحسين التمرير للهواتف */
-        @media (max-width: 768px) { .sidebar { height: 250px; width: 100%; border-left: none; border-bottom: 1px solid var(--border); } }
+        :root { --bg: #050505; --red: #7f1d1d; --border: #1a1a1a; }
+        body { background: var(--bg); color: #a3a3a3; font-family: 'Inter', sans-serif; }
+        .sidebar { background: #0a0a0a; border-left: 1px solid var(--border); }
+        .nav-btn { border-right: 3px solid transparent; transition: 0.3s; }
+        .nav-btn.active { background: #141414; border-right-color: var(--red); color: white; }
+        .content-view { background: radial-gradient(circle at top right, #0d0202 0%, #050505 100%); }
+        pre { white-space: pre-wrap; font-family: inherit; line-height: 1.8; color: #d4d4d4; }
+        /* شريط تمرير احترافي */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: var(--red); }
     </style>
 </head>
 <body class="h-screen flex flex-col md:flex-row overflow-hidden">
 
     <div id="app" class="flex flex-col md:flex-row w-full h-full">
         
-        <aside class="sidebar w-full md:w-72 flex flex-col shrink-0 overflow-hidden">
-            <div class="p-5 border-b border-[#1f1f1f] flex justify-between items-center">
-                <h2 class="font-black text-white tracking-widest uppercase text-sm">Central Archive</h2>
-                <a href="index.html" class="text-[10px] text-neutral-500 hover:text-white transition">EXIT</a>
+        <aside class="sidebar w-full md:w-80 flex flex-col shrink-0">
+            <div class="p-6 border-b border-[#1a1a1a]">
+                <h2 class="text-white font-black tracking-widest text-xs mb-1 uppercase">Malines Intelligence</h2>
+                <p class="text-[9px] text-neutral-600 uppercase">Database Access Terminal</p>
             </div>
-            <nav class="flex-grow overflow-y-auto p-2 space-y-1">
-                <div v-if="articles.length === 0" class="text-center py-10 text-xs text-neutral-600">جاري فحص المجلدات...</div>
+            
+            <nav class="flex-grow overflow-y-auto p-3 space-y-1">
+                <div v-if="error" class="text-red-900 text-[10px] p-4 border border-red-900/20 bg-red-900/5">
+                    خطأ في الاتصال بالنظام الأرشيفي. تأكد من وجود ملفات في مجلد TXT.
+                </div>
                 <button 
                     v-for="art in articles" 
-                    @click="loadContent(art)"
-                    :class="['nav-btn w-full text-right p-3 text-xs uppercase tracking-tighter', activeId === art.id ? 'active' : 'hover:bg-[#111] text-neutral-500']"
+                    @click="loadArticle(art)"
+                    :class="['nav-btn w-full text-right p-4 text-xs font-bold uppercase tracking-tight', activeId === art.id ? 'active' : 'text-neutral-500 hover:text-neutral-300']"
                 >
                     {{ art.title }}
                 </button>
             </nav>
+
+            <div class="p-4 border-t border-[#1a1a1a]">
+                <a href="index.html" class="block text-center text-[10px] text-neutral-600 hover:text-red-700 transition font-bold">RETURN TO COMMAND</a>
+            </div>
         </aside>
 
-        <main class="flex-grow overflow-y-auto bg-black p-6 md:p-14 relative">
-            <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-black/50 z-50">
-                <div class="w-8 h-8 border-2 border-red-900 border-t-red-600 rounded-full animate-spin"></div>
+        <main class="flex-grow overflow-y-auto content-view p-6 md:p-16">
+            <div v-if="loading" class="h-full flex items-center justify-center">
+                <div class="w-6 h-6 border-2 border-red-900 border-t-red-500 rounded-full animate-spin"></div>
             </div>
 
-            <div v-if="current" class="max-w-3xl mx-auto">
-                <header class="mb-10 border-b border-red-900/30 pb-6">
-                    <div class="text-[10px] text-red-700 font-bold tracking-[0.4em] mb-2 uppercase">Document Decrypted</div>
-                    <h1 class="text-3xl md:text-5xl font-black text-white uppercase">{{ current.title }}</h1>
+            <div v-else-if="current" class="max-w-4xl mx-auto">
+                <header class="mb-12">
+                    <div class="w-12 h-1 bg-red-900 mb-6"></div>
+                    <h1 class="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter leading-none mb-4">
+                        {{ current.title }}
+                    </h1>
                 </header>
 
-                <div v-if="imgError === false" class="mb-10 border border-[#1f1f1f] shadow-2xl bg-[#0a0a0a]">
-                    <img :src="'/PNG/' + current.id + '.png'" @error="imgError = true" class="w-full h-auto opacity-80 hover:opacity-100 transition duration-500">
+                <div v-if="!imageError" class="mb-12 border border-neutral-900 p-1 bg-black">
+                    <img :src="'/PNG/' + current.id + '.png'" @error="imageError = true" class="w-full grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition duration-700">
                 </div>
 
-                <article class="text-neutral-400 text-lg">
+                <article class="prose prose-invert max-w-none">
                     <pre>{{ content }}</pre>
                 </article>
             </div>
 
-            <div v-else class="h-full flex flex-col items-center justify-center text-neutral-800 uppercase tracking-[0.5em] text-[10px]">
-                <svg class="mb-4 w-12 h-12 opacity-10" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"></path></svg>
-                Select Entry to Access Data
+            <div v-else class="h-full flex flex-col items-center justify-center border border-[#111] m-4 opacity-20">
+                <span class="text-[10px] tracking-[1em] uppercase">No File Selected</span>
             </div>
         </main>
     </div>
@@ -74,29 +84,36 @@
                 const content = ref('');
                 const activeId = ref('');
                 const loading = ref(false);
-                const imgError = ref(false);
+                const imageError = ref(false);
+                const error = ref(false);
 
-                const fetchList = async () => {
+                const fetchArticles = async () => {
                     try {
                         const res = await fetch('/api/articles');
+                        if (!res.ok) throw new Error();
                         articles.value = await res.json();
-                    } catch (e) { console.error("Archive Error"); }
+                        error.value = articles.value.length === 0;
+                    } catch (e) {
+                        error.value = true;
+                    }
                 };
 
-                const loadContent = async (art) => {
+                const loadArticle = async (art) => {
                     loading.value = true;
-                    imgError.value = false;
+                    imageError.value = false;
                     activeId.value = art.id;
                     try {
                         const res = await fetch(`/TXT/${art.id}.txt`);
                         content.value = await res.text();
                         current.value = art;
-                    } catch (e) { content.value = "Error loading document."; }
+                    } catch (e) {
+                        content.value = "فشل تحميل الوثيقة.";
+                    }
                     loading.value = false;
                 };
 
-                onMounted(fetchList);
-                return { articles, current, content, activeId, loading, loadContent, imgError };
+                onMounted(fetchArticles);
+                return { articles, current, content, activeId, loading, imageError, error, loadArticle };
             }
         }).mount('#app');
     </script>
