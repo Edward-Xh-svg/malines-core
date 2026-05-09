@@ -1,37 +1,40 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs'); // مكتبة النظام لقراءة المجلدات
+const fs = require('fs');
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// خدمة الملفات من المجلدات المطلوبة
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/TXT', express.static(path.join(__dirname, 'TXT')));
-app.use('/PNG', express.static(path.join(__dirname, 'PNG')));
+// استخدام مسار العمل الحالي لضمان الوصول للمجلدات خارج public
+const rootDir = process.cwd();
 
-// API لجلب قائمة الملفات من مجلد TXT تلقائياً
+app.use(express.static(path.join(rootDir, 'public')));
+app.use('/TXT', express.static(path.join(rootDir, 'TXT')));
+app.use('/PNG', express.static(path.join(rootDir, 'PNG')));
+
 app.get('/api/articles', (req, res) => {
-    const directoryPath = path.join(__dirname, 'TXT');
+    const txtPath = path.join(rootDir, 'TXT');
     
-    fs.readdir(directoryPath, (err, files) => {
-        if (err) {
-            return res.status(500).send('Unable to scan directory');
-        }
-        // فلترة الملفات التي تنتهي بـ .txt فقط وإرسال أسمائها بدون الصيغة
+    // التأكد من وجود المجلد قبل القراءة
+    if (!fs.existsSync(txtPath)) {
+        return res.json([{ id: 'error', title: 'مجلد TXT غير موجود' }]);
+    }
+
+    fs.readdir(txtPath, (err, files) => {
+        if (err) return res.status(500).json({ error: "Failed to read" });
+        
         const articles = files
             .filter(file => file.endsWith('.txt'))
             .map(file => ({
                 id: file.replace('.txt', ''),
-                title: file.replace('.txt', '').replace(/-/g, ' ') // تحويل الشرطات لمسافات للعنوان
+                title: file.replace('.txt', '').replace(/-/g, ' ')
             }));
         res.json(articles);
     });
 });
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// توجيه أي مسار غير معروف لـ index.html
+app.get('*', (req, res) => {
+    res.sendFile(path.join(rootDir, 'public', 'index.html'));
 });
 
-app.listen(PORT, () => {
-    console.log(`Malines System Active on http://localhost:${PORT}`);
-});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`System Online: ${PORT}`));
