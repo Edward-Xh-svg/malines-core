@@ -95,25 +95,23 @@
                 const imageError = ref(false);
                 const error = ref(false);
 
-                // جلب قائمة المقالات
                 const fetchArticles = async () => {
                     loadingList.value = true;
                     error.value = false;
                     try {
                         const res = await fetch('/api/articles');
-                        if (!res.ok) throw new Error("Network response was not ok");
+                        if (!res.ok) throw new Error();
                         const data = await res.json();
                         articles.value = data;
                         if (data.length === 0) error.value = true;
                     } catch (e) {
-                        console.error("Archive fetch error:", e);
                         error.value = true;
                     } finally {
                         loadingList.value = false;
                     }
                 };
 
-                // جلب محتوى مقالة محددة
+                // التعديل هنا: جلب المحتوى عبر السيرفر (API) وليس مباشرة
                 const loadArticle = async (art) => {
                     if (activeId.value === art.id) return;
                     
@@ -122,13 +120,15 @@
                     activeId.value = art.id;
                     
                     try {
-                        const res = await fetch(`/TXT/${art.id}.txt`);
+                        const res = await fetch(`/api/content/${art.id}`);
                         if (!res.ok) throw new Error("File not found");
-                        content.value = await res.text();
+                        const data = await res.json();
+                        content.value = data.content; // نأخذ النص من حقل content في الـ JSON
                         current.value = art;
                     } catch (e) {
-                        content.value = "تحذير: تعذر فك تشفير الوثيقة. الملف قد يكون مفقوداً أو تالفاً.";
-                        current.value = art; // نبقي العنوان ظاهراً
+                        console.error(e);
+                        content.value = "تحذير: تعذر فك تشفير الوثيقة. الملف مفقود في مجلد TXT.";
+                        current.value = art;
                     } finally {
                         loadingArticle.value = false;
                     }
