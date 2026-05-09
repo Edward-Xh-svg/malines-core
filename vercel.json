@@ -1,6 +1,12 @@
 {
+  "version": 2,
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "TXT/**,PNG/**"
+    }
+  },
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/articles" },
+    { "source": "/api/(.*)", "destination": "/api/index.js" },
     { "source": "/(.*)", "destination": "/public/$1" }
   ]
 }
