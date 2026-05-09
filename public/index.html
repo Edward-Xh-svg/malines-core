@@ -3,58 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Malines Community | الرئيسية</title>
+    <title>Malines Community | البوابة</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --dark: #050505; --surface: #0a0a0a; --red: #7f1d1d; --border: #1a1a1a;
-        }
-        body { background: var(--dark); color: #d4d4d4; font-family: system-ui, -apple-system, sans-serif; }
-        .hero-gradient { background: radial-gradient(circle at center, #1a0505 0%, #050505 100%); }
-        .btn-red { background: var(--red); transition: 0.3s; border: 1px solid #991b1b; }
-        .btn-red:hover { background: #b91c1c; box-shadow: 0 0 20px rgba(127, 29, 29, 0.4); }
+        body { background: #050505; color: #737373; font-family: system-ui, sans-serif; }
+        .red-line { height: 2px; width: 50px; background: #7f1d1d; margin: 20px auto; }
+        .btn-access { border: 1px solid #7f1d1d; color: white; transition: 0.4s; letter-spacing: 2px; }
+        .btn-access:hover { background: #7f1d1d; box-shadow: 0 0 30px rgba(127,29,29,0.3); }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="h-screen flex flex-col justify-between">
 
-    <header class="border-b border-[#1a1a1a] sticky top-0 bg-black/80 backdrop-blur-md z-50">
-        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <span class="w-1 h-6 bg-red-800"></span>
-                <span class="font-black tracking-tighter text-xl text-white">MALINES</span>
-            </div>
-            <nav class="hidden md:flex gap-8 text-xs font-bold tracking-widest text-neutral-500">
-                <a href="#" class="hover:text-red-700 transition">INFRASTRUCTURE</a>
-                <a href="#" class="hover:text-red-700 transition">PROTOCOLS</a>
-                <a href="wiki.html" class="text-red-600">ARCHIVE</a>
-            </nav>
-        </div>
+    <header class="p-10 text-center">
+        <div class="text-white font-black text-2xl tracking-[0.3em] uppercase">MALINES</div>
+        <div class="red-line"></div>
     </header>
 
-    <main class="flex-grow flex flex-col items-center justify-center relative px-6 hero-gradient">
-        <div class="text-center max-w-4xl py-20">
-            <h1 class="text-5xl md:text-7xl font-black text-white mb-6 leading-none">
-                GEOPOLITICAL <br><span class="text-red-800">COMMAND CENTER</span>
-            </h1>
-            <p class="text-neutral-500 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-                المنصة المركزية لإدارة العمليات السياسية والمحاكاة الاستراتيجية ضمن مجتمع Malines. 
-            </p>
-            <div class="flex flex-col md:flex-row gap-4 justify-center">
-                <a href="wiki.html" class="btn-red px-10 py-4 text-white font-bold text-sm uppercase tracking-widest">
-                    دخول الأرشيف الإخباري
-                </a>
-            </div>
-        </div>
+    <main class="max-w-4xl mx-auto px-6 text-center">
+        <h1 class="text-white text-5xl md:text-7xl font-black mb-8 leading-tight tracking-tighter uppercase">
+            Geopolitical <br> <span class="text-neutral-800">Research Hub</span>
+        </h1>
+        <p class="text-neutral-500 text-lg md:text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
+            المجتمع الرسمي المختص بالدراسات والأنظمة الجيوسياسية. <br> توثيق، إدارة، ومحاكاة دقيقة.
+        </p>
+        <a href="wiki.html" class="btn-access inline-block px-12 py-4 text-xs font-bold uppercase">
+            دخول قاعدة البيانات
+        </a>
     </main>
 
-    <footer class="border-t border-[#1a1a1a] p-10 bg-black">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="text-center md:text-right">
-                <p class="text-[10px] text-neutral-600 uppercase tracking-widest mb-1">Official Communications</p>
-                <a href="mailto:malines@ivanova.sbs" class="text-neutral-400 hover:text-red-700 font-mono">malines@ivanova.sbs</a>
-            </div>
-            <p class="text-[10px] text-neutral-700 font-mono uppercase tracking-widest">© 2026 IVANOVA CORP. SYSTEM ID: MALINES-CORE</p>
-        </div>
+    <footer class="p-10 border-t border-[#111] flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="text-[10px] uppercase tracking-widest">System Status: <span class="text-green-900">Stable</span></div>
+        <a href="mailto:malines@ivanova.sbs" class="text-xs font-mono hover:text-white transition">malines@ivanova.sbs</a>
+        <div class="text-[10px] uppercase tracking-widest">© 2026 IVANOVA</div>
     </footer>
 
 </body>
