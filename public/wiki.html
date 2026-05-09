@@ -9,123 +9,51 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root { --bg: #050505; --red: #b91c1c; --border: #1a1a1a; }
-        body { 
-            background: var(--bg); 
-            color: #d4d4d4; 
-            font-family: 'Cairo', sans-serif; 
-            margin: 0; 
-            line-height: 1.6;
+        body { background: var(--bg); color: #d4d4d4; font-family: 'Cairo', sans-serif; margin: 0; }
+        .article-card { border-bottom: 1px solid var(--border); padding: 4rem 0; }
+        .document-content { 
+            font-family: 'JetBrains Mono', monospace; 
+            font-size: 0.95rem; 
+            color: #a3a3a3; 
+            white-space: pre-wrap; 
+            border-right: 2px solid var(--red); 
+            padding-right: 1.5rem; 
+            margin-top: 2rem;
         }
-        
-        .article-card {
-            background: rgba(10, 10, 10, 0.4);
-            border: 1px solid var(--border);
-            transition: all 0.5s ease;
-        }
-        
-        .article-card:hover {
-            border-color: rgba(185, 28, 28, 0.3);
-            box-shadow: 0 0 30px rgba(185, 28, 28, 0.05);
-        }
-
-        .title-glitch {
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: -0.02em;
-            background: linear-gradient(to bottom, #fff 0%, #666 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .document-content {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.95rem;
-            color: #a3a3a3;
-            white-space: pre-wrap;
-            border-right: 2px solid var(--red);
-            padding-right: 1.5rem;
-        }
-
-        .img-container {
-            position: relative;
-            overflow: hidden;
-            background: #000;
-        }
-
-        .img-container img {
-            filter: grayscale(1) contrast(1.2) brightness(0.8);
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .article-card:hover .img-container img {
-            filter: grayscale(0) contrast(1) brightness(1);
-            transform: scale(1.02);
-        }
-
-        /* شريط تمرير أحمر أنيق */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--red); border-radius: 10px; }
+        .title-text { font-weight: 900; color: white; letter-spacing: -0.02em; }
+        /* شريط تحميل بسيط */
+        .loader-bar { height: 2px; background: var(--red); width: 0%; transition: 0.3s; }
     </style>
 </head>
-<body class="selection:bg-red-900 selection:text-white">
-
+<body class="content-view">
     <div id="app">
-        <div v-if="loading" class="fixed inset-0 bg-black z-[100] flex flex-col items-center justify-center">
-            <div class="w-16 h-[2px] bg-red-900 animate-pulse mb-4"></div>
-            <p class="text-[10px] tracking-[0.5em] text-neutral-500 uppercase animate-pulse">Establishing Connection...</p>
-        </div>
-
-        <header class="sticky top-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/5 px-6 py-4">
+        <header class="sticky top-0 z-50 bg-black/90 border-b border-white/5 px-6 py-4">
             <div class="max-w-5xl mx-auto flex justify-between items-center">
-                <div class="flex items-center gap-4">
-                    <div class="w-2 h-2 bg-red-700 animate-ping"></div>
-                    <span class="text-xs font-bold tracking-widest text-white uppercase">Archive Protocol: Malines</span>
-                </div>
-                <a href="index.html" class="text-[10px] border border-white/10 px-4 py-1 hover:bg-white hover:text-black transition duration-500 uppercase tracking-tighter">Exit Terminal</a>
+                <span class="text-xs font-bold tracking-widest text-white uppercase">Terminal: Malines Wiki</span>
+                <a href="index.html" class="text-[10px] text-neutral-500 uppercase">Return</a>
             </div>
         </header>
 
-        <main class="max-w-4xl mx-auto px-6 py-20">
-            <div v-if="error" class="text-center py-20 border border-red-900/20 rounded-lg">
-                <p class="text-red-500 text-sm">CRITICAL ERROR: DATABASE UNREACHABLE</p>
-                <button @click="loadAll" class="mt-4 text-[10px] uppercase underline">Retry Link</button>
+        <main class="max-w-4xl mx-auto px-6">
+            <div v-if="loading" class="py-20 text-center animate-pulse text-xs uppercase tracking-widest">
+                قاري قراءة البيانات...
             </div>
 
-            <div v-else class="space-y-32">
-                <section v-for="article in fullArticles" :key="article.id" class="article-card p-6 md:p-10 rounded-sm">
-                    
-                    <div class="flex items-center gap-4 mb-8">
-                        <span class="text-[10px] text-red-700 font-bold uppercase tracking-[0.3em]">REF: {{ article.id }}</span>
-                        <div class="h-[1px] flex-grow bg-white/5"></div>
-                        <span class="text-[10px] text-neutral-600">UNCLASSIFIED / PUBLIC</span>
+            <div v-else>
+                <section v-for="article in fullArticles" :key="article.id" class="article-card">
+                    <span class="text-[10px] text-red-700 font-bold tracking-[0.3em] uppercase block mb-4">REF: {{ article.id }}</span>
+                    <h2 class="title-text text-4xl md:text-6xl mb-10">{{ article.title }}</h2>
+
+                    <div class="mb-10 border border-white/5 bg-black p-1">
+                        <img :src="'/png/' + article.id + '.png'" 
+                             @error="(e) => e.target.style.display = 'none'" 
+                             class="w-full grayscale hover:grayscale-0 transition duration-700">
                     </div>
 
-                    <h2 class="title-glitch text-4xl md:text-7xl mb-12">
-                        {{ article.title }}
-                    </h2>
-
-                    <div class="img-container mb-12 border border-white/5 p-1">
-                        <img 
-                            :src="'/png/' + article.id + '.png'" 
-                            @error="(e) => e.target.src = '/PNG/' + article.id + '.png'"
-                            class="w-full h-auto object-cover"
-                        >
-                    </div>
-
-                    <div class="document-content">
-                        {{ article.content }}
-                    </div>
-
-                    <div class="mt-12 flex justify-end">
-                        <span class="text-[9px] text-neutral-800 uppercase tracking-widest">End of Document</span>
-                    </div>
+                    <div class="document-content">{{ article.content }}</div>
                 </section>
             </div>
         </main>
-
-        <footer class="py-20 text-center opacity-30">
-            <p class="text-[10px] tracking-[1em] uppercase">Ivanova System Intelligence</p>
-        </footer>
     </div>
 
     <script>
@@ -134,31 +62,29 @@
             setup() {
                 const fullArticles = ref([]);
                 const loading = ref(true);
-                const error = ref(false);
 
-                const loadAll = async () => {
+                const loadArticles = async () => {
                     loading.value = true;
-                    error.value = false;
                     try {
                         const res = await fetch('/api/articles');
-                        const basic = await res.json();
+                        const list = await res.json();
                         
-                        const detailed = await Promise.all(basic.map(async (art) => {
-                            const cRes = await fetch(`/api/content/${art.id}`);
-                            const cData = await cRes.json();
-                            return { ...art, content: cData.content };
-                        }));
-                        
-                        fullArticles.value = detailed;
-                    } catch (e) {
-                        error.value = true;
-                    } finally {
-                        loading.value = false;
-                    }
+                        // جلب المحتوى لكل ملف بشكل منفصل لضمان استقرار قراءة TXT
+                        for (let item of list) {
+                            try {
+                                const textRes = await fetch(`/txt/${item.id}.txt`);
+                                if (textRes.ok) {
+                                    item.content = await textRes.text();
+                                    fullArticles.value.push(item);
+                                }
+                            } catch (e) { console.error("Error loading " + item.id); }
+                        }
+                    } catch (e) { console.error("Archive Error"); }
+                    loading.value = false;
                 };
 
-                onMounted(loadAll);
-                return { fullArticles, loading, error, loadAll };
+                onMounted(loadArticles);
+                return { fullArticles, loading };
             }
         }).mount('#app');
     </script>
