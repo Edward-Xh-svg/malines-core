@@ -9,137 +9,179 @@
     <style>
         :root { --bg: #050505; --red: #7f1d1d; --border: #1a1a1a; }
         body { background: var(--bg); color: #a3a3a3; font-family: 'Inter', sans-serif; margin: 0; }
-        .sidebar { background: #0a0a0a; border-left: 1px solid var(--border); transition: all 0.3s; }
-        .nav-btn { border-right: 3px solid transparent; transition: 0.3s; text-align: right; }
-        .nav-btn.active { background: #141414; border-right-color: var(--red); color: white; }
-        .content-view { background: radial-gradient(circle at top right, #0d0202 0%, #050505 100%); }
-        pre { white-space: pre-wrap; font-family: inherit; line-height: 1.8; color: #d4d4d4; margin: 0; }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: var(--red); }
+        
+        /* شريط علوي بسيط وثابت */
+        header { 
+            background: #0a0a0a; 
+            border-bottom: 1px solid var(--border); 
+            position: sticky; 
+            top: 0; 
+            z-index: 100;
+        }
+
+        /* حاوية المقال */
+        .article-container {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 4rem;
+            margin-bottom: 4rem;
+        }
+
+        .article-container:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .content-view { 
+            background: radial-gradient(circle at top right, #0d0202 0%, #050505 100%); 
+        }
+
+        /* تنسيق النص للحفاظ على المسافات والسطور */
+        pre { 
+            white-space: pre-wrap; 
+            font-family: inherit; 
+            line-height: 1.8; 
+            color: #d4d4d4; 
+            margin: 0; 
+        }
+
+        /* شريط تمرير احترافي */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #1a1a1a; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--red); }
     </style>
 </head>
-<body class="h-screen flex flex-col md:flex-row overflow-hidden">
+<body class="min-h-screen content-view">
 
-    <div id="app" class="flex flex-col md:flex-row w-full h-full">
+    <div id="app" class="flex flex-col">
         
-        <aside class="sidebar w-full md:w-80 flex flex-col shrink-0 z-10">
-            <div class="p-6 border-b border-[#1a1a1a]">
-                <h2 class="text-white font-black tracking-widest text-xs mb-1 uppercase">Malines Intelligence</h2>
-                <p class="text-[9px] text-neutral-600 uppercase tracking-tighter">Database Access Terminal</p>
+        <header>
+            <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <span class="w-1 h-5 bg-red-900"></span>
+                    <h1 class="text-white font-black tracking-widest text-xs uppercase">Malines Intelligence</h1>
+                </div>
+                <nav class="flex items-center gap-6 text-[10px] text-neutral-600 font-bold uppercase tracking-widest">
+                    <span>Database Access</span>
+                    <a href="index.html" class="hover:text-red-700 transition">Return</a>
+                </nav>
             </div>
+        </header>
+
+        <main class="flex-grow w-full max-w-4xl mx-auto p-6 md:p-16 relative">
             
-            <nav class="flex-grow overflow-y-auto p-3 space-y-1">
-                <div v-if="loadingList" class="text-neutral-600 text-[10px] p-4 animate-pulse">جاري فحص قاعدة البيانات...</div>
+            <div v-if="loadingAll" class="fixed inset-0 flex flex-col items-center justify-center bg-black z-50">
+                <div class="w-10 h-10 border-2 border-red-900 border-t-red-500 rounded-full animate-spin mb-4"></div>
+                <p class="text-xs text-neutral-600 uppercase tracking-widest">Decryption in progress...</p>
+            </div>
+
+            <div v-else-if="error" class="text-center py-20 border border-red-900/20 bg-red-900/5 rounded p-10">
+                <p class="text-red-700 text-sm mb-4">فشل الاتصال بالنظام الأرشيفي أو المجلد فارغ.</p>
+                <button @click="fetchAllArticlesData" class="text-xs text-white underline uppercase">إعادة المحاولة</button>
+            </div>
+
+            <div v-else class="space-y-10">
                 
-                <div v-if="error" class="text-red-900 text-[10px] p-4 border border-red-900/20 bg-red-900/5">
-                    فشل الاتصال بالنظام الأرشيفي. 
-                    <button @click="fetchArticles" class="underline block mt-2">إعادة المحاولة</button>
+                <div v-for="article in fullArticles" :key="article.id" class="article-container">
+                    
+                    <header class="mb-10">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-red-700 text-xs font-bold tracking-[0.4em] uppercase">Document: {{ article.id }}</span>
+                            <span class="w-20 h-[1px] bg-red-900/30"></span>
+                        </div>
+                        <h2 class="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter leading-none">
+                            {{ article.title }}
+                        </h2>
+                    </header>
+
+                    <div v-if="!article.imageError" class="mb-12 border border-neutral-900 p-1 bg-black shadow-2xl">
+                        <img 
+                            :src="'/png/' + article.id + '.png'" 
+                            :alt="article.title"
+                            @error="article.imageError = true" 
+                            class="w-full grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition duration-700"
+                        >
+                    </div>
+
+                    <article class="prose prose-invert max-w-none">
+                        <pre>{{ article.content }}</pre>
+                    </article>
+
                 </div>
 
-                <button 
-                    v-for="art in articles" 
-                    :key="art.id"
-                    @click="loadArticle(art)"
-                    :class="['nav-btn w-full p-4 text-xs font-bold uppercase tracking-tight', activeId === art.id ? 'active' : 'text-neutral-500 hover:text-neutral-300']"
-                >
-                    {{ art.title }}
-                </button>
-            </nav>
-
-            <div class="p-4 border-t border-[#1a1a1a]">
-                <a href="index.html" class="block text-center text-[10px] text-neutral-600 hover:text-red-700 transition font-bold uppercase">RETURN TO COMMAND</a>
-            </div>
-        </aside>
-
-        <main class="flex-grow overflow-y-auto content-view p-6 md:p-16 relative">
-            <div v-if="loadingArticle" class="absolute inset-0 bg-black/60 flex items-center justify-center z-20">
-                <div class="w-6 h-6 border-2 border-red-900 border-t-red-500 rounded-full animate-spin"></div>
-            </div>
-
-            <div v-if="current" class="max-w-4xl mx-auto">
-                <header class="mb-12">
-                    <div class="w-12 h-1 bg-red-900 mb-6"></div>
-                    <h1 class="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter leading-none mb-4">
-                        {{ current.title }}
-                    </h1>
-                </header>
-
-                <div v-if="!imageError" class="mb-12 border border-neutral-900 p-1 bg-black shadow-2xl">
-                    <img :src="'/PNG/' + current.id + '.png'" @error="imageError = true" class="w-full grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition duration-1000">
-                </div>
-
-                <article class="text-neutral-400 text-lg leading-relaxed">
-                    <pre>{{ content }}</pre>
-                </article>
-            </div>
-
-            <div v-else-if="!loadingList" class="h-full flex flex-col items-center justify-center opacity-20">
-                <div class="w-20 h-20 border border-neutral-800 rounded-full flex items-center justify-center mb-4">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                </div>
-                <span class="text-[10px] tracking-[1em] uppercase">Security Level 4 Required</span>
             </div>
         </main>
+
+        <footer class="border-t border-[#1a1a1a] p-10 bg-black/50 text-center text-[10px] text-neutral-700 font-mono uppercase tracking-widest">
+            Ivanova Corp. Terminal v1.0 | All Data Classified
+        </footer>
     </div>
 
     <script>
         const { createApp, ref, onMounted } = Vue;
         createApp({
             setup() {
-                const articles = ref([]);
-                const current = ref(null);
-                const content = ref('');
-                const activeId = ref('');
-                const loadingList = ref(false);
-                const loadingArticle = ref(false);
-                const imageError = ref(false);
+                const fullArticles = ref([]); // مصفوفة تحتوي على البيانات الكاملة للمقالات (العنوان + النص)
+                const loadingAll = ref(true);
                 const error = ref(false);
 
-                const fetchArticles = async () => {
-                    loadingList.value = true;
-                    error.value = false;
+                // دالة لجلب محتوى مقالة واحدة (نص)
+                const fetchArticleContent = async (id) => {
                     try {
-                        const res = await fetch('/api/articles');
-                        if (!res.ok) throw new Error();
-                        const data = await res.json();
-                        articles.value = data;
-                        if (data.length === 0) error.value = true;
-                    } catch (e) {
-                        error.value = true;
-                    } finally {
-                        loadingList.value = false;
-                    }
-                };
-
-                // التعديل هنا: جلب المحتوى عبر السيرفر (API) وليس مباشرة
-                const loadArticle = async (art) => {
-                    if (activeId.value === art.id) return;
-                    
-                    loadingArticle.value = true;
-                    imageError.value = false;
-                    activeId.value = art.id;
-                    
-                    try {
-                        const res = await fetch(`/api/content/${art.id}`);
+                        const res = await fetch(`/api/content/${id}`);
                         if (!res.ok) throw new Error("File not found");
                         const data = await res.json();
-                        content.value = data.content; // نأخذ النص من حقل content في الـ JSON
-                        current.value = art;
+                        return data.content;
                     } catch (e) {
-                        console.error(e);
-                        content.value = "تحذير: تعذر فك تشفير الوثيقة. الملف مفقود في مجلد TXT.";
-                        current.value = art;
-                    } finally {
-                        loadingArticle.value = false;
+                        return "خطأ: تعذر فك تشفير محتوى هذا الملف. قد يكون مفقوداً.";
                     }
                 };
 
-                onMounted(fetchArticles);
+                // الدالة الرئيسية لجلب القائمة ثم محتوى كل ملف بالتوازي
+                const fetchAllArticlesData = async () => {
+                    loadingAll.value = true;
+                    error.value = false;
+                    fullArticles.value = [];
+                    try {
+                        // 1. جلب قائمة المقالات أولاً
+                        const res = await fetch('/api/articles');
+                        if (!res.ok) throw new Error();
+                        const basicArticles = await res.json();
+                        
+                        if (basicArticles.length === 0) {
+                            error.value = true;
+                            loadingAll.value = false;
+                            return;
+                        }
+
+                        // 2. جلب محتوى كل مقالة ديناميكياً
+                        // نستخدم Promise.all لضمان جلب النصوص كلها بالتوازي لسرعة التحميل
+                        const articlesWithContent = await Promise.all(basicArticles.map(async (art) => {
+                            const content = await fetchArticleContent(art.id);
+                            return {
+                                ...art,
+                                content: content,
+                                imageError: false // حالة خاصة للصورة لكل مقال
+                            };
+                        }));
+
+                        fullArticles.value = articlesWithContent;
+
+                    } catch (e) {
+                        console.error("Archive fetch error:", e);
+                        error.value = true;
+                    } finally {
+                        loadingAll.value = false;
+                    }
+                };
+
+                onMounted(fetchAllArticlesData);
                 
                 return { 
-                    articles, current, content, activeId, 
-                    loadingList, loadingArticle, imageError, error, 
-                    loadArticle, fetchArticles 
+                    fullArticles,
+                    loadingAll,
+                    error,
+                    fetchAllArticlesData
                 };
             }
         }).mount('#app');
