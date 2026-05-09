@@ -3,39 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Malines Community | البوابة</title>
+    <title>Malines Intelligence | المركز الرئيسي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #050505; color: #737373; font-family: system-ui, sans-serif; }
-        .red-line { height: 2px; width: 50px; background: #7f1d1d; margin: 20px auto; }
-        .btn-access { border: 1px solid #7f1d1d; color: white; transition: 0.4s; letter-spacing: 2px; }
-        .btn-access:hover { background: #7f1d1d; box-shadow: 0 0 30px rgba(127,29,29,0.3); }
+        :root { --bg: #050505; --red: #7f1d1d; }
+        body { 
+            background: var(--bg); 
+            color: #d4d4d4; 
+            font-family: 'Cairo', sans-serif; 
+            height: 100vh; 
+            overflow: hidden; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+        }
+        
+        .glitch-wrapper {
+            text-align: center;
+            position: relative;
+        }
+
+        .main-title {
+            font-size: 4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.05em;
+            color: white;
+            line-height: 1;
+            margin-bottom: 2rem;
+        }
+
+        .scanline {
+            width: 100%;
+            height: 2px;
+            background: rgba(127, 29, 29, 0.2);
+            position: absolute;
+            top: 0;
+            animation: scan 4s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        .btn-access {
+            display: inline-block;
+            padding: 1rem 3rem;
+            border: 1px solid var(--red);
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+            position: relative;
+            background: rgba(127, 29, 29, 0.05);
+        }
+
+        .btn-access:hover {
+            background: var(--red);
+            box-shadow: 0 0 20px var(--red);
+        }
+
+        .terminal-status {
+            margin-top: 2rem;
+            font-family: monospace;
+            font-size: 0.7rem;
+            color: #444;
+            text-transform: uppercase;
+        }
     </style>
 </head>
-<body class="h-screen flex flex-col justify-between">
+<body>
 
-    <header class="p-10 text-center">
-        <div class="text-white font-black text-2xl tracking-[0.3em] uppercase">MALINES</div>
-        <div class="red-line"></div>
-    </header>
+    <div class="scanline"></div>
 
-    <main class="max-w-4xl mx-auto px-6 text-center">
-        <h1 class="text-white text-5xl md:text-7xl font-black mb-8 leading-tight tracking-tighter uppercase">
-            Geopolitical <br> <span class="text-neutral-800">Research Hub</span>
-        </h1>
-        <p class="text-neutral-500 text-lg md:text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
-            المجتمع الرسمي المختص بالدراسات والأنظمة الجيوسياسية. <br> توثيق، إدارة، ومحاكاة دقيقة.
-        </p>
-        <a href="wiki.html" class="btn-access inline-block px-12 py-4 text-xs font-bold uppercase">
-            دخول قاعدة البيانات
-        </a>
-    </main>
+    <div class="glitch-wrapper px-6">
+        <p class="text-red-700 font-bold tracking-[0.5em] mb-4 text-xs uppercase">System Status: Online</p>
+        <h1 class="main-title md:text-8xl">MALINES<br><span class="text-neutral-800">DATABASE</span></h1>
+        
+        <div class="mt-10">
+            <a href="wiki.html" class="btn-access">
+                دخول الأرشيف المركزي
+            </a>
+        </div>
 
-    <footer class="p-10 border-t border-[#111] flex flex-col md:flex-row justify-between items-center gap-4">
-        <div class="text-[10px] uppercase tracking-widest">System Status: <span class="text-green-900">Stable</span></div>
-        <a href="mailto:malines@ivanova.sbs" class="text-xs font-mono hover:text-white transition">malines@ivanova.sbs</a>
-        <div class="text-[10px] uppercase tracking-widest">© 2026 IVANOVA</div>
-    </footer>
+        <div class="terminal-status">
+            <p>Connection: Encrypted</p>
+            <p>Location: Classified</p>
+        </div>
+    </div>
 
 </body>
 </html>
