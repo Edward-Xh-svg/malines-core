@@ -3,27 +3,34 @@ const path = require('path');
 const fs = require('fs');
 const app = express();
 
-// إخبار السيرفر أن المجلد العام هو public
-app.use(express.static('public'));
+// إخبار إكسبريس بمكان الملفات العامة
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/api/articles', (req, res) => {
     try {
-        // المسار الفيزيائي للمجلد TXT داخل public
-        const txtPath = path.join(process.cwd(), 'public', 'TXT');
+        // استخدام __dirname لضمان الإشارة إلى مجلد المشروع الصحيح في Vercel
+        const txtPath = path.join(__dirname, 'public', 'TXT');
         
+        console.log("Checking path:", txtPath); // للسجلات في Vercel
+
         if (fs.existsSync(txtPath)) {
             const files = fs.readdirSync(txtPath);
-            const articles = files.filter(f => f.endsWith('.txt')).map(f => ({
-                id: f.replace('.txt', ''),
-                title: f.replace('.txt', '').replace(/-/g, ' ')
-            }));
+            const articles = files
+                .filter(f => f.endsWith('.txt'))
+                .map(f => ({
+                    id: f.replace('.txt', ''),
+                    title: f.replace('.txt', '').replace(/-/g, ' ')
+                }));
             return res.json(articles);
+        } else {
+            // إذا لم يجد المجلد، يرسل تنبيه في السجلات
+            console.error("Directory TXT not found at:", txtPath);
+            return res.json([]);
         }
-        res.json([]);
     } catch (e) {
-        res.json([]);
+        console.error("Server Error:", e);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 });
 
-// هذا السطر مهم جداً لـ Vercel ليتمكن من تشغيل الملف كدالة
 module.exports = app;
