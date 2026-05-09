@@ -4,116 +4,127 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Malines Wiki | الأرشيف المركزي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=JetBrains+Mono:wght@300;500&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --bg: #050505; --red: #7f1d1d; --border: #1a1a1a; }
-        body { background: var(--bg); color: #a3a3a3; font-family: 'Inter', sans-serif; margin: 0; }
-        
-        /* شريط علوي بسيط وثابت */
-        header { 
-            background: #0a0a0a; 
-            border-bottom: 1px solid var(--border); 
-            position: sticky; 
-            top: 0; 
-            z-index: 100;
-        }
-
-        /* حاوية المقال */
-        .article-container {
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 4rem;
-            margin-bottom: 4rem;
-        }
-
-        .article-container:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-        }
-
-        .content-view { 
-            background: radial-gradient(circle at top right, #0d0202 0%, #050505 100%); 
-        }
-
-        /* تنسيق النص للحفاظ على المسافات والسطور */
-        pre { 
-            white-space: pre-wrap; 
-            font-family: inherit; 
-            line-height: 1.8; 
+        :root { --bg: #050505; --red: #b91c1c; --border: #1a1a1a; }
+        body { 
+            background: var(--bg); 
             color: #d4d4d4; 
+            font-family: 'Cairo', sans-serif; 
             margin: 0; 
+            line-height: 1.6;
+        }
+        
+        .article-card {
+            background: rgba(10, 10, 10, 0.4);
+            border: 1px solid var(--border);
+            transition: all 0.5s ease;
+        }
+        
+        .article-card:hover {
+            border-color: rgba(185, 28, 28, 0.3);
+            box-shadow: 0 0 30px rgba(185, 28, 28, 0.05);
         }
 
-        /* شريط تمرير احترافي */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg); }
-        ::-webkit-scrollbar-thumb { background: #1a1a1a; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--red); }
+        .title-glitch {
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+            background: linear-gradient(to bottom, #fff 0%, #666 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .document-content {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            color: #a3a3a3;
+            white-space: pre-wrap;
+            border-right: 2px solid var(--red);
+            padding-right: 1.5rem;
+        }
+
+        .img-container {
+            position: relative;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .img-container img {
+            filter: grayscale(1) contrast(1.2) brightness(0.8);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .article-card:hover .img-container img {
+            filter: grayscale(0) contrast(1) brightness(1);
+            transform: scale(1.02);
+        }
+
+        /* شريط تمرير أحمر أنيق */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--red); border-radius: 10px; }
     </style>
 </head>
-<body class="min-h-screen content-view">
+<body class="selection:bg-red-900 selection:text-white">
 
-    <div id="app" class="flex flex-col">
-        
-        <header>
-            <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <span class="w-1 h-5 bg-red-900"></span>
-                    <h1 class="text-white font-black tracking-widest text-xs uppercase">Malines Intelligence</h1>
+    <div id="app">
+        <div v-if="loading" class="fixed inset-0 bg-black z-[100] flex flex-col items-center justify-center">
+            <div class="w-16 h-[2px] bg-red-900 animate-pulse mb-4"></div>
+            <p class="text-[10px] tracking-[0.5em] text-neutral-500 uppercase animate-pulse">Establishing Connection...</p>
+        </div>
+
+        <header class="sticky top-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/5 px-6 py-4">
+            <div class="max-w-5xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <div class="w-2 h-2 bg-red-700 animate-ping"></div>
+                    <span class="text-xs font-bold tracking-widest text-white uppercase">Archive Protocol: Malines</span>
                 </div>
-                <nav class="flex items-center gap-6 text-[10px] text-neutral-600 font-bold uppercase tracking-widest">
-                    <span>Database Access</span>
-                    <a href="index.html" class="hover:text-red-700 transition">Return</a>
-                </nav>
+                <a href="index.html" class="text-[10px] border border-white/10 px-4 py-1 hover:bg-white hover:text-black transition duration-500 uppercase tracking-tighter">Exit Terminal</a>
             </div>
         </header>
 
-        <main class="flex-grow w-full max-w-4xl mx-auto p-6 md:p-16 relative">
-            
-            <div v-if="loadingAll" class="fixed inset-0 flex flex-col items-center justify-center bg-black z-50">
-                <div class="w-10 h-10 border-2 border-red-900 border-t-red-500 rounded-full animate-spin mb-4"></div>
-                <p class="text-xs text-neutral-600 uppercase tracking-widest">Decryption in progress...</p>
+        <main class="max-w-4xl mx-auto px-6 py-20">
+            <div v-if="error" class="text-center py-20 border border-red-900/20 rounded-lg">
+                <p class="text-red-500 text-sm">CRITICAL ERROR: DATABASE UNREACHABLE</p>
+                <button @click="loadAll" class="mt-4 text-[10px] uppercase underline">Retry Link</button>
             </div>
 
-            <div v-else-if="error" class="text-center py-20 border border-red-900/20 bg-red-900/5 rounded p-10">
-                <p class="text-red-700 text-sm mb-4">فشل الاتصال بالنظام الأرشيفي أو المجلد فارغ.</p>
-                <button @click="fetchAllArticlesData" class="text-xs text-white underline uppercase">إعادة المحاولة</button>
-            </div>
-
-            <div v-else class="space-y-10">
-                
-                <div v-for="article in fullArticles" :key="article.id" class="article-container">
+            <div v-else class="space-y-32">
+                <section v-for="article in fullArticles" :key="article.id" class="article-card p-6 md:p-10 rounded-sm">
                     
-                    <header class="mb-10">
-                        <div class="flex items-center gap-3 mb-4">
-                            <span class="text-red-700 text-xs font-bold tracking-[0.4em] uppercase">Document: {{ article.id }}</span>
-                            <span class="w-20 h-[1px] bg-red-900/30"></span>
-                        </div>
-                        <h2 class="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter leading-none">
-                            {{ article.title }}
-                        </h2>
-                    </header>
+                    <div class="flex items-center gap-4 mb-8">
+                        <span class="text-[10px] text-red-700 font-bold uppercase tracking-[0.3em]">REF: {{ article.id }}</span>
+                        <div class="h-[1px] flex-grow bg-white/5"></div>
+                        <span class="text-[10px] text-neutral-600">UNCLASSIFIED / PUBLIC</span>
+                    </div>
 
-                    <div v-if="!article.imageError" class="mb-12 border border-neutral-900 p-1 bg-black shadow-2xl">
+                    <h2 class="title-glitch text-4xl md:text-7xl mb-12">
+                        {{ article.title }}
+                    </h2>
+
+                    <div class="img-container mb-12 border border-white/5 p-1">
                         <img 
                             :src="'/png/' + article.id + '.png'" 
-                            :alt="article.title"
-                            @error="article.imageError = true" 
-                            class="w-full grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition duration-700"
+                            @error="(e) => e.target.src = '/PNG/' + article.id + '.png'"
+                            class="w-full h-auto object-cover"
                         >
                     </div>
 
-                    <article class="prose prose-invert max-w-none">
-                        <pre>{{ article.content }}</pre>
-                    </article>
+                    <div class="document-content">
+                        {{ article.content }}
+                    </div>
 
-                </div>
-
+                    <div class="mt-12 flex justify-end">
+                        <span class="text-[9px] text-neutral-800 uppercase tracking-widest">End of Document</span>
+                    </div>
+                </section>
             </div>
         </main>
 
-        <footer class="border-t border-[#1a1a1a] p-10 bg-black/50 text-center text-[10px] text-neutral-700 font-mono uppercase tracking-widest">
-            Ivanova Corp. Terminal v1.0 | All Data Classified
+        <footer class="py-20 text-center opacity-30">
+            <p class="text-[10px] tracking-[1em] uppercase">Ivanova System Intelligence</p>
         </footer>
     </div>
 
@@ -121,68 +132,33 @@
         const { createApp, ref, onMounted } = Vue;
         createApp({
             setup() {
-                const fullArticles = ref([]); // مصفوفة تحتوي على البيانات الكاملة للمقالات (العنوان + النص)
-                const loadingAll = ref(true);
+                const fullArticles = ref([]);
+                const loading = ref(true);
                 const error = ref(false);
 
-                // دالة لجلب محتوى مقالة واحدة (نص)
-                const fetchArticleContent = async (id) => {
-                    try {
-                        const res = await fetch(`/api/content/${id}`);
-                        if (!res.ok) throw new Error("File not found");
-                        const data = await res.json();
-                        return data.content;
-                    } catch (e) {
-                        return "خطأ: تعذر فك تشفير محتوى هذا الملف. قد يكون مفقوداً.";
-                    }
-                };
-
-                // الدالة الرئيسية لجلب القائمة ثم محتوى كل ملف بالتوازي
-                const fetchAllArticlesData = async () => {
-                    loadingAll.value = true;
+                const loadAll = async () => {
+                    loading.value = true;
                     error.value = false;
-                    fullArticles.value = [];
                     try {
-                        // 1. جلب قائمة المقالات أولاً
                         const res = await fetch('/api/articles');
-                        if (!res.ok) throw new Error();
-                        const basicArticles = await res.json();
+                        const basic = await res.json();
                         
-                        if (basicArticles.length === 0) {
-                            error.value = true;
-                            loadingAll.value = false;
-                            return;
-                        }
-
-                        // 2. جلب محتوى كل مقالة ديناميكياً
-                        // نستخدم Promise.all لضمان جلب النصوص كلها بالتوازي لسرعة التحميل
-                        const articlesWithContent = await Promise.all(basicArticles.map(async (art) => {
-                            const content = await fetchArticleContent(art.id);
-                            return {
-                                ...art,
-                                content: content,
-                                imageError: false // حالة خاصة للصورة لكل مقال
-                            };
+                        const detailed = await Promise.all(basic.map(async (art) => {
+                            const cRes = await fetch(`/api/content/${art.id}`);
+                            const cData = await cRes.json();
+                            return { ...art, content: cData.content };
                         }));
-
-                        fullArticles.value = articlesWithContent;
-
+                        
+                        fullArticles.value = detailed;
                     } catch (e) {
-                        console.error("Archive fetch error:", e);
                         error.value = true;
                     } finally {
-                        loadingAll.value = false;
+                        loading.value = false;
                     }
                 };
 
-                onMounted(fetchAllArticlesData);
-                
-                return { 
-                    fullArticles,
-                    loadingAll,
-                    error,
-                    fetchAllArticlesData
-                };
+                onMounted(loadAll);
+                return { fullArticles, loading, error, loadAll };
             }
         }).mount('#app');
     </script>
