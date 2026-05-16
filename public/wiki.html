@@ -3,103 +3,277 @@
 <head>
     <meta charset="UTF-8">
     <title>أرشيف مالينز المركزي</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&family=JetBrains+Mono&family=IBM+Plex+Sans+Arabic:wght@300;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&family=IBM+Plex+Sans+Arabic:wght@300;500&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 
-<!-- Open Graph / WhatsApp / Facebook -->
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://malines.ivanova.sbs/wiki.html" />
-<meta property="og:title" content=Archive | Malines Community" />
-<meta property="og:description" content="مرحبا في ارشيف مجتمع مالينز" />
-<meta property="og:image" content="https://malines.ivanova.sbs/sex-con.png" />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="630" />
-<meta property="og:locale" content="ar_MA" />
-<meta property="og:site_name" content="Archive | Malines Community" />
+    <!-- Open Graph / WhatsApp / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://malines.ivanova.sbs/wiki.html" />
+    <meta property="og:title" content="Archive | Malines Community" />
+    <meta property="og:description" content="مرحبا في ارشيف مجتمع مالينز" />
+    <meta property="og:image" content="https://malines.ivanova.sbs/sex-con.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="ar_MA" />
+    <meta property="og:site_name" content="Archive | Malines Community" />
 
-<!-- Twitter / X -->
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:url" content="https://malines.ivanova.sbs/wiki.html" />
-<meta name="twitter:title" content="Archive | Malines Community" />
-<meta name="twitter:description" content="مرحبا في ارشيف مجتمع مالينز!" />
-<meta name="twitter:image" content="https://malines.ivanova.sbs/sex-con.png" />
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://malines.ivanova.sbs/wiki.html" />
+    <meta name="twitter:title" content="Archive | Malines Community" />
+    <meta name="twitter:description" content="مرحبا في ارشيف مجتمع مالينز!" />
+    <meta name="twitter:image" content="https://malines.ivanova.sbs/sex-con.png" />
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --accent: #7f1d1d; }
-        body { background: #050505; color: #d4d4d4; font-family: 'Cairo', sans-serif; }
-        .article-card { border-bottom: 1px solid #1a1a1a; padding: 60px 0; }
-        .document-text { 
-            font-family: 'IBM Plex Sans Arabic', sans-serif; 
-            white-space: pre-wrap; 
-            background: #0a0a0a; 
-            padding: 30px; 
-            border-right: 4px solid var(--accent);
-            line-height: 2;
-            font-size: 1rem;
-            color: #bcbcbc;
+        :root {
+            --bg: #0d0d0d;
+            --sidebar-bg: #121212;
+            --text: #d0d0d0;
+            --link: #6ea8dc;
+            --border: #2a2a2a;
+            --accent: #b8860b; /* ذهبي داكن */
         }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+            margin: 0;
+        }
+        .wiki-body {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            border-left: 1px solid var(--border);
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        .main-content {
+            flex: 1;
+            padding: 40px 60px;
+            max-width: 900px;
+        }
+        .article-title {
+            font-family: 'Amiri', serif;
+            font-weight: 700;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            color: #f0f0f0;
+        }
+        .document-text {
+            font-family: 'Amiri', serif;
+            line-height: 2.2;
+            font-size: 1.15rem;
+            color: #c0c0c0;
+            white-space: pre-wrap;
+            background: rgba(255,255,255,0.02);
+            padding: 20px;
+            border-radius: 8px;
+            border-right: 3px solid var(--accent);
+        }
+        .sidebar-link {
+            display: block;
+            padding: 8px 12px;
+            margin: 4px 0;
+            border-radius: 6px;
+            color: #aaa;
+            text-decoration: none;
+            transition: 0.2s;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            background: #1e1e1e;
+            color: #fff;
+            border-right: 3px solid var(--accent);
+        }
+        .search-input {
+            width: 100%;
+            padding: 8px 12px;
+            background: #1a1a1a;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: #ddd;
+            margin-bottom: 20px;
+            font-family: inherit;
+        }
+        .image-container img {
+            max-width: 100%;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            filter: grayscale(0.3);
+            transition: 0.5s;
+        }
+        .image-container img:hover {
+            filter: grayscale(0);
+        }
+        .placeholder-message {
+            font-style: italic;
+            color: #888;
+        }
+        /* شريط التمرير مخصص */
+        .sidebar::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-track { background: #0a0a0a; }
+        .sidebar::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
     </style>
 </head>
 <body>
-    <div id="app" class="max-w-4xl mx-auto px-6 py-10">
-        
-        <header class="mb-20 border-b border-white/5 pb-6">
-            <h1 class="text-white font-black text-3xl uppercase tracking-tighter">Malines Wiki Archive</h1>
-        </header>
+    <div id="app">
+        <div class="wiki-body">
+            <!-- الشريط الجانبي -->
+            <aside class="sidebar">
+                <div style="font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 1.3rem; color: #ddd; margin-bottom: 25px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+                    📜 الأرشيف
+                </div>
+                <input 
+                    type="text" 
+                    v-model="searchQuery" 
+                    placeholder="ابحث عن مقال..." 
+                    class="search-input"
+                />
+                <nav>
+                    <div 
+                        v-for="art in filteredArticles" 
+                        :key="art.id"
+                        :class="['sidebar-link', { active: activeId === art.id }]"
+                        @click="selectArticle(art.id)"
+                    >
+                        {{ art.title }}
+                    </div>
+                    <div v-if="filteredArticles.length === 0" style="color: #555; padding: 10px;">
+                        لا توجد نتائج
+                    </div>
+                </nav>
+            </aside>
 
-        <div v-for="art in articles" :key="art.id" class="article-card">
-            <h2 class="text-5xl font-black text-white mb-8 uppercase tracking-tighter">{{ art.title }}</h2>
+            <!-- المحتوى الرئيسي -->
+            <main class="main-content">
+                <!-- إذا لم يتم اختيار مقال بعد -->
+                <div v-if="!activeArticle" style="text-align: center; margin-top: 100px;">
+                    <h2 style="font-family: 'Amiri', serif; font-size: 2.5rem; color: #555;">مرحباً بك في الأرشيف</h2>
+                    <p class="placeholder-message">اختر مقالاً من القائمة الجانبية للبدء</p>
+                </div>
 
-            <div class="mb-10 bg-black p-1 border border-white/5">
-                <img :src="'/PNG/' + art.id + '.png'" 
-                     @error="(e) => e.target.style.display='none'"
-                     class="w-full grayscale hover:grayscale-0 transition duration-700">
-            </div>
-            
-            <pre v-if="art.content" class="document-text">{{ art.content }}</pre>
-            <div v-else class="text-[10px] text-red-900 animate-pulse tracking-[0.2em] font-mono">RETRIEVING DATA...</div>
+                <!-- المقال النشط -->
+                <div v-else>
+                    <h1 class="article-title" style="font-size: 2.4rem;">{{ activeArticle.title }}</h1>
+
+                    <!-- الصورة -->
+                    <div class="image-container" style="margin-bottom: 30px;">
+                        <img 
+                            :src="'/PNG/' + activeArticle.id + '.png'" 
+                            @error="(e) => e.target.style.display='none'"
+                            :alt="activeArticle.title"
+                            loading="lazy"
+                        />
+                        <div v-if="imageFailed" style="color: #444; font-size: 0.8rem; margin-top: 5px;">(لا توجد صورة)</div>
+                    </div>
+
+                    <!-- المحتوى النصي -->
+                    <div v-if="activeArticle.content" class="document-text">
+                        {{ activeArticle.content }}
+                    </div>
+                    <div v-else-if="loadingContent" class="placeholder-message" style="padding: 30px; text-align: center;">
+                        ⏳ جارٍ تحميل الوثيقة...
+                    </div>
+                    <div v-else class="placeholder-message" style="padding: 30px; text-align: center; color: #aa0000;">
+                        ⚠️ تعذر تحميل المحتوى لهذا المقال.
+                    </div>
+                </div>
+            </main>
         </div>
-
     </div>
 
     <script>
-        const { createApp, ref, onMounted } = Vue;
+        const { createApp, ref, computed, onMounted } = Vue;
 
         createApp({
             setup() {
-                
-                // ==========================================================
-                // 📂 [منطقة النشر] - أضف ملفاتك الجديدة هنا فقط!
-                // ==========================================================
+                // ============ قاعدة المقالات (أضف هنا) ============
                 const articles = ref([
                     { id: '11001', title: 'معاهدة جين ستي', content: null },
                     { id: '11002', title: 'الحرب الهولندية اليابانية الألمانية : اغسطس 1906 - مارس 1907', content: null },
                     { id: '11003', title: 'الحرب الهولندية اليابانية الألمانية : اغسطس 1907 - مارس 1908', content: null },
-                    
-                    // لنشر مقال جديد، انسخ السطر التالي وضعه فوق هذا التعليق:
-                    // { id: 'اسم_الملف', title: 'عنوان المقال المكتوب', content: null },
+                    // أضف مقالات جديدة بنفس الصيغة:
+                    // { id: 'رقم_الملف', title: 'العنوان', content: null },
                 ]);
-                // ==========================================================
+                // ===============================================
 
+                const activeId = ref(null);
+                const searchQuery = ref('');
+                const loadingContent = ref(false);
 
-                // ⚙️ [دالة النشر التلقائي] - لا تلمس هذا الجزء
-                const autoPublish = async () => {
-                    for (let article of articles.value) {
+                // تصفية المقالات حسب البحث
+                const filteredArticles = computed(() => {
+                    const q = searchQuery.value.trim().toLowerCase();
+                    if (!q) return articles.value;
+                    return articles.value.filter(art => 
+                        art.title.toLowerCase().includes(q)
+                    );
+                });
+
+                // المقال النشط
+                const activeArticle = computed(() => {
+                    return articles.value.find(a => a.id === activeId.value) || null;
+                });
+
+                // تحميل المحتوى لجميع المقالات مرة واحدة
+                const loadAllContents = async () => {
+                    const promises = articles.value.map(async (article) => {
                         try {
                             const res = await fetch(`/TXT/${article.id}.txt`);
                             if (res.ok) {
                                 article.content = await res.text();
+                            } else {
+                                article.content = ''; // للإشارة إلى الفشل
                             }
                         } catch (e) {
-                            console.error("فشل جلب الوثيقة: " + article.id);
+                            article.content = ''; // فشل الشبكة
                         }
+                    });
+                    await Promise.allSettled(promises);
+                };
+
+                // اختيار مقال
+                const selectArticle = (id) => {
+                    activeId.value = id;
+                    // إذا كان المحتوى لم يحمّل بعد (نادر بعد التحميل المسبق)، أظهر التحميل
+                    const art = articles.value.find(a => a.id === id);
+                    if (art && art.content === null) {
+                        loadingContent.value = true;
+                        // محاولة تحميله الآن (قد لا يحدث لأننا حملنا الكل مسبقًا)
+                        fetch(`/TXT/${id}.txt`)
+                            .then(res => res.ok ? res.text() : '')
+                            .then(text => {
+                                art.content = text;
+                                loadingContent.value = false;
+                            })
+                            .catch(() => {
+                                art.content = '';
+                                loadingContent.value = false;
+                            });
                     }
                 };
 
-                onMounted(autoPublish);
+                onMounted(loadAllContents);
 
-                return { articles };
+                return {
+                    articles,
+                    activeId,
+                    searchQuery,
+                    filteredArticles,
+                    activeArticle,
+                    loadingContent,
+                    selectArticle,
+                };
             }
         }).mount('#app');
     </script>
