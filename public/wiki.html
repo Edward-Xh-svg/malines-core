@@ -177,6 +177,15 @@
         .sidebar::-webkit-scrollbar { width: 6px; }
         .sidebar::-webkit-scrollbar-track { background: #0a0a0a; }
         .sidebar::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        .warning-box {
+            background: #332200;
+            border: 1px solid #b8860b;
+            color: #ffd966;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -213,6 +222,9 @@
                 <div v-if="!activeArticle" style="text-align: center; margin-top: 100px;">
                     <h2 style="font-family: 'Amiri', serif; font-size: 2.5rem; color: #555;">مرحباً بك في الأرشيف</h2>
                     <p class="placeholder-message">اختر مقالاً من القائمة الجانبية للبدء</p>
+                    <div v-if="voicesWarning" class="warning-box">
+                        ⚠️ لم يتم العثور على أصوات عربية. قد لا يعمل الاستماع. تأكد من تثبيت حزمة صوت عربي في نظام التشغيل.
+                    </div>
                 </div>
 
                 <div v-else>
@@ -227,6 +239,10 @@
                             {{ isSpeaking ? '🔊' : '🔈' }}
                         </button>
                     </h1>
+
+                    <div v-if="voicesWarning" class="warning-box">
+                        ⚠️ لم يتم العثور على أصوات عربية. قد لا يعمل الاستماع. تأكد من تثبيت حزمة صوت عربي في نظام التشغيل.
+                    </div>
 
                     <div class="image-container" style="margin-bottom: 30px;">
                         <img 
@@ -274,8 +290,10 @@
                 const isSpeaking = ref(false);
                 const currentTokenIndex = ref(-1);
                 const tokens = ref([]);
+                const voicesWarning = ref(false);
                 const speechSynth = window.speechSynthesis;
                 let utterance = null;
+                let voices = [];
 
                 const filteredArticles = computed(() => {
                     const q = searchQuery.value.trim().toLowerCase();
@@ -324,15 +342,12 @@
                     }
                 };
 
-                // تقسيم النص إلى كلمات مع الحفاظ على الفراغات
                 const tokenize = (text) => {
                     if (!text) return [];
-                    // تقسيم يحافظ على المسافات والأسطر كعناصر منفصلة
                     const parts = text.split(/(\s+)/);
                     return parts.map(p => ({ text: p, isSpace: /^\s+$/.test(p) }));
                 };
 
-                // تحديث tokens عند تغير المقال النشط أو محتواه
                 watch([activeArticle, () => activeArticle.value?.content], () => {
                     if (activeArticle.value && activeArticle.value.content) {
                         tokens.value = tokenize(activeArticle.value.content);
@@ -342,32 +357,71 @@
                     currentTokenIndex.value = -1;
                 }, { immediate: true });
 
+                // تحميل الأصوات (قد تتطلب الانتظار حتى التغيير)
+                const loadVoices = () => {
+                    return new Promise((resolve) => {
+                        const v = speechSynth.getVoices();
+                        if (v.length) {
+                            voices = v;
+                            resolve();
+                            return;
+                        }
+                        speechSynth.onvoiceschanged = () => {
+                            voices = speechSynth.getVoices();
+                            resolve();
+                        };
+                        // أحياناً لا يتم تشغيل الحدث، ننتظر 500 مللي ثانية كحد أقصى
+                        setTimeout(() => {
+                            voices = speechSynth.getVoices();
+                            resolve();
+                        }, 500);
+                    });
+                };
+
+                const findArabicVoice = () => {
+                    return voices.find(v => v.lang.startsWith('ar')) || null;
+                };
+
                 const stopSpeech = () => {
                     speechSynth.cancel();
                     isSpeaking.value = false;
                     currentTokenIndex.value = -1;
                 };
 
-                const toggleSpeech = () => {
+                const toggleSpeech = async () => {
                     if (isSpeaking.value) {
                         stopSpeech();
                         return;
                     }
                     if (!activeArticle.value || !activeArticle.value.content) return;
 
-                    // إيقاف أي كلام حالي
+                    // تأكد من تحميل الأصوات
+                    if (!voices.length) {
+                        await loadVoices();
+                    }
+
+                    const arabicVoice = findArabicVoice();
+                    if (!arabicVoice) {
+                        voicesWarning.value = true;
+                        // لكن نسمح بالمحاولة بصوت افتراضي
+                    } else {
+                        voicesWarning.value = false;
+                    }
+
+                    // إلغاء أي نطق سابق
                     speechSynth.cancel();
 
                     const text = activeArticle.value.content;
                     utterance = new SpeechSynthesisUtterance(text);
-                    utterance.lang = 'ar-SA'; // العربية
+                    utterance.lang = 'ar-SA';
                     utterance.rate = 0.9;
                     utterance.pitch = 1;
+                    if (arabicVoice) {
+                        utterance.voice = arabicVoice;
+                    }
 
-                    // تتبع الحدود لتحديث المؤشر
                     utterance.onboundary = (event) => {
                         if (event.charIndex !== undefined) {
-                            // البحث عن token الذي يغطي هذا الموضع
                             let charCount = 0;
                             for (let i = 0; i < tokens.value.length; i++) {
                                 const t = tokens.value[i];
@@ -386,16 +440,24 @@
                         currentTokenIndex.value = -1;
                     };
 
-                    utterance.onerror = () => {
+                    utterance.onerror = (e) => {
+                        console.error('Speech error:', e);
                         isSpeaking.value = false;
                         currentTokenIndex.value = -1;
+                        alert('حدث خطأ أثناء محاولة النطق. تأكد من أن المتصفح يدعم خاصية تحويل النص إلى كلام.');
                     };
 
                     speechSynth.speak(utterance);
                     isSpeaking.value = true;
                 };
 
-                onMounted(loadAllContents);
+                onMounted(async () => {
+                    await loadVoices();
+                    if (!findArabicVoice()) {
+                        voicesWarning.value = true;
+                    }
+                    loadAllContents();
+                });
 
                 return {
                     articles,
@@ -407,6 +469,7 @@
                     isSpeaking,
                     currentTokenIndex,
                     tokens,
+                    voicesWarning,
                     toggleSpeech,
                     selectArticle,
                 };
