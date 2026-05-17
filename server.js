@@ -1,36 +1,57 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
 const app = express();
 
-// إخبار إكسبريس بمكان الملفات العامة
+app.use(express.json());
+
+// خدمة الملفات الثابتة من public
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/api/articles', (req, res) => {
-    try {
-        // استخدام __dirname لضمان الإشارة إلى مجلد المشروع الصحيح في Vercel
-        const txtPath = path.join(__dirname, 'public', 'TXT');
-        
-        console.log("Checking path:", txtPath); // للسجلات في Vercel
+// نقطة نهاية DeepSeek
+app.post('/api/deepseek', async (req, res) => {
+    const { messages } = req.body;
 
-        if (fs.existsSync(txtPath)) {
-            const files = fs.readdirSync(txtPath);
-            const articles = files
-                .filter(f => f.endsWith('.txt'))
-                .map(f => ({
-                    id: f.replace('.txt', ''),
-                    title: f.replace('.txt', '').replace(/-/g, ' ')
-                }));
-            return res.json(articles);
-        } else {
-            // إذا لم يجد المجلد، يرسل تنبيه في السجلات
-            console.error("Directory TXT not found at:", txtPath);
-            return res.json([]);
-        }
-    } catch (e) {
-        console.error("Server Error:", e);
-        res.status(500).json({ error: "Internal Server Error" });
+    if (!messages || !Array.isArray(messages)) {
+        return res.status(400).json({ error: 'يجب توفير مصفوفة messages' });
     }
+
+    const apiKey = process.env.DEEPSEEK_API_KEY;
+    if (!apiKey) {
+        return res.status(500).json({ error: 'مفتاح API غير مضبوط' });
+    }
+
+    try {
+        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                model: 'deepseek-chat',
+                messages: [
+                    {
+                        role: 'system',
+                        content: 'أنت Malines Hostaka - ChatBot Economy. مهمتك حساب دخل شركات لعبة Malines بشكل واقعي صارم مع هوامش دقيقة. أجب بالعربية.'
+                    },
+                    ...messages
+                ],
+                temperature: 0.7,
+                max_tokens: 2000
+            })
+        });
+
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error('خطأ في الاتصال بـ DeepSeek:', error);
+        res.status(500).json({ error: 'فشل الاتصال بخدمة الذكاء الاصطناعي' });
+    }
+});
+
+// أي مسار غير معروف → index.html
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 module.exports = app;
