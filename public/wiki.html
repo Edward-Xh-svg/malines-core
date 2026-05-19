@@ -32,7 +32,7 @@
             --text: #d0d0d0;
             --link: #6ea8dc;
             --border: #2a2a2a;
-            --accent: #b8860b; /* ذهبي داكن */
+            --accent: #b8860b;
         }
         body {
             background: var(--bg);
@@ -119,7 +119,6 @@
             font-style: italic;
             color: #888;
         }
-        /* شريط التمرير مخصص */
         .sidebar::-webkit-scrollbar { width: 6px; }
         .sidebar::-webkit-scrollbar-track { background: #0a0a0a; }
         .sidebar::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
@@ -128,7 +127,6 @@
 <body>
     <div id="app">
         <div class="wiki-body">
-            <!-- الشريط الجانبي -->
             <aside class="sidebar">
                 <div style="font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 1.3rem; color: #ddd; margin-bottom: 25px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
                     📜 الأرشيف
@@ -154,19 +152,15 @@
                 </nav>
             </aside>
 
-            <!-- المحتوى الرئيسي -->
             <main class="main-content">
-                <!-- إذا لم يتم اختيار مقال بعد -->
                 <div v-if="!activeArticle" style="text-align: center; margin-top: 100px;">
                     <h2 style="font-family: 'Amiri', serif; font-size: 2.5rem; color: #555;">مرحباً بك في الأرشيف</h2>
                     <p class="placeholder-message">اختر مقالاً من القائمة الجانبية للبدء</p>
                 </div>
 
-                <!-- المقال النشط -->
                 <div v-else>
                     <h1 class="article-title" style="font-size: 2.4rem;">{{ activeArticle.title }}</h1>
 
-                    <!-- الصورة -->
                     <div class="image-container" style="margin-bottom: 30px;">
                         <img 
                             :src="'/PNG/' + activeArticle.id + '.png'" 
@@ -177,7 +171,6 @@
                         <div v-if="imageFailed" style="color: #444; font-size: 0.8rem; margin-top: 5px;">(لا توجد صورة)</div>
                     </div>
 
-                    <!-- المحتوى النصي -->
                     <div v-if="activeArticle.content" class="document-text">
                         {{ activeArticle.content }}
                     </div>
@@ -197,8 +190,7 @@
 
         createApp({
             setup() {
-
-    <!-- The center of wiki -->
+                // ========== The center of wiki ==========
                 const articles = ref([
                     { id: '11001', title: 'معاهدة جين ستي', content: null },
                     { id: '11002', title: 'الحرب الهولندية اليابانية الألمانية : اغسطس 1906 - مارس 1907', content: null },
@@ -210,14 +202,13 @@
                     { id: '11020', title: 'الحرب الكبرى : مايو 1915 – اغسطس 1915 ', content: null },
                     { id: '11021', title: 'الحرب الكبرى : ابريل 1916 - اغسطس 1916', content: null },
                     { id: '11022', title: 'الحرب الكبرى : اغسطس 1916 - اكتوبر 1916', content: null },
-                    
-    <!-- The Fin of the center of wiki -->
+                ]);
+                // ========== The Fin of the center of wiki ==========
 
                 const activeId = ref(null);
                 const searchQuery = ref('');
                 const loadingContent = ref(false);
 
-                // تصفية المقالات حسب البحث
                 const filteredArticles = computed(() => {
                     const q = searchQuery.value.trim().toLowerCase();
                     if (!q) return articles.value;
@@ -226,12 +217,10 @@
                     );
                 });
 
-                // المقال النشط
                 const activeArticle = computed(() => {
                     return articles.value.find(a => a.id === activeId.value) || null;
                 });
 
-                // تحميل المحتوى لجميع المقالات مرة واحدة
                 const loadAllContents = async () => {
                     const promises = articles.value.map(async (article) => {
                         try {
@@ -239,23 +228,20 @@
                             if (res.ok) {
                                 article.content = await res.text();
                             } else {
-                                article.content = ''; // للإشارة إلى الفشل
+                                article.content = '';
                             }
                         } catch (e) {
-                            article.content = ''; // فشل الشبكة
+                            article.content = '';
                         }
                     });
                     await Promise.allSettled(promises);
                 };
 
-                // اختيار مقال
                 const selectArticle = (id) => {
                     activeId.value = id;
-                    // إذا كان المحتوى لم يحمّل بعد (نادر بعد التحميل المسبق)، أظهر التحميل
                     const art = articles.value.find(a => a.id === id);
                     if (art && art.content === null) {
                         loadingContent.value = true;
-                        // محاولة تحميله الآن (قد لا يحدث لأننا حملنا الكل مسبقًا)
                         fetch(`/TXT/${id}.txt`)
                             .then(res => res.ok ? res.text() : '')
                             .then(text => {
