@@ -4,17 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>أرشيف مالينز | الصفحة الرئيسية</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bg: '#0d0d0d',
+                        surface: '#121212',
+                        border: '#2a2a2a',
+                        accent: '#b8860b',
+                        'accent-hover': '#d4a017',
+                        text: '#d0d0d0',
+                        'text-muted': '#888888',
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                        amiri: ['Amiri', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         :root {
             --bg: #0d0d0d;
             --surface: #121212;
             --border: #2a2a2a;
             --accent: #b8860b;
+            --accent-hover: #d4a017;
             --text: #d0d0d0;
+            --text-muted: #888888;
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             background: var(--bg);
             color: var(--text);
@@ -27,7 +54,8 @@
             position: relative;
             overflow-x: hidden;
         }
-        /* زخرفة خلفية بشكل دوائر متقاطعة */
+
+        /* Background radial gradient */
         body::before {
             content: '';
             position: absolute;
@@ -35,34 +63,53 @@
             right: -50%;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at 30% 40%, rgba(184,134,11,0.05) 0%, transparent 50%);
+            background: radial-gradient(circle at 30% 40%, rgba(184,134,11,0.04) 0%, transparent 50%);
             pointer-events: none;
         }
+
+        body::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -30%;
+            width: 60%;
+            height: 60%;
+            background: radial-gradient(circle at 70% 60%, rgba(184,134,11,0.03) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
         .container {
             width: 100%;
-            max-width: 700px;
+            max-width: 720px;
             text-align: center;
             z-index: 2;
+            position: relative;
         }
+
         .logo {
             font-family: 'Amiri', serif;
             font-size: 3.5rem;
             font-weight: 700;
-            color: #fff;
+            color: #ffffff;
             letter-spacing: -1px;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
             line-height: 1.2;
         }
+
         .logo span {
             color: var(--accent);
         }
+
         .subtitle {
-            font-size: 1.2rem;
-            color: #999;
+            font-size: 1.15rem;
+            color: var(--text-muted);
             margin-bottom: 2.5rem;
             font-weight: 300;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
         }
+
+        /* Search box */
         .search-box {
             display: flex;
             gap: 10px;
@@ -70,13 +117,15 @@
             border: 1px solid var(--border);
             border-radius: 50px;
             padding: 6px 6px 6px 20px;
-            transition: 0.3s;
+            transition: all 0.3s ease;
             margin-bottom: 2rem;
         }
+
         .search-box:focus-within {
             border-color: var(--accent);
-            box-shadow: 0 0 15px rgba(184,134,11,0.15);
+            box-shadow: 0 0 20px rgba(184,134,11,0.12);
         }
+
         .search-box input {
             flex: 1;
             background: transparent;
@@ -87,96 +136,169 @@
             outline: none;
             padding: 10px 0;
         }
+
+        .search-box input::placeholder {
+            color: #555;
+        }
+
         .search-box button {
             background: var(--accent);
             border: none;
             color: #000;
-            font-weight: bold;
+            font-weight: 700;
             font-family: 'Cairo', sans-serif;
             border-radius: 40px;
-            padding: 10px 30px;
+            padding: 10px 32px;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s ease;
             white-space: nowrap;
+            font-size: 0.95rem;
         }
+
         .search-box button:hover {
-            background: #d4a017;
+            background: var(--accent-hover);
+            box-shadow: 0 4px 15px rgba(184,134,11,0.3);
         }
+
+        /* Quick links */
         .quick-links {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 24px;
             flex-wrap: wrap;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             font-size: 0.9rem;
         }
+
         .quick-links a {
-            color: #aaa;
+            color: #777;
             text-decoration: none;
             border-bottom: 1px solid transparent;
-            transition: 0.2s;
+            transition: all 0.25s ease;
             padding: 4px 8px;
+            position: relative;
         }
+
+        .quick-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
         .quick-links a:hover {
             color: #fff;
-            border-bottom-color: var(--accent);
         }
+
+        .quick-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Archive button */
         .archive-btn {
             display: inline-block;
-            padding: 12px 40px;
+            padding: 14px 48px;
             border: 1px solid var(--accent);
             color: #fff;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 3px;
             font-size: 0.8rem;
             border-radius: 4px;
-            transition: all 0.4s;
+            transition: all 0.4s ease;
             background: rgba(184,134,11,0.05);
-            margin-top: 1rem;
+            margin-top: 0.5rem;
+            position: relative;
+            overflow: hidden;
         }
+
+        .archive-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
         .archive-btn:hover {
             background: var(--accent);
             color: #000;
-            box-shadow: 0 0 20px var(--accent);
+            box-shadow: 0 0 25px rgba(184,134,11,0.25);
         }
+
+        .archive-btn:hover::before {
+            left: 100%;
+        }
+
+        /* Footer */
         .footer-note {
-            margin-top: 3rem;
-            font-size: 0.7rem;
+            margin-top: 4rem;
+            font-size: 0.65rem;
             color: #444;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             text-transform: uppercase;
         }
-        /* تأثير خط المسح الاختياري */
+
+        /* Scanline effect */
         .scanline {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 2px;
-            background: rgba(184,134,11,0.08);
+            height: 1px;
+            background: rgba(184,134,11,0.06);
             pointer-events: none;
-            animation: scan 6s linear infinite;
+            animation: scan 8s linear infinite;
             z-index: 1;
         }
+
         @keyframes scan {
             0% { top: 0; }
             100% { top: 100%; }
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .logo { font-size: 2.5rem; }
+            .subtitle { font-size: 0.95rem; letter-spacing: 2px; }
+            .search-box { padding: 4px 4px 4px 16px; }
+            .search-box button { padding: 8px 20px; font-size: 0.85rem; }
+            .quick-links { gap: 12px; }
+            .archive-btn { padding: 12px 32px; }
+        }
+
+        /* Subtle grain texture overlay */
+        .grain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
         }
     </style>
 </head>
 <body>
     <div class="scanline"></div>
+    <div class="grain"></div>
 
     <div class="container">
-        <!-- شعار ويكيبيدي مُخصص -->
         <div class="logo">
             أرشيف <span>مالينز</span>
         </div>
         <div class="subtitle">الموسوعة الحرة للوثائق والمخطوطات</div>
 
-        <!-- بحث سريع ينقلك إلى wiki.html مع استعلام -->
         <div class="search-box">
             <input 
                 type="text" 
@@ -187,26 +309,20 @@
             <button onclick="goSearch()">بحث</button>
         </div>
 
-        <!-- روابط سريعة لبعض المقالات (يمكنك تعديلها) -->
         <div class="quick-links">
             <a href="wiki.html?id=11001">معاهدة جين ستي</a>
             <a href="wiki.html?id=11002">الحرب 1906 - 1907</a>
             <a href="wiki.html?id=11003">الحرب 1907 - 1908</a>
         </div>
 
-        <!-- زر الدخول التقليدي -->
         <a href="wiki.html" class="archive-btn">دخول الأرشيف المركزي</a>
-        <a href="chat.html" class="btn-access" style="margin-right: 10px;">
-    ❦ المستشار الاقتصادي
-</a>
 
         <div class="footer-note">
-            اتصال آمن • موقع سري • جميع الحقوق محفوظة
+            اتصال آمن &middot; موقع سري &middot; جميع الحقوق محفوظة
         </div>
     </div>
 
     <script>
-        // دالة البحث: تنقلك إلى wiki.html مع وسيط بحث q
         function goSearch() {
             const query = document.getElementById('searchInput').value.trim();
             if (query) {
