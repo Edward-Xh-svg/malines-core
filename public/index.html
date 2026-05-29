@@ -3,27 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أرشيف مالينز | الصفحة الرئيسية</title>
+    <title>مجتمع مالينز | المنصة الرئيسية</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        bg: '#0d0d0d',
-                        surface: '#121212',
-                        border: '#2a2a2a',
-                        accent: '#b8860b',
-                        'accent-hover': '#d4a017',
-                        text: '#d0d0d0',
-                        'text-muted': '#888888',
+                        malines: {
+                            black: '#0a0a0a',
+                            dark: '#111111',
+                            card: '#161616',
+                            border: '#2a2a2a',
+                            text: '#e0e0e0',
+                            muted: '#888888',
+                            red: '#c0392b',
+                            'red-hover': '#e74c3c',
+                            accent: '#d4af37',
+                        }
                     },
                     fontFamily: {
                         cairo: ['Cairo', 'sans-serif'],
-                        amiri: ['Amiri', 'serif'],
                     }
                 }
             }
@@ -31,50 +34,28 @@
     </script>
     <style>
         :root {
-            --bg: #0d0d0d;
-            --surface: #121212;
+            --black: #0a0a0a;
+            --dark: #111111;
+            --card: #161616;
             --border: #2a2a2a;
-            --accent: #b8860b;
-            --accent-hover: #d4a017;
-            --text: #d0d0d0;
-            --text-muted: #888888;
+            --text: #e0e0e0;
+            --muted: #888888;
+            --red: #c0392b;
+            --red-hover: #e74c3c;
+            --accent: #d4af37;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background: var(--bg);
+            background: var(--black);
             color: var(--text);
             font-family: 'Cairo', sans-serif;
-            min-height: 100vh;
-            position: relative;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* خلفية زخرفية */
-        .bg-glow {
-            position: fixed;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 30% 40%, rgba(184,134,11,0.04) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .bg-glow2 {
-            position: fixed;
-            bottom: -30%;
-            left: -30%;
-            width: 60%;
-            height: 60%;
-            background: radial-gradient(circle at 70% 60%, rgba(184,134,11,0.03) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* الشريط العلوي */
+        /* ========== الشريط العلوي ========== */
         .topbar {
             position: fixed;
             top: 0;
@@ -82,94 +63,100 @@
             right: 0;
             height: 60px;
             background: rgba(10,10,10,0.85);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255,255,255,0.06);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 24px;
+            padding: 0 28px;
             z-index: 100;
         }
 
-        .topbar-brand {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #fff;
-            text-decoration: none;
-            letter-spacing: 0.5px;
-        }
-
-        .topbar-actions {
+        .topbar-left {
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
-        /* زر تسجيل الدخول */
+        .topbar-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .topbar-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
+            letter-spacing: 0.3px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
         .btn-login {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 7px;
             background: transparent;
-            border: 1px solid rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
             color: #ccc;
-            padding: 8px 18px;
-            border-radius: 30px;
+            padding: 7px 18px;
+            border-radius: 50px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-family: 'Cairo', sans-serif;
             transition: all 0.3s ease;
             white-space: nowrap;
         }
 
         .btn-login:hover {
-            border-color: var(--accent);
+            border-color: #fff;
             color: #fff;
-            background: rgba(184,134,11,0.08);
+            background: rgba(255,255,255,0.05);
         }
 
-        .btn-login svg {
-            flex-shrink: 0;
-        }
-
-        /* أيقونة المستخدم */
         .user-badge {
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
-            background: var(--accent);
+            background: #fff;
             color: #000;
             font-weight: 700;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            border: 2px solid rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
             transition: all 0.3s ease;
             position: relative;
         }
 
         .user-badge:hover {
-            transform: scale(1.08);
-            box-shadow: 0 0 20px rgba(184,134,11,0.3);
+            transform: scale(1.06);
+            box-shadow: 0 0 25px rgba(255,255,255,0.15);
         }
 
-        /* قائمة منسدلة للمستخدم */
         .user-dropdown {
             position: absolute;
-            top: 50px;
+            top: 48px;
             left: 0;
-            background: var(--surface);
+            background: var(--card);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 8px 0;
-            min-width: 160px;
+            border-radius: 10px;
+            padding: 6px 0;
+            min-width: 170px;
             opacity: 0;
             visibility: hidden;
-            transform: translateY(-5px);
+            transform: translateY(-6px);
             transition: all 0.25s ease;
+            z-index: 10;
         }
 
         .user-dropdown.show {
@@ -178,18 +165,26 @@
             transform: translateY(0);
         }
 
+        .user-dropdown .dropdown-name {
+            padding: 8px 16px;
+            color: var(--muted);
+            font-size: 0.8rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 4px;
+        }
+
         .user-dropdown button {
             display: block;
             width: 100%;
             text-align: right;
-            padding: 10px 16px;
+            padding: 9px 16px;
             background: none;
             border: none;
             color: #ccc;
             cursor: pointer;
             font-family: 'Cairo', sans-serif;
             font-size: 0.9rem;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
 
         .user-dropdown button:hover {
@@ -197,155 +192,237 @@
             color: #fff;
         }
 
-        /* المحتوى المركزي */
-        .main-container {
+        /* ========== Hero Section ========== */
+        .hero {
+            position: relative;
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 80px 24px 40px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .content-wrapper {
-            width: 100%;
-            max-width: 680px;
             text-align: center;
+            padding: 100px 24px 80px;
+            overflow: hidden;
         }
 
-        .logo {
-            font-family: 'Amiri', serif;
-            font-size: clamp(2.2rem, 5vw, 3.5rem);
-            font-weight: 700;
-            color: #ffffff;
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .hero-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.35;
+            filter: brightness(0.6) contrast(1.1);
+        }
+
+        .hero-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, transparent 30%, var(--black) 80%);
+        }
+
+        /* حلقات ضبابية مثل Grok */
+        .hero-rings {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.06);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .ring-1 {
+            width: 280px;
+            height: 280px;
+            animation: ringPulse 4s ease-in-out infinite;
+        }
+
+        .ring-2 {
+            width: 380px;
+            height: 380px;
+            border-color: rgba(255,255,255,0.04);
+            animation: ringPulse 4s ease-in-out 0.5s infinite;
+        }
+
+        .ring-3 {
+            width: 500px;
+            height: 500px;
+            border-color: rgba(255,255,255,0.02);
+            animation: ringPulse 4s ease-in-out 1s infinite;
+        }
+
+        @keyframes ringPulse {
+            0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(0.95); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.02); }
+        }
+
+        /* شعار Malines */
+        .hero-logo-container {
+            position: relative;
+            z-index: 2;
+            margin-bottom: 24px;
+        }
+
+        .hero-logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            position: relative;
+            z-index: 3;
+            box-shadow: 0 0 80px rgba(192,57,43,0.25), 0 0 150px rgba(192,57,43,0.1);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 900;
+            color: #fff;
             letter-spacing: -1px;
-            margin-bottom: 0.4rem;
+            margin-bottom: 12px;
             line-height: 1.2;
         }
 
-        .logo span { color: var(--accent); }
-
-        .subtitle {
-            font-size: clamp(0.85rem, 2vw, 1.1rem);
-            color: var(--text-muted);
-            margin-bottom: 2.2rem;
-            font-weight: 300;
-            letter-spacing: 3px;
-            text-transform: uppercase;
+        .hero-subtitle {
+            font-size: clamp(0.95rem, 2vw, 1.15rem);
+            color: var(--muted);
+            font-weight: 400;
+            letter-spacing: 1px;
+            margin-bottom: 32px;
         }
 
-        /* مربع البحث */
-        .search-wrapper {
-            display: flex;
-            gap: 10px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 50px;
-            padding: 5px 5px 5px 18px;
-            transition: all 0.3s ease;
-            margin-bottom: 1.8rem;
-        }
-
-        .search-wrapper:focus-within {
-            border-color: var(--accent);
-            box-shadow: 0 0 20px rgba(184,134,11,0.1);
-        }
-
-        .search-wrapper input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-size: 1rem;
-            font-family: 'Cairo', sans-serif;
-            outline: none;
-            padding: 10px 0;
-            min-width: 0;
-        }
-
-        .search-wrapper input::placeholder { color: #555; }
-
-        .search-wrapper button {
-            background: var(--accent);
-            border: none;
-            color: #000;
-            font-weight: 700;
-            font-family: 'Cairo', sans-serif;
-            border-radius: 40px;
-            padding: 10px 28px;
+        .hero-scroll {
+            position: absolute;
+            bottom: 30px;
+            z-index: 2;
+            animation: bounceDown 2s ease infinite;
+            color: var(--muted);
             cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-            font-size: 0.95rem;
         }
 
-        .search-wrapper button:hover {
-            background: var(--accent-hover);
-            box-shadow: 0 4px 15px rgba(184,134,11,0.3);
+        @keyframes bounceDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(8px); }
         }
 
-        /* روابط سريعة */
-        .quick-links {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-bottom: 2.2rem;
-            font-size: 0.9rem;
+        /* ========== قسم الخدمات ========== */
+        .services {
+            position: relative;
+            z-index: 2;
+            padding: 60px 24px 100px;
+            max-width: 1100px;
+            margin: 0 auto;
         }
 
-        .quick-links a {
-            color: #777;
-            text-decoration: none;
-            border-bottom: 1px solid transparent;
-            transition: all 0.25s ease;
-            padding: 4px 8px;
-        }
-
-        .quick-links a:hover {
-            color: #fff;
-            border-bottom-color: var(--accent);
-        }
-
-        /* أزرار الأرشيف */
-        .btn-archive {
-            display: inline-block;
-            padding: 14px 44px;
-            border: 1px solid var(--accent);
-            color: #fff;
-            text-decoration: none;
+        .services-title {
+            text-align: center;
+            font-size: clamp(1.5rem, 3vw, 2rem);
             font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            font-size: 0.8rem;
-            border-radius: 4px;
-            transition: all 0.4s ease;
-            background: rgba(184,134,11,0.05);
-            margin: 6px;
+            color: #fff;
+            margin-bottom: 8px;
         }
 
-        .btn-archive:hover {
-            background: var(--accent);
-            color: #000;
-            box-shadow: 0 0 25px rgba(184,134,11,0.25);
+        .services-subtitle {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.95rem;
+            margin-bottom: 40px;
         }
 
-        .footer-note {
-            margin-top: 3.5rem;
-            font-size: 0.65rem;
-            color: #444;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
         }
 
-        /* المودال */
+        .service-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px 24px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--red);
+            border-radius: 0 4px 4px 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .service-card:hover {
+            border-color: rgba(255,255,255,0.15);
+            background: #1a1a1a;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+
+        .service-card:hover::before {
+            opacity: 1;
+        }
+
+        .service-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(192,57,43,0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            color: var(--red);
+        }
+
+        .service-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .service-desc {
+            font-size: 0.9rem;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        /* ========== مودال تسجيل الدخول ========== */
         .modal-backdrop {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.75);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -362,9 +439,9 @@
         }
 
         .modal-box {
-            background: var(--surface);
+            background: var(--card);
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: 20px;
             padding: 32px 28px;
             width: 100%;
             max-width: 420px;
@@ -395,7 +472,6 @@
             font-size: 1.3rem;
             cursor: pointer;
             padding: 6px;
-            line-height: 1;
             transition: color 0.2s;
         }
 
@@ -416,9 +492,9 @@
         .form-group input {
             width: 100%;
             padding: 12px 14px;
-            background: #1a1a1a;
+            background: #1e1e1e;
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 10px;
             color: #fff;
             font-family: 'Cairo', sans-serif;
             font-size: 0.95rem;
@@ -427,13 +503,11 @@
 
         .form-group input:focus {
             outline: none;
-            border-color: var(--accent);
+            border-color: #fff;
         }
 
-        .form-group input::placeholder { color: #444; }
-
         .form-error {
-            color: #e74c3c;
+            color: var(--red-hover);
             font-size: 0.85rem;
             margin-bottom: 16px;
             display: none;
@@ -441,19 +515,17 @@
             gap: 6px;
         }
 
-        .form-error.show {
-            display: flex;
-        }
+        .form-error.show { display: flex; }
 
         .btn-submit {
             width: 100%;
             padding: 13px;
-            background: var(--accent);
+            background: #fff;
             border: none;
             color: #000;
             font-weight: 700;
             font-size: 1rem;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             font-family: 'Cairo', sans-serif;
             transition: all 0.3s ease;
@@ -461,46 +533,51 @@
         }
 
         .btn-submit:hover {
-            background: var(--accent-hover);
-            box-shadow: 0 4px 18px rgba(184,134,11,0.25);
+            background: #e0e0e0;
         }
 
         .btn-submit:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
         }
 
-        /* تحسينات الجوال */
+        /* ========== تذييل ========== */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #444;
+            font-size: 0.75rem;
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+
+        /* ========== تحسينات الجوال ========== */
         @media (max-width: 640px) {
-            .topbar {
-                padding: 0 16px;
-                height: 54px;
-            }
-            .topbar-brand { font-size: 1rem; }
-            .btn-login { padding: 7px 14px; font-size: 0.8rem; gap: 5px; }
+            .topbar { padding: 0 16px; height: 54px; }
+            .topbar-title { font-size: 1rem; }
             .btn-login span { display: none; }
-            .main-container { padding: 70px 16px 30px; }
-            .search-wrapper { padding: 4px 4px 4px 14px; }
-            .search-wrapper button { padding: 10px 20px; font-size: 0.85rem; }
-            .quick-links { gap: 12px; font-size: 0.8rem; }
-            .btn-archive { padding: 12px 30px; font-size: 0.7rem; letter-spacing: 2px; margin: 4px; }
+            .btn-login { padding: 7px 12px; }
+            .hero { padding: 80px 16px 60px; }
+            .hero-logo { width: 75px; height: 75px; }
+            .ring-1 { width: 180px; height: 180px; }
+            .ring-2 { width: 260px; height: 260px; }
+            .ring-3 { width: 350px; height: 350px; }
+            .services { padding: 40px 16px 60px; }
             .modal-box { padding: 24px 18px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- خلفيات -->
-    <div class="bg-glow"></div>
-    <div class="bg-glow2"></div>
-
-    <!-- الشريط العلوي -->
+    <!-- ==================== الشريط العلوي ==================== -->
     <header class="topbar">
-        <a href="/" class="topbar-brand">📦 أرشيف مالينز</a>
-        <div class="topbar-actions">
+        <div class="topbar-left">
+            <img src="malines-icon.png" alt="Malines" class="topbar-logo" onerror="this.style.display='none'">
+            <span class="topbar-title">مجتمع مالينز</span>
+        </div>
+        <div class="topbar-right">
             <!-- زر تسجيل الدخول -->
             <button id="btnLogin" class="btn-login" onclick="openModal()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"/></svg>
                 <span>تسجيل الدخول</span>
             </button>
 
@@ -508,38 +585,65 @@
             <div id="userBadge" class="user-badge" style="display: none;" onclick="toggleDropdown()">
                 <span id="userInitial"></span>
                 <div id="userDropdown" class="user-dropdown">
-                    <div style="padding: 8px 16px; color: #888; font-size: 0.8rem; border-bottom: 1px solid var(--border); margin-bottom: 4px;" id="dropdownUsername"></div>
+                    <div class="dropdown-name" id="dropdownUsername"></div>
                     <button onclick="handleLogout()">تسجيل الخروج</button>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- المحتوى الرئيسي -->
-    <div class="main-container">
-        <div class="content-wrapper">
-            <div class="logo">أرشيف <span>مالينز</span></div>
-            <div class="subtitle">الموسوعة الحرة للوثائق والمخطوطات</div>
-
-            <div class="search-wrapper">
-                <input type="text" id="searchInput" placeholder="ابحث عن معاهدة، حرب، وثيقة..." onkeypress="if(event.key==='Enter') doSearch()">
-                <button onclick="doSearch()">بحث</button>
-            </div>
-
-            <div class="quick-links">
-                <a href="wiki.html?id=11001">معاهدة جين ستي</a>
-                <a href="wiki.html?id=11002">الحرب 1906 - 1907</a>
-                <a href="wiki.html?id=11003">الحرب 1907 - 1908</a>
-            </div>
-
-            <a href="wiki.html" class="btn-archive">دخول الأرشيف المركزي</a>
-            <a href="chat.html" class="btn-archive" style="border-color:#c49b3f;">المستشار الاقتصادي</a>
-
-            <div class="footer-note">اتصال آمن &middot; موقع سري &middot; جميع الحقوق محفوظة</div>
+    <!-- ==================== Hero Section ==================== -->
+    <section class="hero" id="hero">
+        <div class="hero-bg">
+            <img src="malines-excon.png" alt="Malines Background" onerror="this.style.display='none'">
         </div>
-    </div>
 
-    <!-- مودال تسجيل الدخول -->
+        <!-- حلقات ضبابية -->
+        <div class="hero-rings">
+            <div class="ring ring-1"></div>
+            <div class="ring ring-2"></div>
+            <div class="ring ring-3"></div>
+        </div>
+
+        <!-- الشعار -->
+        <div class="hero-logo-container">
+            <img src="malines-icon.png" alt="Malines" class="hero-logo" onerror="this.style.display='none'">
+        </div>
+
+        <div class="hero-content">
+            <h1 class="hero-title">مرحباً بك في مجتمع مالينز</h1>
+            <p class="hero-subtitle">المنصة المتكاملة للتوثيق والأرشيف والمجتمع</p>
+        </div>
+
+        <!-- سهم التمرير -->
+        <div class="hero-scroll" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+    </section>
+
+    <!-- ==================== قسم الخدمات ==================== -->
+    <section class="services" id="services">
+        <h2 class="services-title">الخدمات</h2>
+        <p class="services-subtitle">اكتشف ما تقدمه منصة مجتمع مالينز</p>
+
+        <div class="services-grid">
+            <!-- خدمة الأرشيف (الويكي) -->
+            <a href="wiki.html" class="service-card">
+                <div class="service-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                </div>
+                <div class="service-name">أرشيف مالينز المركزي</div>
+                <div class="service-desc">الموسوعة الحرة للوثائق والمخطوطات. تصفح المعاهدات، الحروب، والعمليات التاريخية المؤرشفة.</div>
+            </a>
+        </div>
+    </section>
+
+    <!-- ==================== تذييل ==================== -->
+    <footer class="footer">
+        مجتمع مالينز &copy; 2026 &middot; جميع الحقوق محفوظة
+    </footer>
+
+    <!-- ==================== مودال تسجيل الدخول ==================== -->
     <div id="loginModal" class="modal-backdrop">
         <div class="modal-box">
             <button class="modal-close" onclick="closeModal()">✕</button>
@@ -565,7 +669,6 @@
         const STORAGE_KEY = 'malines_user';
         let dropdownVisible = false;
 
-        // ============ عناصر DOM ============
         const btnLogin = document.getElementById('btnLogin');
         const userBadge = document.getElementById('userBadge');
         const userInitial = document.getElementById('userInitial');
@@ -575,7 +678,7 @@
         const loginError = document.getElementById('loginError');
         const btnSubmit = document.getElementById('btnSubmit');
 
-        // ============ دوال المودال ============
+        // ============ المودال ============
         function openModal() {
             loginModal.classList.add('active');
             document.getElementById('emailInput').focus();
@@ -588,35 +691,24 @@
             loginModal.classList.remove('active');
         }
 
-        // إغلاق المودال عند النقر على الخلفية
         loginModal.addEventListener('click', function(e) {
             if (e.target === loginModal) closeModal();
         });
 
-        // إغلاق المودال عند Escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeModal();
         });
 
-        // ============ دوال تسجيل الدخول ============
+        // ============ تسجيل الدخول ============
         async function doLogin() {
             const email = document.getElementById('emailInput').value.trim();
             const password = document.getElementById('passInput').value;
 
-            // إخفاء الخطأ السابق
             loginError.classList.remove('show');
 
-            // تحقق من المدخلات
-            if (!email) {
-                showError('يرجى إدخال البريد الإلكتروني');
-                return;
-            }
-            if (!password) {
-                showError('يرجى إدخال كلمة المرور');
-                return;
-            }
+            if (!email) { showError('يرجى إدخال البريد الإلكتروني'); return; }
+            if (!password) { showError('يرجى إدخال كلمة المرور'); return; }
 
-            // تعطيل الزر أثناء الطلب
             btnSubmit.disabled = true;
             btnSubmit.textContent = 'جارٍ التحقق...';
 
@@ -630,14 +722,13 @@
                 const data = await response.json();
 
                 if (response.ok && data.success) {
-                    // تسجيل دخول ناجح
                     setLoggedInUser(data.username);
                     closeModal();
                 } else {
                     showError(data.error || 'فشل تسجيل الدخول');
                 }
             } catch (err) {
-                showError('تعذر الاتصال بالخادم. حاول مرة أخرى.');
+                showError('تعذر الاتصال بالخادم');
             } finally {
                 btnSubmit.disabled = false;
                 btnSubmit.textContent = 'دخول';
@@ -649,7 +740,7 @@
             loginError.classList.add('show');
         }
 
-        // ============ دوال المستخدم ============
+        // ============ المستخدم ============
         function setLoggedInUser(username) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify({ username }));
             updateUI(username);
@@ -676,14 +767,9 @@
 
         function toggleDropdown() {
             dropdownVisible = !dropdownVisible;
-            if (dropdownVisible) {
-                userDropdown.classList.add('show');
-            } else {
-                userDropdown.classList.remove('show');
-            }
+            userDropdown.classList.toggle('show', dropdownVisible);
         }
 
-        // إغلاق القائمة عند النقر خارجها
         document.addEventListener('click', function(e) {
             if (!userBadge.contains(e.target)) {
                 userDropdown.classList.remove('show');
@@ -691,28 +777,14 @@
             }
         });
 
-        // ============ دالة البحث ============
-        function doSearch() {
-            const query = document.getElementById('searchInput').value.trim();
-            if (query) {
-                window.location.href = `wiki.html?q=${encodeURIComponent(query)}`;
-            } else {
-                window.location.href = 'wiki.html';
-            }
-        }
-
-        // ============ التهيئة عند التحميل ============
+        // ============ التهيئة ============
         (function init() {
             const stored = localStorage.getItem(STORAGE_KEY);
             if (stored) {
                 try {
                     const user = JSON.parse(stored);
-                    if (user.username) {
-                        updateUI(user.username);
-                    }
-                } catch (e) {
-                    clearUser();
-                }
+                    if (user.username) updateUI(user.username);
+                } catch (e) { clearUser(); }
             }
         })();
     </script>
