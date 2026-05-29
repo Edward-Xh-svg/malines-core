@@ -1,55 +1,68 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const app = express();
 
 app.use(express.json());
 
+// منع الوصول المباشر إلى مجلدات البريد وكلمات المرور
+app.use((req, res, next) => {
+    if (req.path.startsWith('/email') || req.path.startsWith('/PS')) {
+        return res.status(404).send('Not Found');
+    }
+    next();
+});
+
 // خدمة الملفات الثابتة من public
 app.use(express.static(path.join(__dirname, 'public')));
 
-// نقطة نهاية DeepSeek
-app.post('/api/deepseek', async (req, res) => {
-    const { messages } = req.body;
-
-    if (!messages || !Array.isArray(messages)) {
-        return res.status(400).json({ error: 'يجب توفير مصفوفة messages' });
+// نقطة نهاية تسجيل الدخول
+app.post('/api/login', (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+        return res.status(400).json({ error: 'يجب إدخال البريد الإلكتروني وكلمة المرور' });
     }
 
-    const apiKey = process.env.DEEPSEEK_API_KEY;
-    if (!apiKey) {
-        return res.status(500).json({ error: 'مفتاح API غير مضبوط' });
-    }
+    const emailDir = path.join(__dirname, 'public', 'email');
+    const psDir = path.join(__dirname, 'public', 'PS');
 
+    // قراءة مجلد البريد الإلكتروني
+    let files;
     try {
-        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-                model: 'deepseek-chat',
-                messages: [
-                    {
-                        role: 'system',
-                        content: 'أنت Malines Hostaka - ChatBot Economy. مهمتك حساب دخل شركات لعبة Malines بشكل واقعي صارم مع هوامش دقيقة. أجب بالعربية.'
-                    },
-                    ...messages
-                ],
-                temperature: 0.7,
-                max_tokens: 2000
-            })
-        });
-
-        const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        console.error('خطأ في الاتصال بـ DeepSeek:', error);
-        res.status(500).json({ error: 'فشل الاتصال بخدمة الذكاء الاصطناعي' });
+        files = fs.readdirSync(emailDir);
+    } catch (err) {
+        return res.status(500).json({ error: 'خطأ في الخادم' });
     }
+
+    // البحث عن ملف يحتوي على نفس البريد الإلكتروني
+    for (const file of files) {
+        if (!file.endsWith('.txt')) continue;
+        const emailFilePath = path.join(emailDir, file);
+        try {
+            const content = fs.readFileSync(emailFilePath, 'utf8').trim();
+            if (content === email) {
+                // البريد موجود، نتحقق من كلمة المرور
+                const username = path.basename(file, '.txt'); // اسم الملف بدون .txt هو اسم المستخدم
+                const passFilePath = path.join(psDir, file); // نفس اسم الملف في مجلد PS
+                if (fs.existsSync(passFilePath)) {
+                    const passContent = fs.readFileSync(passFilePath, 'utf8').trim();
+                    if (passContent === password) {
+                        return res.json({ success: true, username });
+                    }
+                }
+                // كلمة مرور خاطئة أو ملف غير موجود
+                return res.status(401).json({ error: 'كلمة المرور غير صحيحة' });
+            }
+        } catch (err) {
+            continue; // تخطي الملفات التي تعذرت قراءتها
+        }
+    }
+
+    // إذا لم نجد البريد الإلكتروني
+    return res.status(404).json({ error: 'البريد الإلكتروني غير مسجل' });
 });
 
-// أي مسار غير معروف → index.html
+// جميع المسارات الأخرى تذهب إلى index.html
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
