@@ -47,89 +47,96 @@
             color: var(--text);
             font-family: 'Cairo', sans-serif;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
             position: relative;
             overflow-x: hidden;
         }
 
-        body::before {
-            content: '';
-            position: absolute;
+        /* خلفية زخرفية */
+        .bg-glow {
+            position: fixed;
             top: -50%;
             right: -50%;
             width: 100%;
             height: 100%;
             background: radial-gradient(circle at 30% 40%, rgba(184,134,11,0.04) 0%, transparent 50%);
             pointer-events: none;
+            z-index: 0;
         }
 
-        body::after {
-            content: '';
-            position: absolute;
+        .bg-glow2 {
+            position: fixed;
             bottom: -30%;
             left: -30%;
             width: 60%;
             height: 60%;
             background: radial-gradient(circle at 70% 60%, rgba(184,134,11,0.03) 0%, transparent 50%);
             pointer-events: none;
+            z-index: 0;
         }
 
-        /* Header */
-        .header {
+        /* الشريط العلوي */
+        .topbar {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            padding: 15px 25px;
+            height: 60px;
+            background: rgba(10,10,10,0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
+            padding: 0 24px;
             z-index: 100;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
-        .header-left {
+        .topbar-brand {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+
+        .topbar-actions {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
-        .home-link {
-            color: #fff;
-            font-weight: 700;
-            text-decoration: none;
-            font-size: 1.1rem;
-            letter-spacing: 1px;
-        }
-
-        .login-btn {
-            background: none;
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            padding: 8px 20px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s;
+        /* زر تسجيل الدخول */
+        .btn-login {
             display: flex;
             align-items: center;
             gap: 8px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #ccc;
+            padding: 8px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
-        .login-btn:hover {
+        .btn-login:hover {
             border-color: var(--accent);
             color: #fff;
+            background: rgba(184,134,11,0.08);
         }
 
-        .user-avatar {
-            width: 38px;
-            height: 38px;
+        .btn-login svg {
+            flex-shrink: 0;
+        }
+
+        /* أيقونة المستخدم */
+        .user-badge {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: var(--accent);
             color: #000;
@@ -139,152 +146,113 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            border: none;
-            transition: transform 0.3s;
+            border: 2px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+            position: relative;
         }
 
-        .user-avatar:hover {
-            transform: scale(1.1);
+        .user-badge:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 20px rgba(184,134,11,0.3);
         }
 
-        /* Modal overlay */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
+        /* قائمة منسدلة للمستخدم */
+        .user-dropdown {
+            position: absolute;
+            top: 50px;
             left: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 0;
+            min-width: 160px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-5px);
+            transition: all 0.25s ease;
+        }
+
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-dropdown button {
+            display: block;
             width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(5px);
+            text-align: right;
+            padding: 10px 16px;
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .user-dropdown button:hover {
+            background: rgba(255,255,255,0.04);
+            color: #fff;
+        }
+
+        /* المحتوى المركزي */
+        .main-container {
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 200;
-            visibility: hidden;
-            opacity: 0;
-            transition: visibility 0.3s, opacity 0.3s;
-        }
-
-        .modal-overlay.active {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .modal {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 30px;
-            width: 90%;
-            max-width: 400px;
+            padding: 80px 24px 40px;
             position: relative;
-            text-align: right;
+            z-index: 1;
         }
 
-        .modal h2 {
-            font-size: 1.3rem;
-            margin-bottom: 20px;
-            color: #fff;
-        }
-
-        .modal label {
-            display: block;
-            margin-bottom: 5px;
-            color: #aaa;
-            font-size: 0.9rem;
-        }
-
-        .modal input {
+        .content-wrapper {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            background: #1a1a1a;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: #fff;
-            font-family: 'Cairo', sans-serif;
-        }
-
-        .modal .error {
-            color: #e74c3c;
-            font-size: 0.85rem;
-            margin-bottom: 15px;
-        }
-
-        .modal .btn-submit {
-            width: 100%;
-            padding: 12px;
-            background: var(--accent);
-            border: none;
-            color: #000;
-            font-weight: 700;
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: 'Cairo', sans-serif;
-            transition: background 0.3s;
-        }
-
-        .modal .btn-submit:hover {
-            background: var(--accent-hover);
-        }
-
-        .modal .close-btn {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: none;
-            border: none;
-            color: #aaa;
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 720px;
+            max-width: 680px;
             text-align: center;
-            z-index: 2;
-            position: relative;
         }
 
         .logo {
             font-family: 'Amiri', serif;
-            font-size: 3.5rem;
+            font-size: clamp(2.2rem, 5vw, 3.5rem);
             font-weight: 700;
             color: #ffffff;
             letter-spacing: -1px;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
             line-height: 1.2;
         }
 
         .logo span { color: var(--accent); }
 
         .subtitle {
-            font-size: 1.15rem;
+            font-size: clamp(0.85rem, 2vw, 1.1rem);
             color: var(--text-muted);
-            margin-bottom: 2.5rem;
+            margin-bottom: 2.2rem;
             font-weight: 300;
             letter-spacing: 3px;
             text-transform: uppercase;
         }
 
-        .search-box {
+        /* مربع البحث */
+        .search-wrapper {
             display: flex;
             gap: 10px;
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 50px;
-            padding: 6px 6px 6px 20px;
+            padding: 5px 5px 5px 18px;
             transition: all 0.3s ease;
-            margin-bottom: 2rem;
+            margin-bottom: 1.8rem;
         }
 
-        .search-box:focus-within {
+        .search-wrapper:focus-within {
             border-color: var(--accent);
-            box-shadow: 0 0 20px rgba(184,134,11,0.12);
+            box-shadow: 0 0 20px rgba(184,134,11,0.1);
         }
 
-        .search-box input {
+        .search-wrapper input {
             flex: 1;
             background: transparent;
             border: none;
@@ -293,35 +261,37 @@
             font-family: 'Cairo', sans-serif;
             outline: none;
             padding: 10px 0;
+            min-width: 0;
         }
 
-        .search-box input::placeholder { color: #555; }
+        .search-wrapper input::placeholder { color: #555; }
 
-        .search-box button {
+        .search-wrapper button {
             background: var(--accent);
             border: none;
             color: #000;
             font-weight: 700;
             font-family: 'Cairo', sans-serif;
             border-radius: 40px;
-            padding: 10px 32px;
+            padding: 10px 28px;
             cursor: pointer;
             transition: all 0.3s ease;
             white-space: nowrap;
             font-size: 0.95rem;
         }
 
-        .search-box button:hover {
+        .search-wrapper button:hover {
             background: var(--accent-hover);
             box-shadow: 0 4px 15px rgba(184,134,11,0.3);
         }
 
+        /* روابط سريعة */
         .quick-links {
             display: flex;
             justify-content: center;
-            gap: 24px;
+            gap: 20px;
             flex-wrap: wrap;
-            margin-bottom: 2.5rem;
+            margin-bottom: 2.2rem;
             font-size: 0.9rem;
         }
 
@@ -331,26 +301,17 @@
             border-bottom: 1px solid transparent;
             transition: all 0.25s ease;
             padding: 4px 8px;
-            position: relative;
         }
 
-        .quick-links a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 0;
-            height: 1px;
-            background: var(--accent);
-            transition: width 0.3s ease;
+        .quick-links a:hover {
+            color: #fff;
+            border-bottom-color: var(--accent);
         }
 
-        .quick-links a:hover { color: #fff; }
-        .quick-links a:hover::after { width: 100%; }
-
-        .archive-btn {
+        /* أزرار الأرشيف */
+        .btn-archive {
             display: inline-block;
-            padding: 14px 48px;
+            padding: 14px 44px;
             border: 1px solid var(--accent);
             color: #fff;
             text-decoration: none;
@@ -361,164 +322,303 @@
             border-radius: 4px;
             transition: all 0.4s ease;
             background: rgba(184,134,11,0.05);
-            margin-top: 0.5rem;
-            position: relative;
-            overflow: hidden;
+            margin: 6px;
         }
 
-        .archive-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .archive-btn:hover {
+        .btn-archive:hover {
             background: var(--accent);
             color: #000;
             box-shadow: 0 0 25px rgba(184,134,11,0.25);
         }
 
-        .archive-btn:hover::before { left: 100%; }
-
         .footer-note {
-            margin-top: 4rem;
+            margin-top: 3.5rem;
             font-size: 0.65rem;
             color: #444;
             letter-spacing: 2px;
             text-transform: uppercase;
         }
 
-        .scanline {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background: rgba(184,134,11,0.06);
-            pointer-events: none;
-            animation: scan 8s linear infinite;
-            z-index: 1;
-        }
-
-        @keyframes scan {
-            0% { top: 0; }
-            100% { top: 100%; }
-        }
-
-        .grain {
+        /* المودال */
+        .modal-backdrop {
             position: fixed;
-            top: 0;
-            left: 0;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            padding: 20px;
+        }
+
+        .modal-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px 28px;
             width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.03;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            max-width: 420px;
+            position: relative;
+            text-align: right;
+            transform: translateY(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-backdrop.active .modal-box {
+            transform: translateY(0);
+        }
+
+        .modal-box h2 {
+            font-size: 1.4rem;
+            margin-bottom: 24px;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 6px;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover { color: #fff; }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #aaa;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            background: #1a1a1a;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.95rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .form-group input::placeholder { color: #444; }
+
+        .form-error {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            margin-bottom: 16px;
+            display: none;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-error.show {
+            display: flex;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 13px;
+            background: var(--accent);
+            border: none;
+            color: #000;
+            font-weight: 700;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+
+        .btn-submit:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 4px 18px rgba(184,134,11,0.25);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* تحسينات الجوال */
+        @media (max-width: 640px) {
+            .topbar {
+                padding: 0 16px;
+                height: 54px;
+            }
+            .topbar-brand { font-size: 1rem; }
+            .btn-login { padding: 7px 14px; font-size: 0.8rem; gap: 5px; }
+            .btn-login span { display: none; }
+            .main-container { padding: 70px 16px 30px; }
+            .search-wrapper { padding: 4px 4px 4px 14px; }
+            .search-wrapper button { padding: 10px 20px; font-size: 0.85rem; }
+            .quick-links { gap: 12px; font-size: 0.8rem; }
+            .btn-archive { padding: 12px 30px; font-size: 0.7rem; letter-spacing: 2px; margin: 4px; }
+            .modal-box { padding: 24px 18px; }
         }
     </style>
 </head>
 <body>
-    <div class="scanline"></div>
-    <div class="grain"></div>
 
-    <!-- Header -->
-    <header class="header">
-        <div class="header-left">
-            <a href="/" class="home-link">أرشيف مالينز</a>
-        </div>
-        <div>
-            <!-- زر تسجيل الدخول (يظهر إذا لم يسجل) -->
-            <button id="loginButton" class="login-btn" onclick="openLoginModal()">
+    <!-- خلفيات -->
+    <div class="bg-glow"></div>
+    <div class="bg-glow2"></div>
+
+    <!-- الشريط العلوي -->
+    <header class="topbar">
+        <a href="/" class="topbar-brand">📦 أرشيف مالينز</a>
+        <div class="topbar-actions">
+            <!-- زر تسجيل الدخول -->
+            <button id="btnLogin" class="btn-login" onclick="openModal()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"/></svg>
-                تسجيل الدخول
+                <span>تسجيل الدخول</span>
             </button>
-            <!-- دائرة المستخدم (تظهر بعد تسجيل الدخول) -->
-            <div id="userAvatar" style="display: none;" class="user-avatar" onclick="logout()"></div>
+
+            <!-- أيقونة المستخدم -->
+            <div id="userBadge" class="user-badge" style="display: none;" onclick="toggleDropdown()">
+                <span id="userInitial"></span>
+                <div id="userDropdown" class="user-dropdown">
+                    <div style="padding: 8px 16px; color: #888; font-size: 0.8rem; border-bottom: 1px solid var(--border); margin-bottom: 4px;" id="dropdownUsername"></div>
+                    <button onclick="handleLogout()">تسجيل الخروج</button>
+                </div>
+            </div>
         </div>
     </header>
 
-    <!-- المودال -->
-    <div id="loginModal" class="modal-overlay">
-        <div class="modal">
-            <button class="close-btn" onclick="closeLoginModal()">✕</button>
-            <h2>تسجيل الدخول</h2>
-            <div>
-                <label for="emailInput">البريد الإلكتروني</label>
-                <input type="email" id="emailInput" placeholder="example@mail.com" dir="ltr">
+    <!-- المحتوى الرئيسي -->
+    <div class="main-container">
+        <div class="content-wrapper">
+            <div class="logo">أرشيف <span>مالينز</span></div>
+            <div class="subtitle">الموسوعة الحرة للوثائق والمخطوطات</div>
+
+            <div class="search-wrapper">
+                <input type="text" id="searchInput" placeholder="ابحث عن معاهدة، حرب، وثيقة..." onkeypress="if(event.key==='Enter') doSearch()">
+                <button onclick="doSearch()">بحث</button>
             </div>
-            <div>
-                <label for="passwordInput">كلمة المرور</label>
-                <input type="password" id="passwordInput" placeholder="********">
+
+            <div class="quick-links">
+                <a href="wiki.html?id=11001">معاهدة جين ستي</a>
+                <a href="wiki.html?id=11002">الحرب 1906 - 1907</a>
+                <a href="wiki.html?id=11003">الحرب 1907 - 1908</a>
             </div>
-            <div id="loginError" class="error" style="display: none;"></div>
-            <button class="btn-submit" onclick="handleLogin()">دخول</button>
+
+            <a href="wiki.html" class="btn-archive">دخول الأرشيف المركزي</a>
+            <a href="chat.html" class="btn-archive" style="border-color:#c49b3f;">المستشار الاقتصادي</a>
+
+            <div class="footer-note">اتصال آمن &middot; موقع سري &middot; جميع الحقوق محفوظة</div>
         </div>
     </div>
 
-    <!-- المحتوى الرئيسي -->
-    <div class="container">
-        <div class="logo">
-            أرشيف <span>مالينز</span>
-        </div>
-        <div class="subtitle">الموسوعة الحرة للوثائق والمخطوطات</div>
-
-        <div class="search-box">
-            <input 
-                type="text" 
-                id="searchInput" 
-                placeholder="ابحث عن معاهدة، حرب، وثيقة..." 
-                onkeypress="if(event.key==='Enter') goSearch()"
-            />
-            <button onclick="goSearch()">بحث</button>
-        </div>
-
-        <div class="quick-links">
-            <a href="wiki.html?id=11001">معاهدة جين ستي</a>
-            <a href="wiki.html?id=11002">الحرب 1906 - 1907</a>
-            <a href="wiki.html?id=11003">الحرب 1907 - 1908</a>
-        </div>
-
-        <a href="wiki.html" class="archive-btn">دخول الأرشيف المركزي</a>
-
-        <div class="footer-note">
-            اتصال آمن &middot; موقع سري &middot; جميع الحقوق محفوظة
+    <!-- مودال تسجيل الدخول -->
+    <div id="loginModal" class="modal-backdrop">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <h2>تسجيل الدخول</h2>
+            <div class="form-group">
+                <label for="emailInput">البريد الإلكتروني</label>
+                <input type="email" id="emailInput" placeholder="example@malines.com" dir="ltr" autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label for="passInput">كلمة المرور</label>
+                <input type="password" id="passInput" placeholder="••••••••" autocomplete="current-password">
+            </div>
+            <div id="loginError" class="form-error">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                <span></span>
+            </div>
+            <button id="btnSubmit" class="btn-submit" onclick="doLogin()">دخول</button>
         </div>
     </div>
 
     <script>
-        // ========== وظائف تسجيل الدخول ==========
+        // ============ المتغيرات ============
         const STORAGE_KEY = 'malines_user';
+        let dropdownVisible = false;
 
-        function openLoginModal() {
-            document.getElementById('loginModal').classList.add('active');
+        // ============ عناصر DOM ============
+        const btnLogin = document.getElementById('btnLogin');
+        const userBadge = document.getElementById('userBadge');
+        const userInitial = document.getElementById('userInitial');
+        const userDropdown = document.getElementById('userDropdown');
+        const dropdownUsername = document.getElementById('dropdownUsername');
+        const loginModal = document.getElementById('loginModal');
+        const loginError = document.getElementById('loginError');
+        const btnSubmit = document.getElementById('btnSubmit');
+
+        // ============ دوال المودال ============
+        function openModal() {
+            loginModal.classList.add('active');
             document.getElementById('emailInput').focus();
-        }
-
-        function closeLoginModal() {
-            document.getElementById('loginModal').classList.remove('active');
-            document.getElementById('loginError').style.display = 'none';
+            loginError.classList.remove('show');
             document.getElementById('emailInput').value = '';
-            document.getElementById('passwordInput').value = '';
+            document.getElementById('passInput').value = '';
         }
 
-        async function handleLogin() {
+        function closeModal() {
+            loginModal.classList.remove('active');
+        }
+
+        // إغلاق المودال عند النقر على الخلفية
+        loginModal.addEventListener('click', function(e) {
+            if (e.target === loginModal) closeModal();
+        });
+
+        // إغلاق المودال عند Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // ============ دوال تسجيل الدخول ============
+        async function doLogin() {
             const email = document.getElementById('emailInput').value.trim();
-            const password = document.getElementById('passwordInput').value;
-            const errorDiv = document.getElementById('loginError');
+            const password = document.getElementById('passInput').value;
 
-            errorDiv.style.display = 'none';
+            // إخفاء الخطأ السابق
+            loginError.classList.remove('show');
 
-            if (!email || !password) {
-                errorDiv.textContent = 'يرجى إدخال البريد الإلكتروني وكلمة المرور';
-                errorDiv.style.display = 'block';
+            // تحقق من المدخلات
+            if (!email) {
+                showError('يرجى إدخال البريد الإلكتروني');
                 return;
             }
+            if (!password) {
+                showError('يرجى إدخال كلمة المرور');
+                return;
+            }
+
+            // تعطيل الزر أثناء الطلب
+            btnSubmit.disabled = true;
+            btnSubmit.textContent = 'جارٍ التحقق...';
 
             try {
                 const response = await fetch('/api/login', {
@@ -530,49 +630,69 @@
                 const data = await response.json();
 
                 if (response.ok && data.success) {
-                    // حفظ اسم المستخدم في localStorage
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify({ username: data.username }));
-                    updateUIForLoggedInUser(data.username);
-                    closeLoginModal();
+                    // تسجيل دخول ناجح
+                    setLoggedInUser(data.username);
+                    closeModal();
                 } else {
-                    errorDiv.textContent = data.error || 'حدث خطأ ما';
-                    errorDiv.style.display = 'block';
+                    showError(data.error || 'فشل تسجيل الدخول');
                 }
             } catch (err) {
-                errorDiv.textContent = 'فشل الاتصال بالخادم';
-                errorDiv.style.display = 'block';
+                showError('تعذر الاتصال بالخادم. حاول مرة أخرى.');
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.textContent = 'دخول';
             }
         }
 
-        function updateUIForLoggedInUser(username) {
-            document.getElementById('loginButton').style.display = 'none';
-            const avatar = document.getElementById('userAvatar');
-            avatar.style.display = 'flex';
-            avatar.textContent = username.charAt(0).toUpperCase();
-            avatar.title = username;
+        function showError(msg) {
+            loginError.querySelector('span').textContent = msg;
+            loginError.classList.add('show');
         }
 
-        function logout() {
+        // ============ دوال المستخدم ============
+        function setLoggedInUser(username) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ username }));
+            updateUI(username);
+        }
+
+        function updateUI(username) {
+            btnLogin.style.display = 'none';
+            userBadge.style.display = 'flex';
+            userInitial.textContent = username.charAt(0).toUpperCase();
+            dropdownUsername.textContent = username;
+        }
+
+        function clearUser() {
             localStorage.removeItem(STORAGE_KEY);
-            document.getElementById('loginButton').style.display = 'flex';
-            document.getElementById('userAvatar').style.display = 'none';
+            btnLogin.style.display = 'flex';
+            userBadge.style.display = 'none';
+            userDropdown.classList.remove('show');
+            dropdownVisible = false;
         }
 
-        // تحقق من وجود جلسة عند التحميل
-        (function initAuth() {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            if (stored) {
-                try {
-                    const user = JSON.parse(stored);
-                    if (user.username) {
-                        updateUIForLoggedInUser(user.username);
-                    }
-                } catch (e) { /* تجاهل */ }
-            }
-        })();
+        function handleLogout() {
+            clearUser();
+        }
 
-        // ========== وظيفة البحث ==========
-        function goSearch() {
+        function toggleDropdown() {
+            dropdownVisible = !dropdownVisible;
+            if (dropdownVisible) {
+                userDropdown.classList.add('show');
+            } else {
+                userDropdown.classList.remove('show');
+            }
+        }
+
+        // إغلاق القائمة عند النقر خارجها
+        document.addEventListener('click', function(e) {
+            if (!userBadge.contains(e.target)) {
+                userDropdown.classList.remove('show');
+                dropdownVisible = false;
+            }
+        });
+
+        // ============ دالة البحث ============
+        function doSearch() {
             const query = document.getElementById('searchInput').value.trim();
             if (query) {
                 window.location.href = `wiki.html?q=${encodeURIComponent(query)}`;
@@ -580,6 +700,21 @@
                 window.location.href = 'wiki.html';
             }
         }
+
+        // ============ التهيئة عند التحميل ============
+        (function init() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    const user = JSON.parse(stored);
+                    if (user.username) {
+                        updateUI(user.username);
+                    }
+                } catch (e) {
+                    clearUser();
+                }
+            }
+        })();
     </script>
 </body>
 </html>
