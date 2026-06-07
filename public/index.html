@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مجتمع مالينز | المنصة الرئيسية</title>
+
     <script>
         window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
     </script>
@@ -12,6 +13,7 @@
         window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
     </script>
     <script defer src="/_vercel/speed-insights/script.js"></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -28,7 +30,7 @@
                             card: '#111111',
                             border: '#222222',
                             text: '#e5e5e5',
-                            muted: '#888888',
+                            muted: '#8a8a8a',
                             red: '#c0392b',
                             'red-hover': '#e74c3c',
                             accent: '#d4af37',
@@ -41,6 +43,7 @@
             }
         }
     </script>
+
     <style>
         :root {
             --black: #050505;
@@ -48,7 +51,7 @@
             --card: #111111;
             --border: #222222;
             --text: #e5e5e5;
-            --muted: #888888;
+            --muted: #8a8a8a;
             --red: #c0392b;
             --red-hover: #e74c3c;
             --accent: #d4af37;
@@ -56,53 +59,56 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        html { scroll-behavior: smooth; }
+
         body {
-            background: var(--black);
+            background:
+                radial-gradient(circle at 20% 15%, rgba(192,57,43,0.10), transparent 20%),
+                radial-gradient(circle at 80% 20%, rgba(212,175,55,0.06), transparent 18%),
+                radial-gradient(circle at 50% 80%, rgba(255,255,255,0.03), transparent 24%),
+                var(--black);
             color: var(--text);
             font-family: 'Cairo', sans-serif;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
-            scroll-behavior: smooth;
+            text-rendering: optimizeLegibility;
         }
 
-        /* خلفية نجوم متحركة خفيفة */
         .stars {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             pointer-events: none;
             z-index: 0;
-            background: radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.1), transparent),
-                        radial-gradient(1px 1px at 80% 60%, rgba(255,255,255,0.08), transparent),
-                        radial-gradient(1.5px 1.5px at 40% 80%, rgba(255,255,255,0.12), transparent),
-                        radial-gradient(1px 1px at 70% 10%, rgba(255,255,255,0.06), transparent);
-            animation: starsMove 30s linear infinite;
+            opacity: 0.7;
+            background:
+                radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,0.12), transparent),
+                radial-gradient(1px 1px at 78% 28%, rgba(255,255,255,0.08), transparent),
+                radial-gradient(1.5px 1.5px at 42% 72%, rgba(255,255,255,0.10), transparent),
+                radial-gradient(1px 1px at 70% 10%, rgba(255,255,255,0.07), transparent),
+                radial-gradient(1px 1px at 25% 85%, rgba(255,255,255,0.06), transparent);
+            animation: starsMove 36s linear infinite;
         }
 
         @keyframes starsMove {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-30px); }
+            from { transform: translateY(0); }
+            to { transform: translateY(-30px); }
         }
 
-        /* الشريط العلوي */
         .topbar {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            height: 64px;
-            background: rgba(5,5,5,0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            height: 68px;
+            background: rgba(5,5,5,0.70);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
             border-bottom: 1px solid rgba(255,255,255,0.05);
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 32px;
             z-index: 100;
-            transition: background 0.3s;
         }
 
         .topbar-left {
@@ -112,19 +118,20 @@
         }
 
         .topbar-logo {
-            width: 34px;
-            height: 34px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             object-fit: cover;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.10);
+            box-shadow: 0 0 14px rgba(255,255,255,0.08);
         }
 
         .topbar-title {
-            font-weight: 700;
-            font-size: 1.15rem;
+            font-weight: 800;
+            font-size: 1.12rem;
             color: #fff;
             letter-spacing: -0.3px;
-            background: linear-gradient(135deg, #ffffff 0%, #cccccc 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #d0d0d0 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -138,58 +145,59 @@
         .btn-login {
             display: flex;
             align-items: center;
-            gap: 7px;
+            gap: 8px;
             background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.15);
-            color: #ccc;
-            padding: 8px 20px;
-            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.14);
+            color: #d7d7d7;
+            padding: 9px 20px;
+            border-radius: 999px;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             font-family: 'Cairo', sans-serif;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
             white-space: nowrap;
             backdrop-filter: blur(10px);
         }
 
         .btn-login:hover {
-            border-color: rgba(255,255,255,0.35);
+            border-color: rgba(255,255,255,0.30);
             color: #fff;
             background: rgba(255,255,255,0.06);
-            box-shadow: 0 4px 15px rgba(192,57,43,0.15);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(192,57,43,0.12);
         }
 
         .user-badge {
-            width: 40px;
-            height: 40px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #e6e6e6 100%);
             color: #000;
-            font-weight: 700;
-            font-size: 1.1rem;
+            font-weight: 800;
+            font-size: 1.05rem;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            border: 2px solid rgba(255,255,255,0.2);
-            transition: all 0.3s ease;
+            border: 2px solid rgba(255,255,255,0.18);
+            transition: all 0.25s ease;
             position: relative;
-            box-shadow: 0 0 15px rgba(255,255,255,0.1);
+            box-shadow: 0 0 18px rgba(255,255,255,0.10);
         }
 
         .user-badge:hover {
-            transform: scale(1.07);
-            box-shadow: 0 0 25px rgba(255,255,255,0.2);
+            transform: scale(1.05);
+            box-shadow: 0 0 26px rgba(255,255,255,0.18);
         }
 
         .user-dropdown {
             position: absolute;
-            top: 50px;
+            top: 52px;
             left: 0;
-            background: rgba(10,10,10,0.95);
+            background: rgba(10,10,10,0.96);
             backdrop-filter: blur(20px);
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 8px 0;
             min-width: 180px;
             opacity: 0;
@@ -233,7 +241,6 @@
             color: #fff;
         }
 
-        /* Hero Section */
         .hero {
             position: relative;
             min-height: 100vh;
@@ -242,7 +249,7 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 100px 24px 80px;
+            padding: 120px 24px 88px;
             overflow: hidden;
             isolation: isolate;
         }
@@ -257,68 +264,69 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            opacity: 0.3;
-            filter: brightness(0.5) contrast(1.2) saturate(0.5);
+            opacity: 0.22;
+            filter: brightness(0.52) contrast(1.15) saturate(0.7);
         }
 
         .hero-bg::after {
             content: '';
             position: absolute;
             inset: 0;
-            background: radial-gradient(ellipse at center, transparent 20%, var(--black) 85%);
+            background:
+                linear-gradient(to bottom, rgba(5,5,5,0.10), rgba(5,5,5,0.72) 70%, rgba(5,5,5,0.96)),
+                radial-gradient(ellipse at center, transparent 20%, rgba(5,5,5,0.88) 86%);
         }
 
-        /* حلقات ضبابية محسنة */
-        .hero-rings {
+        .hero-aurora {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            inset: 0;
             z-index: 1;
             pointer-events: none;
+            overflow: hidden;
         }
 
-        .ring {
+        .aurora-blob {
             position: absolute;
             border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.08);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation: ringPulse 6s ease-in-out infinite;
+            filter: blur(28px);
+            opacity: 0.55;
+            transform: translateZ(0);
         }
 
-        .ring-1 {
-            width: 300px;
-            height: 300px;
-            border-color: rgba(192,57,43,0.2);
-            box-shadow: 0 0 40px rgba(192,57,43,0.1);
+        .aurora-blob.one {
+            width: 340px;
+            height: 340px;
+            top: 12%;
+            right: -90px;
+            background: radial-gradient(circle, rgba(192,57,43,0.24) 0%, rgba(192,57,43,0.02) 60%, transparent 75%);
         }
 
-        .ring-2 {
+        .aurora-blob.two {
             width: 420px;
             height: 420px;
-            border-color: rgba(255,255,255,0.05);
-            animation-delay: 0.8s;
+            bottom: -120px;
+            left: -120px;
+            background: radial-gradient(circle, rgba(212,175,55,0.14) 0%, rgba(212,175,55,0.02) 55%, transparent 75%);
         }
 
-        .ring-3 {
-            width: 560px;
-            height: 560px;
-            border-color: rgba(255,255,255,0.03);
-            animation-delay: 1.6s;
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.10;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.12) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.12) 1px, transparent 1px);
+            background-size: 72px 72px;
+            mask-image: radial-gradient(circle at center, black 32%, transparent 85%);
+            -webkit-mask-image: radial-gradient(circle at center, black 32%, transparent 85%);
         }
 
-        @keyframes ringPulse {
-            0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(0.96); }
-            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.02); }
-        }
-
-        /* شعار مالينز */
         .hero-logo-container {
             position: relative;
             z-index: 2;
-            margin-bottom: 30px;
+            margin-bottom: 28px;
         }
 
         .hero-logo-glow {
@@ -326,43 +334,66 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 120px;
-            height: 120px;
-            background: radial-gradient(circle, rgba(192,57,43,0.4) 0%, transparent 70%);
+            width: 116px;
+            height: 116px;
+            background: radial-gradient(circle, rgba(192,57,43,0.35) 0%, transparent 68%);
             border-radius: 50%;
             z-index: -1;
-            animation: glowPulse 3s ease-in-out infinite;
+            animation: glowPulse 4s ease-in-out infinite;
         }
 
         @keyframes glowPulse {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
-            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.60; }
+            50% { transform: translate(-50%, -50%) scale(1.14); opacity: 0.95; }
         }
 
         .hero-logo {
-            width: 100px;
-            height: 100px;
+            width: 102px;
+            height: 102px;
             border-radius: 50%;
             object-fit: cover;
             position: relative;
             z-index: 3;
-            box-shadow: 0 0 60px rgba(192,57,43,0.3), 0 0 120px rgba(192,57,43,0.1);
+            box-shadow: 0 0 60px rgba(192,57,43,0.22), 0 0 120px rgba(192,57,43,0.08);
         }
 
         .hero-content {
             position: relative;
             z-index: 2;
-            max-width: 700px;
+            max-width: 760px;
+        }
+
+        .hero-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            margin-bottom: 18px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.03);
+            color: #bcbcbc;
+            font-size: 0.85rem;
+            letter-spacing: 0.4px;
+            backdrop-filter: blur(12px);
+        }
+
+        .hero-kicker .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--red-hover);
+            box-shadow: 0 0 10px rgba(231,76,60,0.55);
         }
 
         .hero-title {
-            font-size: clamp(2.2rem, 6vw, 3.8rem);
+            font-size: clamp(2.3rem, 6vw, 4.1rem);
             font-weight: 900;
             color: #fff;
-            letter-spacing: -1px;
+            letter-spacing: -1.2px;
             margin-bottom: 16px;
-            line-height: 1.15;
-            background: linear-gradient(to bottom, #ffffff, #b0b0b0);
+            line-height: 1.12;
+            background: linear-gradient(to bottom, #ffffff, #b6b6b6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -371,14 +402,15 @@
             font-size: clamp(1rem, 2.5vw, 1.25rem);
             color: var(--muted);
             font-weight: 400;
-            letter-spacing: 1.5px;
-            margin-bottom: 40px;
-            opacity: 0.8;
+            letter-spacing: 0.6px;
+            margin-bottom: 34px;
+            opacity: 0.92;
+            line-height: 1.8;
         }
 
         .hero-scroll {
             position: absolute;
-            bottom: 30px;
+            bottom: 28px;
             z-index: 2;
             animation: bounceDown 2s ease infinite;
             color: var(--muted);
@@ -395,37 +427,142 @@
             50% { transform: translateY(10px); }
         }
 
-        /* قسم الخدمات */
+        .app-banner {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: -20px auto 10px;
+            padding: 0 24px;
+        }
+
+        .app-banner-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 22px 24px;
+            background:
+                linear-gradient(135deg, rgba(16,16,16,0.96), rgba(20,20,20,0.88)),
+                rgba(17,17,17,0.92);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 22px;
+            box-shadow: 0 18px 50px rgba(0,0,0,0.34);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-banner-box::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(192,57,43,0.12), transparent 40%, rgba(255,255,255,0.02));
+            pointer-events: none;
+        }
+
+        .app-banner-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-align: right;
+            position: relative;
+            z-index: 1;
+        }
+
+        .app-banner-icon {
+            min-width: 64px;
+            height: 64px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            background:
+                radial-gradient(circle at top, rgba(255,255,255,0.22), transparent 60%),
+                linear-gradient(135deg, rgba(192,57,43,1), rgba(160,35,26,1));
+            box-shadow: 0 10px 24px rgba(192,57,43,0.26);
+            flex-shrink: 0;
+        }
+
+        .app-banner-title {
+            font-size: 1.16rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .app-banner-text {
+            font-size: 0.96rem;
+            color: #c9c9c9;
+            line-height: 1.75;
+            max-width: 720px;
+        }
+
+        .banner-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 13px 20px;
+            border-radius: 14px;
+            text-decoration: none;
+            color: #000;
+            background: linear-gradient(135deg, #ffffff, #e7e7e7);
+            font-weight: 800;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+            box-shadow: 0 12px 24px rgba(255,255,255,0.08);
+            position: relative;
+            z-index: 1;
+        }
+
+        .banner-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 30px rgba(255,255,255,0.10);
+        }
+
         .services {
             position: relative;
             z-index: 2;
-            padding: 80px 24px 100px;
+            padding: 72px 24px 100px;
             max-width: 1200px;
             margin: 0 auto;
         }
 
         .section-header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 56px;
         }
 
         .section-label {
-            display: inline-block;
-            padding: 4px 16px;
-            background: rgba(192,57,43,0.1);
-            border: 1px solid rgba(192,57,43,0.3);
-            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            background: rgba(192,57,43,0.10);
+            border: 1px solid rgba(192,57,43,0.24);
+            border-radius: 999px;
             font-size: 0.8rem;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--red-hover);
-            letter-spacing: 2px;
+            letter-spacing: 1.8px;
             text-transform: uppercase;
             margin-bottom: 16px;
         }
 
+        .section-label::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--red-hover);
+            box-shadow: 0 0 10px rgba(231,76,60,0.5);
+        }
+
         .section-title {
-            font-size: clamp(1.8rem, 4vw, 2.5rem);
-            font-weight: 700;
+            font-size: clamp(1.8rem, 4vw, 2.65rem);
+            font-weight: 800;
             color: #fff;
             margin-bottom: 8px;
         }
@@ -445,9 +582,9 @@
         .service-card {
             background: linear-gradient(145deg, #0f0f0f 0%, #0a0a0a 100%);
             border: 1px solid var(--border);
-            border-radius: 20px;
+            border-radius: 22px;
             padding: 32px 28px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             text-decoration: none;
             color: inherit;
@@ -467,13 +604,13 @@
             height: 100%;
             background: radial-gradient(circle at top right, rgba(192,57,43,0.08) 0%, transparent 70%);
             opacity: 0;
-            transition: opacity 0.4s;
+            transition: opacity 0.35s;
         }
 
         .service-card:hover {
-            border-color: rgba(255,255,255,0.2);
-            transform: translateY(-4px);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(192,57,43,0.2) inset;
+            border-color: rgba(255,255,255,0.18);
+            transform: translateY(-6px);
+            box-shadow: 0 22px 50px rgba(0,0,0,0.50), 0 0 0 1px rgba(192,57,43,0.14) inset;
         }
 
         .service-card:hover::before {
@@ -484,7 +621,7 @@
             width: 56px;
             height: 56px;
             background: rgba(192,57,43,0.08);
-            border: 1px solid rgba(192,57,43,0.2);
+            border: 1px solid rgba(192,57,43,0.20);
             border-radius: 14px;
             display: flex;
             align-items: center;
@@ -504,7 +641,7 @@
 
         .service-name {
             font-size: 1.25rem;
-            font-weight: 700;
+            font-weight: 800;
             color: #fff;
             margin-bottom: 8px;
             position: relative;
@@ -514,7 +651,7 @@
         .service-desc {
             font-size: 0.95rem;
             color: var(--muted);
-            line-height: 1.7;
+            line-height: 1.8;
             position: relative;
             z-index: 1;
         }
@@ -536,7 +673,6 @@
             transform: translateX(-4px);
         }
 
-        /* تذييل */
         .footer {
             text-align: center;
             padding: 30px;
@@ -547,11 +683,10 @@
             z-index: 2;
         }
 
-        /* مودال */
         .modal-backdrop {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.85);
+            background: rgba(0,0,0,0.84);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             display: flex;
@@ -591,7 +726,7 @@
             font-size: 1.5rem;
             margin-bottom: 28px;
             color: #fff;
-            font-weight: 700;
+            font-weight: 800;
         }
 
         .modal-close {
@@ -608,7 +743,10 @@
             border-radius: 50%;
         }
 
-        .modal-close:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .modal-close:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
 
         .form-group {
             margin-bottom: 20px;
@@ -652,7 +790,9 @@
             border-radius: 8px;
         }
 
-        .form-error.show { display: flex; }
+        .form-error.show {
+            display: flex;
+        }
 
         .btn-submit {
             width: 100%;
@@ -660,7 +800,7 @@
             background: #fff;
             border: none;
             color: #000;
-            font-weight: 700;
+            font-weight: 800;
             font-size: 1rem;
             border-radius: 12px;
             cursor: pointer;
@@ -672,7 +812,8 @@
 
         .btn-submit:hover {
             background: #e0e0e0;
-            box-shadow: 0 8px 25px rgba(255,255,255,0.1);
+            box-shadow: 0 8px 25px rgba(255,255,255,0.10);
+            transform: translateY(-1px);
         }
 
         .btn-submit:disabled {
@@ -680,39 +821,100 @@
             cursor: not-allowed;
             background: #555;
             color: #999;
+            transform: none;
         }
 
-        /* للجوال */
+        @media (max-width: 840px) {
+            .app-banner-box {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .app-banner-left {
+                align-items: flex-start;
+            }
+
+            .banner-btn {
+                width: 100%;
+            }
+        }
+
         @media (max-width: 640px) {
-            .topbar { padding: 0 16px; height: 56px; }
-            .topbar-title { font-size: 1rem; }
-            .btn-login span { display: none; }
-            .btn-login { padding: 8px 14px; }
-            .hero { padding: 80px 16px 60px; }
-            .hero-logo { width: 80px; height: 80px; }
-            .hero-logo-glow { width: 100px; height: 100px; }
-            .ring-1 { width: 200px; height: 200px; }
-            .ring-2 { width: 300px; height: 300px; }
-            .ring-3 { width: 400px; height: 400px; }
-            .services { padding: 40px 16px 60px; }
-            .modal-box { padding: 24px 20px; }
+            .topbar {
+                padding: 0 16px;
+                height: 58px;
+            }
+
+            .topbar-title {
+                font-size: 1rem;
+            }
+
+            .btn-login span {
+                display: none;
+            }
+
+            .btn-login {
+                padding: 8px 14px;
+            }
+
+            .hero {
+                padding: 92px 16px 70px;
+            }
+
+            .hero-logo {
+                width: 80px;
+                height: 80px;
+            }
+
+            .hero-logo-glow {
+                width: 100px;
+                height: 100px;
+            }
+
+            .services {
+                padding: 42px 16px 60px;
+            }
+
+            .modal-box {
+                padding: 24px 20px;
+            }
+
+            .app-banner {
+                padding: 0 16px;
+            }
+
+            .app-banner-box {
+                padding: 18px 16px;
+                border-radius: 18px;
+            }
+
+            .app-banner-left {
+                gap: 12px;
+            }
+
+            .app-banner-icon {
+                min-width: 58px;
+                height: 58px;
+                border-radius: 16px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- نجوم متحركة -->
     <div class="stars"></div>
 
-    <!-- الشريط العلوي -->
     <header class="topbar">
         <div class="topbar-left">
             <img src="malines-icon.png" alt="Malines" class="topbar-logo" onerror="this.style.display='none'">
             <span class="topbar-title">مجتمع مالينز</span>
         </div>
+
         <div class="topbar-right">
             <button id="btnLogin" class="btn-login" onclick="openModal()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"/>
+                </svg>
                 <span>تسجيل الدخول</span>
             </button>
 
@@ -726,17 +928,17 @@
         </div>
     </header>
 
-    <!-- Hero -->
     <section class="hero" id="hero">
         <div class="hero-bg">
             <img src="malines-excon.png" alt="خلفية مالينز" onerror="this.style.display='none'">
         </div>
 
-        <div class="hero-rings">
-            <div class="ring ring-1"></div>
-            <div class="ring ring-2"></div>
-            <div class="ring ring-3"></div>
+        <div class="hero-aurora">
+            <div class="aurora-blob one"></div>
+            <div class="aurora-blob two"></div>
         </div>
+
+        <div class="hero-grid"></div>
 
         <div class="hero-logo-container">
             <div class="hero-logo-glow"></div>
@@ -744,16 +946,48 @@
         </div>
 
         <div class="hero-content">
+            <div class="hero-kicker">
+                <span class="dot"></span>
+                <span>المنصة المتكاملة للتوثيق والأرشيف والمجتمع</span>
+            </div>
             <h1 class="hero-title">مرحباً بك في مجتمع مالينز</h1>
-            <p class="hero-subtitle">المنصة المتكاملة للتوثيق والأرشيف والمجتمع</p>
+            <p class="hero-subtitle">تجربة أكثر هدوءًا واتساقًا، مع واجهة داكنة أنيقة تضع المحتوى في المقدمة وتمنح الصفحة حضورًا بصريًا قويًا دون ازدحام.</p>
         </div>
 
         <div class="hero-scroll" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <polyline points="6 9 12 15 18 9"/>
+            </svg>
         </div>
     </section>
 
-    <!-- الخدمات -->
+    <section class="app-banner">
+        <div class="app-banner-box">
+            <div class="app-banner-left">
+                <div class="app-banner-icon" aria-hidden="true">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="7" y="2" width="10" height="20" rx="2" />
+                        <line x1="10" y1="18" x2="14" y2="18" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="app-banner-title">يمكنكم اليوم تصفح المقالات عبر تطبيق الجوال مباشرة!</div>
+                    <div class="app-banner-text">نسخة الجوال تمنحك تصفحًا أسرع، وصولًا أسهل إلى المقالات، وتجربة قراءة أنظف على الهاتف.</div>
+                </div>
+            </div>
+
+            <a class="banner-btn"
+               href="https://www.mediafire.com/file/g9x7k87n0fbc3t2/Malines_Archive.apk/file"
+               target="_blank"
+               rel="noopener noreferrer">
+                تحميل التطبيق
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12l7 7 7-7"/>
+                </svg>
+            </a>
+        </div>
+    </section>
+
     <section class="services" id="services">
         <div class="section-header">
             <span class="section-label">الخدمات</span>
@@ -764,46 +998,56 @@
         <div class="services-grid">
             <a href="wiki.html" class="service-card">
                 <div class="service-icon">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                    </svg>
                 </div>
                 <div class="service-name">أرشيف مالينز المركزي</div>
                 <div class="service-desc">الموسوعة الحرة للوثائق والمخطوطات. تصفح المعاهدات، الحروب، والعمليات التاريخية المؤرشفة بتصميم احترافي.</div>
                 <div class="service-arrow">
                     <span>استكشف</span>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
                 </div>
             </a>
         </div>
     </section>
 
-    <!-- تذييل -->
     <footer class="footer">
         مجتمع مالينز &copy; 2026 &middot; جميع الحقوق محفوظة
     </footer>
 
-    <!-- مودال تسجيل الدخول -->
     <div id="loginModal" class="modal-backdrop">
         <div class="modal-box">
             <button class="modal-close" onclick="closeModal()">✕</button>
             <h2>تسجيل الدخول</h2>
+
             <div class="form-group">
                 <label for="emailInput">البريد الإلكتروني</label>
                 <input type="email" id="emailInput" placeholder="example@malines.com" dir="ltr" autocomplete="email">
             </div>
+
             <div class="form-group">
                 <label for="passInput">كلمة المرور</label>
                 <input type="password" id="passInput" placeholder="••••••••" autocomplete="current-password">
             </div>
+
             <div id="loginError" class="form-error">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="15" y1="9" x2="9" y2="15"/>
+                    <line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
                 <span></span>
             </div>
+
             <button id="btnSubmit" class="btn-submit" onclick="doLogin()">دخول</button>
         </div>
     </div>
 
     <script>
-        // المتغيرات
         const STORAGE_KEY = 'malines_user';
         let dropdownVisible = false;
 
@@ -912,14 +1156,15 @@
             }
         });
 
-        // التهيئة
         (function init() {
             const stored = localStorage.getItem(STORAGE_KEY);
             if (stored) {
                 try {
                     const user = JSON.parse(stored);
                     if (user.username) updateUI(user.username);
-                } catch (e) { clearUser(); }
+                } catch (e) {
+                    clearUser();
+                }
             }
         })();
     </script>
