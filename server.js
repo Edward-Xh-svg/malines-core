@@ -22,12 +22,29 @@ app.get('/api/articles', (req, res) => {
   }
 });
 
-// Clean URLs
+// صفحات الخدمات الجديدة (روابط نظيفة)
+app.get('/hostaka', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'hostaka.html'));
+});
+
+app.get('/stock', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'stock.html'));
+});
+
+app.get('/records', (req, res) => {   // سجلات الدول
+  res.sendFile(path.join(__dirname, 'public', 'ssc.html'));
+});
+
+app.get('/council', (req, res) => {   // المنتدى الدولي
+  res.sendFile(path.join(__dirname, 'public', 'csc.html'));
+});
+
+// رابط الأرشيف النظيف (كان موجوداً بالفعل)
 app.get('/archive', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'wiki.html'));
 });
 
-// SPA fallback
+// مسار SPA العام (يجب أن يكون آخر مسار)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
