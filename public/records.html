@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>المنتدى الدولي - سجلات هوستاكا | مجتمع مالينز</title>
 
-    <!-- Vercel Analytics -->
     <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments);};</script>
     <script defer src="/_vercel/insights/script.js"></script>
     <script>window.si=window.si||function(){(window.siq=window.siq||[]).push(arguments);};</script>
@@ -54,7 +53,6 @@
         }
         @keyframes starsMove { from{ transform:translateY(0); } to{ transform:translateY(-30px); } }
 
-        /* Topbar (مطابق للموقع) */
         .topbar {
             position: fixed; top:0; left:0; right:0; height:68px;
             background: rgba(5,5,5,0.58); backdrop-filter: blur(28px);
@@ -84,7 +82,6 @@
         .user-dropdown button { width:100%; text-align:right; padding:10px 16px; background:none; border:none; color:#ccc; cursor:pointer; }
         .user-dropdown button:hover { background:rgba(255,255,255,0.04); }
 
-        /* محتوى الصفحة */
         .records-header {
             position:relative; padding:120px 24px 60px; text-align:center; z-index:2;
         }
@@ -97,60 +94,67 @@
             max-width:600px; margin:40px auto 0; position:relative;
         }
         .search-bar input {
-            width:100%; padding:14px 20px; background:#1a1a1a; border:1px solid var(--border);
+            width:100%; padding:14px 20px 14px 48px; background:#1a1a1a; border:1px solid var(--border);
             border-radius:60px; color:#fff; font-family:'Cairo'; font-size:1rem;
         }
         .search-bar input:focus { outline:none; border-color:var(--red); }
+        .search-icon {
+            position:absolute; left:18px; top:50%; transform:translateY(-50%);
+            color:#666; pointer-events:none;
+        }
         .records-container {
             max-width:1300px; margin:0 auto 80px; padding:0 24px;
-            display:grid; grid-template-columns:repeat(auto-fill, minmax(360px,1fr)); gap:28px;
+            display:flex; flex-direction:column; gap:32px;
         }
         .record-card {
             background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.012));
             border:1px solid var(--border); border-radius:28px; overflow:hidden;
             transition:transform 0.25s, border-color 0.2s;
         }
-        .record-card:hover { transform:translateY(-5px); border-color:rgba(255,255,255,0.2); }
+        .record-card:hover { transform:translateY(-3px); border-color:rgba(255,255,255,0.2); }
         .card-img {
-            width:100%; height:200px; object-fit:cover; background:#111;
+            width:100%; max-height:320px; object-fit:cover; background:#111;
         }
         .img-placeholder {
             width:100%; height:200px; background:#111; display:flex; align-items:center; justify-content:center;
             color:#555;
         }
-        .card-content { padding:24px; }
+        .card-content { padding:28px; }
         .publisher-row {
-            display:flex; align-items:center; gap:12px; margin-bottom:16px;
+            display:flex; align-items:center; gap:14px; margin-bottom:20px;
         }
         .avatar {
-            width:44px; height:44px; border-radius:50%; background:linear-gradient(145deg, var(--red), #8e2a1f);
+            width:48px; height:48px; border-radius:50%; background:linear-gradient(145deg, var(--red), #8e2a1f);
             display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:1.3rem;
             color:white;
         }
-        .publisher-name { font-weight:700; font-size:1.1rem; }
+        .publisher-name { font-weight:700; font-size:1.15rem; }
         .record-text {
-            font-family:'Amiri', serif; line-height:1.8; color:#cbcbcb;
-            max-height:120px; overflow:hidden; transition:max-height 0.3s ease;
-            position:relative;
+            font-family:'Amiri', serif; line-height:1.9; color:#d0d0d0;
+            font-size:1.05rem;
+            white-space:pre-wrap;
         }
-        .record-text.expanded { max-height:1000px; }
         .read-more {
-            display:inline-block; margin-top:12px; color:var(--red); cursor:pointer; font-size:0.85rem;
+            display:inline-block; margin-top:16px; color:var(--red); cursor:pointer; font-size:0.9rem;
+            font-weight:600;
         }
         .no-results {
-            text-align:center; padding:60px; color:var(--muted); grid-column:1/-1;
+            text-align:center; padding:60px; color:var(--muted); 
         }
         .loading-spinner {
-            text-align:center; padding:60px; color:var(--muted); grid-column:1/-1;
+            text-align:center; padding:60px; color:var(--muted);
         }
         .footer { text-align:center; padding:30px; color:#444; border-top:1px solid rgba(255,255,255,0.03); }
+        .spinner { width:40px; height:40px; border:3px solid #2a2a2a; border-top-color:var(--red); border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 16px; }
+        @keyframes spin { to { transform:rotate(360deg); } }
 
         @media (max-width:640px) {
             .topbar { padding:0 16px; }
-            .records-container { grid-template-columns:1fr; gap:20px; }
-            .card-content { padding:18px; }
+            .card-content { padding:20px; }
+            .record-text { font-size:1rem; }
         }
-        /* Modal تسجيل الدخول (نفس السابق) */
+
+        /* Modal تسجيل الدخول */
         .modal-backdrop {
             position:fixed; inset:0; background:rgba(0,0,0,0.84); backdrop-filter:blur(12px);
             display:flex; align-items:center; justify-content:center; z-index:200;
@@ -196,16 +200,19 @@
     <h1>المنتدى الدولي</h1>
     <p>القرارات، التصريحات، الخطابات، الأحداث والمقالات الدبلوماسية</p>
     <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="🔍  ابحث في المنشورات... (النص أو اسم الناشر)">
+        <input type="text" id="searchInput" placeholder="ابحث في المنشورات...">
+        <span class="search-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </span>
     </div>
 </section>
 
 <div id="recordsContainer" class="records-container">
-    <div class="loading-spinner"><div class="spinner"></div> جاري تحميل الأرشيف...</div>
+    <div class="loading-spinner"><div class="spinner"></div> جاري تحميل المنشورات...</div>
 </div>
 
 <footer class="footer">
-    مجتمع مالينز &copy; 2026 · هوستاكا - المنتدى الدولي
+    مجتمع مالينز &copy; 2026 · المنتدى الدولي
 </footer>
 
 <div id="loginModal" class="modal-backdrop">
@@ -220,7 +227,7 @@
 </div>
 
 <script>
-    // -------------------- نظام المصادقة (نفس index) --------------------
+    // -------------------- نظام المصادقة --------------------
     const STORAGE_KEY='malines_user'; let dropdownVisible=false;
     const btnLogin=document.getElementById('btnLogin'), userBadge=document.getElementById('userBadge'), userInitial=document.getElementById('userInitial');
     const userDropdown=document.getElementById('userDropdown'), dropdownUsername=document.getElementById('dropdownUsername');
@@ -251,24 +258,31 @@
     document.addEventListener('click',e=>{ if(!userBadge.contains(e.target)){ userDropdown.classList.remove('show'); dropdownVisible=false; } });
     (function init(){ const stored=localStorage.getItem(STORAGE_KEY); if(stored){ try{ const user=JSON.parse(stored); if(user.username) updateUI(user.username); }catch(e){ clearUser(); } } })();
 
-    // -------------------- عرض جميع منشورات BNX --------------------
-    const MIN_ID = 35001;
-    const MAX_ID = 35060;  // ضعه حسب أكبر ملف لديك
+    // -------------------- عرض المنشورات من BNX عبر API حقيقي --------------------
     const container = document.getElementById('recordsContainer');
     const searchInput = document.getElementById('searchInput');
-    let allPosts = [];      // تخزين المنشورات المحملة
+    let allPosts = [];
 
-    async function loadAllPosts() {
-        container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div> جاري تحميل المنشورات...</div>';
-        const promises = [];
-        for (let id = MIN_ID; id <= MAX_ID; id++) {
-            promises.push(fetchPostData(id));
+    async function loadPostsList() {
+        try {
+            const res = await fetch('/api/bnx/list');
+            if (!res.ok) throw new Error();
+            const ids = await res.json();
+            if (!ids.length) {
+                container.innerHTML = '<div class="no-results">لا توجد منشورات حالياً.</div>';
+                return;
+            }
+            // تحميل كل المنشورات بناءً على المعرفات الحقيقية
+            const posts = [];
+            for (const id of ids) {
+                const post = await fetchPostData(id);
+                if (post) posts.push(post);
+            }
+            allPosts = posts.sort((a,b) => b.id - a.id);
+            renderPosts(allPosts);
+        } catch (err) {
+            container.innerHTML = '<div class="no-results">حدث خطأ في تحميل المنشورات.</div>';
         }
-        const results = await Promise.allSettled(promises);
-        allPosts = results.filter(r => r.status === 'fulfilled' && r.value !== null).map(r => r.value);
-        // ترتيب تنازلي حسب المعرف (الأحدث أولاً)
-        allPosts.sort((a,b) => b.id - a.id);
-        renderPosts(allPosts);
     }
 
     async function fetchPostData(id) {
@@ -281,7 +295,6 @@
             const content = await txtRes.text();
             const publisher = (await nameRes.text()).trim();
             if (!content || !publisher) return null;
-            // التحقق من وجود الصورة
             let imgExists = false;
             try {
                 const imgCheck = await fetch(`/BNX/JPG/${id}.jpg`, { method: 'HEAD' });
@@ -295,7 +308,7 @@
 
     function renderPosts(posts) {
         if (!posts.length) {
-            container.innerHTML = '<div class="no-results">⚠️ لا توجد منشورات في هذا النطاق. تأكد من وجود ملفات في BNX.</div>';
+            container.innerHTML = '<div class="no-results">لا توجد منشورات تطابق البحث.</div>';
             return;
         }
         container.innerHTML = '';
@@ -306,7 +319,12 @@
             const imgHtml = post.imgExists 
                 ? `<img class="card-img" src="/BNX/JPG/${post.id}.jpg" alt="صورة المنشور" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'img-placeholder\'><svg width=\'40\' height=\'40\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'#666\'><rect x=\'3\' y=\'3\' width=\'18\' height=\'18\' rx=\'2\'/></svg></div>';">`
                 : `<div class="img-placeholder"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#666"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>`;
-            const shortContent = post.content.length > 300 ? post.content.substring(0, 300) + '...' : post.content;
+            
+            // عرض النص بالكامل مع إمكانية التصغير/التوسيع
+            const fullContentHtml = escapeHtml(post.content).replace(/\n/g, '<br>');
+            const isLong = post.content.length > 400;
+            const shortContent = isLong ? fullContentHtml.substring(0, 400) + '...' : fullContentHtml;
+            
             card.innerHTML = `
                 ${imgHtml}
                 <div class="card-content">
@@ -314,26 +332,28 @@
                         <div class="avatar">${avatarLetter}</div>
                         <div class="publisher-name">${escapeHtml(post.publisher)}</div>
                     </div>
-                    <div class="record-text" id="text-${post.id}">${escapeHtml(shortContent).replace(/\n/g, '<br>')}</div>
-                    ${post.content.length > 300 ? `<div class="read-more" data-id="${post.id}">اقرأ المزيد ▼</div>` : ''}
+                    <div class="record-text" id="text-${post.id}">${isLong ? shortContent : fullContentHtml}</div>
+                    ${isLong ? `<div class="read-more" data-id="${post.id}">اقرأ المزيد ▼</div>` : ''}
                 </div>
             `;
             container.appendChild(card);
         });
-        // إضافة حدث قراءة المزيد
+        
+        // أحداث قراءة المزيد
         document.querySelectorAll('.read-more').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const id = btn.getAttribute('data-id');
+                const id = parseInt(btn.getAttribute('data-id'));
                 const textDiv = document.getElementById(`text-${id}`);
-                const postObj = allPosts.find(p => p.id == id);
+                const post = allPosts.find(p => p.id === id);
+                if (!post) return;
                 if (textDiv.classList.contains('expanded')) {
                     // تصغير
-                    const short = postObj.content.substring(0,300) + (postObj.content.length>300 ? '...' : '');
-                    textDiv.innerHTML = escapeHtml(short).replace(/\n/g, '<br>');
+                    const short = escapeHtml(post.content).substring(0, 400) + (post.content.length > 400 ? '...' : '');
+                    textDiv.innerHTML = short.replace(/\n/g, '<br>');
                     textDiv.classList.remove('expanded');
                     btn.innerHTML = 'اقرأ المزيد ▼';
                 } else {
-                    textDiv.innerHTML = escapeHtml(postObj.content).replace(/\n/g, '<br>');
+                    textDiv.innerHTML = escapeHtml(post.content).replace(/\n/g, '<br>');
                     textDiv.classList.add('expanded');
                     btn.innerHTML = 'عرض أقل ▲';
                 }
@@ -341,22 +361,30 @@
         });
     }
 
-    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
 
     function filterPosts() {
         const query = searchInput.value.trim().toLowerCase();
-        if (!query) { renderPosts(allPosts); return; }
-        const filtered = allPosts.filter(post => post.content.toLowerCase().includes(query) || post.publisher.toLowerCase().includes(query));
+        if (!query) {
+            renderPosts(allPosts);
+            return;
+        }
+        const filtered = allPosts.filter(post => 
+            post.content.toLowerCase().includes(query) || 
+            post.publisher.toLowerCase().includes(query)
+        );
         renderPosts(filtered);
     }
 
     searchInput.addEventListener('input', filterPosts);
-    loadAllPosts();
+    loadPostsList();
 </script>
-<style>
-    .spinner { width:40px; height:40px; border:3px solid #2a2a2a; border-top-color:var(--red); border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 16px; }
-    @keyframes spin { to { transform:rotate(360deg); } }
-    .card-img, .img-placeholder { transition:opacity 0.2s; }
-</style>
 </body>
 </html>
