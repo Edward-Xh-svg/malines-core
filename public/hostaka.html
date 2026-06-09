@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>هوستاكا | مجتمع مالينز</title>
+
+    <!-- Vercel Analytics (نفس index) -->
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script>
+        window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        malines: {
+                            black: '#050505',
+                            dark: '#0a0a0a',
+                            card: '#0f0f10',
+                            border: '#232325',
+                            text: '#e9e9e9',
+                            muted: '#8d8d8d',
+                            red: '#c0392b',
+                            'red-hover': '#e74c3c',
+                            accent: '#d4af37',
+                        }
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* نفس الأنماط الأساسية من index.html */
+        :root {
+            --black: #050505;
+            --dark: #0a0a0a;
+            --card: #0f0f10;
+            --border: #232325;
+            --text: #e9e9e9;
+            --muted: #8d8d8d;
+            --red: #c0392b;
+            --red-hover: #e74c3c;
+            --accent: #d4af37;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: radial-gradient(circle at 18% 16%, rgba(192, 57, 43, 0.10), transparent 22%),
+                        radial-gradient(circle at 82% 14%, rgba(212, 175, 55, 0.06), transparent 18%),
+                        radial-gradient(circle at 50% 84%, rgba(255, 255, 255, 0.03), transparent 24%),
+                        var(--black);
+            color: var(--text);
+            font-family: 'Cairo', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .stars {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.7;
+            background: radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,0.12), transparent),
+                        radial-gradient(1px 1px at 78% 28%, rgba(255,255,255,0.08), transparent),
+                        radial-gradient(1.5px 1.5px at 42% 72%, rgba(255,255,255,0.10), transparent),
+                        radial-gradient(1px 1px at 70% 10%, rgba(255,255,255,0.07), transparent),
+                        radial-gradient(1px 1px at 25% 85%, rgba(255,255,255,0.06), transparent);
+            animation: starsMove 38s linear infinite;
+        }
+
+        @keyframes starsMove {
+            from { transform: translateY(0); }
+            to { transform: translateY(-30px); }
+        }
+
+        /* Topbar - نفس الكود مع تعديل بسيط في الروابط */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 68px;
+            background: rgba(5, 5, 5, 0.58);
+            backdrop-filter: blur(28px);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            z-index: 100;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .topbar-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.10);
+        }
+
+        .topbar-title {
+            font-weight: 800;
+            font-size: 1.1rem;
+            background: linear-gradient(135deg, #ffffff 0%, #cfcfcf 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .btn-login {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.14);
+            color: #d7d7d7;
+            padding: 9px 20px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 0.88rem;
+            transition: all 0.25s ease;
+        }
+
+        .btn-login:hover {
+            border-color: rgba(255,255,255,0.30);
+            color: #fff;
+            background: rgba(255,255,255,0.06);
+            transform: translateY(-1px);
+        }
+
+        .user-badge {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffffff 0%, #e6e6e6 100%);
+            color: #000;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 52px;
+            left: 0;
+            background: rgba(10,10,10,0.96);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 8px 0;
+            min-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all 0.25s;
+            z-index: 10;
+        }
+
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-dropdown .dropdown-name {
+            padding: 8px 16px;
+            color: var(--muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .user-dropdown button {
+            width: 100%;
+            text-align: right;
+            padding: 10px 16px;
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+        }
+
+        .user-dropdown button:hover {
+            background: rgba(255,255,255,0.04);
+        }
+
+        /* Hero خاص بهوستاكا */
+        .hero-hostaka {
+            position: relative;
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 120px 24px 80px;
+            overflow: hidden;
+        }
+
+        .hero-hostaka .hero-orb {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(192,57,43,0.2), transparent 70%);
+            filter: blur(60px);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .hero-hostaka-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+        }
+
+        .hero-hostaka-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            background: linear-gradient(to bottom, #ffffff, #b6b6b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .hero-hostaka-desc {
+            color: var(--muted);
+            font-size: 1.2rem;
+            line-height: 1.8;
+        }
+
+        /* بطاقات الخدمات */
+        .services {
+            padding: 60px 24px 80px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(192,57,43,0.10);
+            border: 1px solid rgba(192,57,43,0.24);
+            border-radius: 999px;
+            padding: 6px 16px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--red-hover);
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 28px;
+        }
+
+        .service-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.012)),
+                        linear-gradient(145deg, #101012 0%, #0b0b0c 100%);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 24px;
+            padding: 32px 24px;
+            transition: all 0.35s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .service-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(255,255,255,0.2);
+            box-shadow: 0 22px 40px rgba(0,0,0,0.4);
+        }
+
+        .service-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(192,57,43,0.1);
+            border: 1px solid rgba(192,57,43,0.3);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            color: var(--red);
+        }
+
+        .service-name {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .service-desc {
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        /* قسم المنشور العشوائي */
+        .random-post-section {
+            max-width: 1000px;
+            margin: 0 auto 80px;
+            padding: 0 24px;
+        }
+
+        .random-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .random-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .refresh-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            color: var(--muted);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        .post-card {
+            background: rgba(15,15,16,0.7);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            overflow: hidden;
+            backdrop-filter: blur(4px);
+        }
+
+        .post-image {
+            width: 100%;
+            max-height: 320px;
+            object-fit: cover;
+            background: #111;
+            transition: opacity 0.3s;
+        }
+
+        .post-placeholder-img {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #444;
+        }
+
+        .post-content {
+            padding: 28px;
+        }
+
+        .post-publisher {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .publisher-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, var(--red), #8e2a1f);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.4rem;
+            color: white;
+            box-shadow: 0 0 12px rgba(192,57,43,0.4);
+        }
+
+        .publisher-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .post-text {
+            font-family: 'Amiri', serif;
+            line-height: 1.9;
+            font-size: 1.05rem;
+            color: #cbcbcb;
+            white-space: pre-wrap;
+            border-right: 3px solid var(--red);
+            padding-right: 20px;
+            margin-top: 8px;
+        }
+
+        .loading-post {
+            text-align: center;
+            padding: 60px;
+            color: #666;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #444;
+            border-top: 1px solid rgba(255,255,255,0.03);
+        }
+
+        /* Modal - نفس السابق */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.84);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s;
+            padding: 20px;
+        }
+        .modal-backdrop.active { opacity: 1; visibility: visible; }
+        .modal-box {
+            background: linear-gradient(180deg, #121213, #0d0d0e);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 24px;
+            padding: 36px 30px;
+            max-width: 420px;
+            width: 100%;
+            text-align: right;
+            transform: translateY(10px);
+            transition: transform 0.3s;
+        }
+        .modal-backdrop.active .modal-box { transform: translateY(0); }
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            background: #1a1a1a;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: #fff;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: #fff;
+            color: #000;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 640px) {
+            .topbar { padding: 0 16px; }
+            .services { padding: 40px 16px; }
+            .post-content { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="stars"></div>
+
+<header class="topbar">
+    <div class="topbar-left">
+        <img src="malines-icon.png" alt="Malines" class="topbar-logo" onerror="this.style.display='none'">
+        <span class="topbar-title">مجتمع مالينز - هوستاكا</span>
+    </div>
+    <div class="topbar-right">
+        <button id="btnLogin" class="btn-login" onclick="openModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"/></svg>
+            <span>تسجيل الدخول</span>
+        </button>
+        <div id="userBadge" class="user-badge" style="display: none;" onclick="toggleDropdown()">
+            <span id="userInitial"></span>
+            <div id="userDropdown" class="user-dropdown">
+                <div class="dropdown-name" id="dropdownUsername"></div>
+                <button onclick="handleLogout()">تسجيل الخروج</button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<section class="hero-hostaka">
+    <div class="hero-orb"></div>
+    <div class="hero-hostaka-content">
+        <h1 class="hero-hostaka-title">هوستاكا Hostaka</h1>
+        <p class="hero-hostaka-desc">لعبة جيوسياسية عميكة وعالم موازٍ داخل مجتمع مالينز.<br>حيث تتشابك السياسة، الاقتصاد والدبلوماسية.</p>
+    </div>
+</section>
+
+<section class="services">
+    <div class="section-header">
+        <span class="section-label">بوابة الخدمات</span>
+        <h2 class="section-title">اختر منصة الخدمات</h2>
+    </div>
+    <div class="services-grid">
+        <a href="/stock" class="service-card">
+            <div class="service-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 22 3 22 9"/><line x1="10" y1="14" x2="21" y2="3"/><path d="M21 16v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3"/><line x1="9" y1="15" x2="3" y2="9"/></svg>
+            </div>
+            <div class="service-name">بورصة هوستاكا</div>
+            <div class="service-desc">تداول الأسهم، متابعة مؤشرات الدول، وإدارة الثروات داخل اللعبة.</div>
+        </a>
+        <a href="/council" class="service-card">
+            <div class="service-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <div class="service-name">سجلات الدول</div>
+            <div class="service-desc">قاعدة بيانات شاملة للدول، الإحصائيات، والملفات الخاصة والعامة.</div>
+        </a>
+        <a href="/records" class="service-card">
+            <div class="service-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            </div>
+            <div class="service-name">المنتدى الدولي</div>
+            <div class="service-desc">القرارات، التصريحات، الخطابات، الأحداث والمقالات الدبلوماسية.</div>
+        </a>
+    </div>
+</section>
+
+<!-- قسم المنشور العشوائي من BNX -->
+<section class="random-post-section">
+    <div class="random-header">
+        <div class="random-title">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/><path d="M6 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M9 12h6"/><path d="M9 8h6"/></svg>
+            منشور عشوائي من المنتدى
+        </div>
+        <button id="refreshPostBtn" class="refresh-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            منشور آخر
+        </button>
+    </div>
+    <div id="randomPostContainer">
+        <div class="loading-post">
+            <div class="spinner"></div>
+            <p>جارٍ تحميل منشور عشوائي...</p>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    مجتمع مالينز &copy; 2026 · هوستاكا - لعبة الجيوسياسية
+</footer>
+
+<div id="loginModal" class="modal-backdrop">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <h2>تسجيل الدخول</h2>
+        <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="emailInput" dir="ltr"></div>
+        <div class="form-group"><label>كلمة المرور</label><input type="password" id="passInput"></div>
+        <div id="loginError" class="form-error" style="display:none; color:var(--red-hover);"></div>
+        <button id="btnSubmit" class="btn-submit" onclick="doLogin()">دخول</button>
+    </div>
+</div>
+
+<script>
+    // نظام المصادقة (نفس index)
+    const STORAGE_KEY = 'malines_user';
+    let dropdownVisible = false;
+    const btnLogin = document.getElementById('btnLogin');
+    const userBadge = document.getElementById('userBadge');
+    const userInitial = document.getElementById('userInitial');
+    const userDropdown = document.getElementById('userDropdown');
+    const dropdownUsername = document.getElementById('dropdownUsername');
+    const loginModal = document.getElementById('loginModal');
+    const loginError = document.getElementById('loginError');
+    const btnSubmit = document.getElementById('btnSubmit');
+
+    function openModal() { loginModal.classList.add('active'); }
+    function closeModal() { loginModal.classList.remove('active'); }
+    loginModal.addEventListener('click', e => { if(e.target === loginModal) closeModal(); });
+    document.addEventListener('keydown', e => { if(e.key === 'Escape') closeModal(); });
+
+    async function doLogin() {
+        const email = document.getElementById('emailInput').value.trim();
+        const password = document.getElementById('passInput').value;
+        loginError.style.display = 'none';
+        if(!email || !password) { showError('يرجى تعبئة الحقول'); return; }
+        btnSubmit.disabled = true;
+        try {
+            const res = await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email,password}) });
+            const data = await res.json();
+            if(res.ok && data.success) { setLoggedInUser(data.username); closeModal(); }
+            else showError(data.error || 'فشل تسجيل الدخول');
+        } catch(e) { showError('تعذر الاتصال بالخادم'); }
+        finally { btnSubmit.disabled = false; }
+    }
+    function showError(msg) { loginError.textContent = msg; loginError.style.display = 'block'; }
+    function setLoggedInUser(username) { localStorage.setItem(STORAGE_KEY, JSON.stringify({username})); updateUI(username); }
+    function updateUI(username) { btnLogin.style.display = 'none'; userBadge.style.display = 'flex'; userInitial.textContent = username.charAt(0).toUpperCase(); dropdownUsername.textContent = username; }
+    function clearUser() { localStorage.removeItem(STORAGE_KEY); btnLogin.style.display = 'flex'; userBadge.style.display = 'none'; userDropdown.classList.remove('show'); }
+    function handleLogout() { clearUser(); }
+    function toggleDropdown() { dropdownVisible = !dropdownVisible; userDropdown.classList.toggle('show', dropdownVisible); }
+    document.addEventListener('click', e => { if(!userBadge.contains(e.target)) { userDropdown.classList.remove('show'); dropdownVisible=false; } });
+    (function init() { const stored = localStorage.getItem(STORAGE_KEY); if(stored) { try { const user = JSON.parse(stored); if(user.username) updateUI(user.username); } catch(e){ clearUser(); } } })();
+
+    // ======================= المنشور العشوائي =======================
+    // نطاق المعرفات (يمكن تعديله حسب الملفات الموجودة في BNX)
+    const MIN_ID = 35001;
+    const MAX_ID = 35030;  // يفضل ضبطه حسب أكبر رقم موجود
+    const container = document.getElementById('randomPostContainer');
+    const refreshBtn = document.getElementById('refreshPostBtn');
+
+    async function fetchRandomPost() {
+        container.innerHTML = `<div class="loading-post"><div class="spinner" style="width:32px;height:32px;border:2px solid #333;border-top-color:var(--red);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div><p>جارٍ تحميل منشور...</p></div>`;
+        
+        // اختيار رقم عشوائي
+        const randomId = Math.floor(Math.random() * (MAX_ID - MIN_ID + 1)) + MIN_ID;
+        const txtUrl = `/BNX/TXT/${randomId}.txt`;
+        const nameUrl = `/BNX/NAME/${randomId}.txt`;
+        const imgUrl = `/BNX/JPG/${randomId}.jpg`;
+        
+        try {
+            const [txtRes, nameRes] = await Promise.all([fetch(txtUrl), fetch(nameUrl)]);
+            if(!txtRes.ok || !nameRes.ok) throw new Error('الملف غير موجود');
+            const content = await txtRes.text();
+            const publisherName = (await nameRes.text()).trim();
+            // عرض الصورة (قد لا توجد دائماً)
+            const imgExists = await fetch(imgUrl, { method:'HEAD' }).then(r => r.ok).catch(()=>false);
+            
+            const avatarLetter = publisherName.charAt(0).toUpperCase();
+            const imageHtml = imgExists ? `<img class="post-image" src="${imgUrl}" alt="صورة المنشور" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'post-placeholder-img\'><svg width=\'48\' height=\'48\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'#666\'><rect x=\'3\' y=\'3\' width=\'18\' height=\'18\' rx=\'2\'/></svg></div>';">` : `<div class="post-placeholder-img"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#666"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>`;
+            
+            const postHtml = `
+                <div class="post-card">
+                    ${imageHtml}
+                    <div class="post-content">
+                        <div class="post-publisher">
+                            <div class="publisher-avatar">${avatarLetter}</div>
+                            <div class="publisher-name">${escapeHtml(publisherName)}</div>
+                        </div>
+                        <div class="post-text">${escapeHtml(content).replace(/\n/g, '<br>')}</div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = postHtml;
+        } catch(error) {
+            container.innerHTML = `<div class="loading-post" style="color:var(--red-hover);">⚠️ فشل تحميل المنشور. حاول مرة أخرى لاحقاً.</div>`;
+            console.error(error);
+        }
+    }
+    
+    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){ if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; return m;}); }
+    
+    refreshBtn.addEventListener('click', fetchRandomPost);
+    fetchRandomPost(); // التحميل الأول
+</script>
+<style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { width: 32px; height: 32px; border: 2px solid #2a2a2a; border-top-color: var(--red); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+    .post-image { width: 100%; max-height: 280px; object-fit: cover; background: #0a0a0a; transition: opacity 0.2s; }
+    .post-placeholder-img { width: 100%; height: 200px; background: #111; display: flex; align-items: center; justify-content: center; }
+    .form-error { background: rgba(192,57,43,0.1); padding: 10px; border-radius: 8px; margin-bottom: 16px; text-align: center; }
+</style>
+</body>
+</html>
