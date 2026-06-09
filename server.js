@@ -12,7 +12,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // -------------------- API Routes --------------------
 
-// قائمة مقالات الأرشيف (كما هي)
+// قائمة مقالات الأرشيف
 app.get('/api/articles', (req, res) => {
   const filePath = path.join(__dirname, 'public', 'articles.json');
   if (fs.existsSync(filePath)) {
