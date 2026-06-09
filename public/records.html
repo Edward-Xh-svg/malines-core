@@ -257,47 +257,64 @@
     document.addEventListener('click',e=>{ if(!userBadge.contains(e.target)){ userDropdown.classList.remove('show'); dropdownVisible=false; } });
     (function init(){ const stored=localStorage.getItem(STORAGE_KEY); if(stored){ try{ const user=JSON.parse(stored); if(user.username) updateUI(user.username); }catch(e){ clearUser(); } } })();
 
-    // -------------------- عرض المنشورات الحقيقية من BNX (بدون API) --------------------
+    // -------------------- عرض المنشورات الحقيقية فقط (رفض HTML) --------------------
     const MIN_ID = 35001;
-    const MAX_ID = 35099;  // يمكنك توسيع النطاق إذا احتجت
+    const MAX_ID = 35099;
     const container = document.getElementById('recordsContainer');
     const searchInput = document.getElementById('searchInput');
     let allPosts = [];
 
+    // دالة للتحقق مما إذا كان النص يبدو كـ HTML
+    function looksLikeHtml(text) {
+        const trimmed = text.trim();
+        return trimmed.startsWith('<!DOCTYPE') || 
+               trimmed.startsWith('<html') || 
+               trimmed.startsWith('<head') ||
+               (trimmed.includes('<body') && trimmed.includes('</body>'));
+    }
+
     async function loadAllExistingPosts() {
         container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div> جاري فحص المنشورات...</div>';
-        const promises = [];
+        const foundPosts = [];
+        
+        // نفحص كل معرف بشكل متسلسل لنتجنب ضغط الخادم (يمكن تغييره إلى موازي لكن متسلسل أخف)
         for (let id = MIN_ID; id <= MAX_ID; id++) {
-            promises.push(checkAndFetchPost(id));
+            try {
+                const [txtRes, nameRes] = await Promise.all([
+                    fetch(`/BNX/TXT/${id}.txt`),
+                    fetch(`/BNX/NAME/${id}.txt`)
+                ]);
+                
+                // نرفض أي استجابة غير 200 OK
+                if (!txtRes.ok || !nameRes.ok) continue;
+                
+                // نتحقق من محتوى الملفات
+                const content = await txtRes.text();
+                const publisher = (await nameRes.text()).trim();
+                
+                // رفض إذا كان المحتوى يبدو كـ HTML
+                if (looksLikeHtml(content)) continue;
+                if (!content || !publisher) continue;
+                
+                // التحقق من وجود الصورة (اختياري)
+                let imgExists = false;
+                try {
+                    const imgCheck = await fetch(`/BNX/JPG/${id}.jpg`, { method: 'HEAD' });
+                    imgExists = imgCheck.ok;
+                } catch(e) { imgExists = false; }
+                
+                foundPosts.push({ id, content, publisher, imgExists });
+            } catch(e) {
+                // نتجاهل أي خطأ شبكي بسيط
+                continue;
+            }
         }
-        const results = await Promise.allSettled(promises);
-        allPosts = results.filter(r => r.status === 'fulfilled' && r.value !== null).map(r => r.value);
-        allPosts.sort((a,b) => b.id - a.id);
+        
+        allPosts = foundPosts.sort((a,b) => b.id - a.id);
         if (allPosts.length === 0) {
             container.innerHTML = '<div class="no-results">لا توجد منشورات حالياً.</div>';
         } else {
             renderPosts(allPosts);
-        }
-    }
-
-    async function checkAndFetchPost(id) {
-        try {
-            const [txtRes, nameRes] = await Promise.all([
-                fetch(`/BNX/TXT/${id}.txt`),
-                fetch(`/BNX/NAME/${id}.txt`)
-            ]);
-            if (!txtRes.ok || !nameRes.ok) return null;
-            const content = await txtRes.text();
-            const publisher = (await nameRes.text()).trim();
-            if (!content || !publisher) return null;
-            let imgExists = false;
-            try {
-                const imgCheck = await fetch(`/BNX/JPG/${id}.jpg`, { method: 'HEAD' });
-                imgExists = imgCheck.ok;
-            } catch(e) { imgExists = false; }
-            return { id, content, publisher, imgExists };
-        } catch(e) {
-            return null;
         }
     }
 
