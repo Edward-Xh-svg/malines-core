@@ -299,7 +299,7 @@
 
     async function loadCountries() {
         try {
-            const response = await fetch('/api/nbn/list');
+            const response = await fetch('/NBN/NB');
             if (!response.ok) throw new Error('HTTP error ' + response.status);
             const text = await response.text();
             if (isHtmlResponse(text)) {
