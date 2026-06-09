@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>هوستاكا | مجتمع مالينز</title>
+    <title>المنتدى الدولي - سجلات هوستاكا | مجتمع مالينز</title>
 
-    <!-- Vercel Analytics -->
     <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments);};</script>
     <script defer src="/_vercel/insights/script.js"></script>
     <script>window.si=window.si||function(){(window.siq=window.siq||[]).push(arguments);};</script>
@@ -83,97 +82,78 @@
         .user-dropdown button { width:100%; text-align:right; padding:10px 16px; background:none; border:none; color:#ccc; cursor:pointer; }
         .user-dropdown button:hover { background:rgba(255,255,255,0.04); }
 
-        .hero-hostaka {
-            position:relative; min-height:50vh; display:flex; align-items:center; justify-content:center;
-            text-align:center; padding:120px 24px 80px; overflow:hidden;
+        .records-header {
+            position:relative; padding:120px 24px 60px; text-align:center; z-index:2;
         }
-        .hero-hostaka .hero-orb {
-            position:absolute; width:500px; height:500px; background:radial-gradient(circle, rgba(192,57,43,0.15), transparent 70%);
-            filter:blur(60px); top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none;
+        .records-header h1 {
+            font-size:clamp(2rem,5vw,3.2rem); font-weight:900;
+            background:linear-gradient(to bottom,#fff,#b6b6b6); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
         }
-        .hero-hostaka-content { position:relative; z-index:2; max-width:800px; }
-        .hero-hostaka-title { font-size:clamp(2rem,5vw,3.5rem); font-weight:900; background:linear-gradient(to bottom,#fff,#b6b6b6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:20px; }
-        .hero-hostaka-desc { color:var(--muted); font-size:1.2rem; line-height:1.8; }
-
-        .services {
-            padding:60px 24px 80px; max-width:1200px; margin:0 auto;
+        .records-header p { color:var(--muted); margin-top:12px; }
+        .search-bar {
+            max-width:600px; margin:40px auto 0; position:relative;
         }
-        .section-header { text-align:center; margin-bottom:48px; }
-        .section-label {
-            display:inline-flex; align-items:center; gap:8px; background:rgba(192,57,43,0.10);
-            border:1px solid rgba(192,57,43,0.24); border-radius:999px; padding:6px 16px;
-            font-size:0.8rem; font-weight:700; color:var(--red-hover); margin-bottom:16px;
+        .search-bar input {
+            width:100%; padding:14px 20px 14px 48px; background:#1a1a1a; border:1px solid var(--border);
+            border-radius:60px; color:#fff; font-family:'Cairo'; font-size:1rem;
         }
-        .section-title { font-size:clamp(1.8rem,4vw,2.5rem); font-weight:800; color:#fff; }
-        .services-grid {
-            display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:28px;
+        .search-bar input:focus { outline:none; border-color:var(--red); }
+        .search-icon {
+            position:absolute; left:18px; top:50%; transform:translateY(-50%);
+            color:#666; pointer-events:none;
         }
-        .service-card {
-            background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.012)), linear-gradient(145deg,#101012,#0b0b0c);
-            border:1px solid rgba(255,255,255,0.08); border-radius:24px; padding:32px 24px;
-            transition:all 0.35s; text-decoration:none; color:inherit; display:block;
+        .records-container {
+            max-width:1300px; margin:0 auto 80px; padding:0 24px;
+            display:flex; flex-direction:column; gap:32px;
         }
-        .service-card:hover { transform:translateY(-6px); border-color:rgba(255,255,255,0.2); box-shadow:0 22px 40px rgba(0,0,0,0.4); }
-        .service-icon {
-            width:56px; height:56px; background:rgba(192,57,43,0.1); border:1px solid rgba(192,57,43,0.3);
-            border-radius:16px; display:flex; align-items:center; justify-content:center; margin-bottom:20px; color:var(--red);
+        .record-card {
+            background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.012));
+            border:1px solid var(--border); border-radius:28px; overflow:hidden;
+            transition:transform 0.25s, border-color 0.2s;
         }
-        .service-name { font-size:1.4rem; font-weight:800; margin-bottom:10px; }
-        .service-desc { color:var(--muted); line-height:1.7; }
-
-        .random-post-section {
-            max-width:1000px; margin:0 auto 80px; padding:0 24px;
+        .record-card:hover { transform:translateY(-3px); border-color:rgba(255,255,255,0.2); }
+        .card-img {
+            width:100%; max-height:320px; object-fit:cover; background:#111;
         }
-        .random-header {
-            display:flex; justify-content:space-between; align-items:baseline;
-            border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:28px;
-            flex-wrap:wrap; gap:12px;
-        }
-        .random-title {
-            font-size:1.5rem; font-weight:800; display:flex; align-items:center; gap:10px;
-        }
-        .refresh-btn {
-            background:rgba(255,255,255,0.05); border:1px solid var(--border);
-            padding:8px 18px; border-radius:40px; cursor:pointer; font-family:'Cairo',sans-serif;
-            color:var(--muted); transition:0.2s; display:flex; align-items:center; gap:8px;
-        }
-        .refresh-btn:hover { background:rgba(255,255,255,0.1); color:#fff; }
-        .post-card {
-            background:rgba(15,15,16,0.7); border:1px solid var(--border); border-radius:28px;
-            overflow:hidden; backdrop-filter:blur(4px);
-        }
-        .post-image {
-            width:100%; max-height:280px; object-fit:cover; background:#111; transition:opacity 0.3s;
-        }
-        .post-placeholder-img {
+        .img-placeholder {
             width:100%; height:200px; background:#111; display:flex; align-items:center; justify-content:center;
             color:#555;
         }
-        .post-content { padding:28px; }
-        .post-publisher {
+        .card-content { padding:28px; }
+        .publisher-row {
             display:flex; align-items:center; gap:14px; margin-bottom:20px;
         }
-        .publisher-avatar {
+        .avatar {
             width:48px; height:48px; border-radius:50%; background:linear-gradient(145deg, var(--red), #8e2a1f);
-            display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:1.4rem;
-            color:white; box-shadow:0 0 12px rgba(192,57,43,0.4);
+            display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:1.3rem;
+            color:white;
         }
-        .publisher-name { font-weight:700; font-size:1.1rem; }
-        .post-text {
-            font-family:'Amiri', serif; line-height:1.9; font-size:1.05rem; color:#cbcbcb;
-            white-space:pre-wrap; border-right:3px solid var(--red); padding-right:20px;
+        .publisher-name { font-weight:700; font-size:1.15rem; }
+        .record-text {
+            font-family:'Amiri', serif; line-height:1.9; color:#d0d0d0;
+            font-size:1.05rem;
+            white-space:pre-wrap;
         }
-        .loading-post { text-align:center; padding:60px; color:var(--muted); }
+        .read-more {
+            display:inline-block; margin-top:16px; color:var(--red); cursor:pointer; font-size:0.9rem;
+            font-weight:600;
+        }
+        .no-results {
+            text-align:center; padding:60px; color:var(--muted);
+        }
+        .loading-spinner {
+            text-align:center; padding:60px; color:var(--muted);
+        }
         .footer { text-align:center; padding:30px; color:#444; border-top:1px solid rgba(255,255,255,0.03); }
         .spinner { width:40px; height:40px; border:3px solid #2a2a2a; border-top-color:var(--red); border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 16px; }
         @keyframes spin { to { transform:rotate(360deg); } }
 
         @media (max-width:640px) {
             .topbar { padding:0 16px; }
-            .services { padding:40px 16px; }
-            .post-content { padding:20px; }
-            .post-text { font-size:1rem; }
+            .card-content { padding:20px; }
+            .record-text { font-size:1rem; }
         }
+
         .modal-backdrop {
             position:fixed; inset:0; background:rgba(0,0,0,0.84); backdrop-filter:blur(12px);
             display:flex; align-items:center; justify-content:center; z-index:200;
@@ -198,7 +178,7 @@
 <header class="topbar">
     <div class="topbar-left">
         <img src="malines-icon.png" alt="Malines" class="topbar-logo" onerror="this.style.display='none'">
-        <span class="topbar-title">مجتمع مالينز - هوستاكا</span>
+        <span class="topbar-title">مجتمع مالينز - المنتدى الدولي</span>
     </div>
     <div class="topbar-right">
         <button id="btnLogin" class="btn-login" onclick="openModal()">
@@ -215,62 +195,23 @@
     </div>
 </header>
 
-<section class="hero-hostaka">
-    <div class="hero-orb"></div>
-    <div class="hero-hostaka-content">
-        <h1 class="hero-hostaka-title">هوستاكا Hostaka</h1>
-        <p class="hero-hostaka-desc">لعبة جيوسياسية عميقة وعالم موازٍ داخل مجتمع مالينز.<br>حيث تتشابك السياسة، الاقتصاد والدبلوماسية.</p>
+<section class="records-header">
+    <h1>المنتدى الدولي</h1>
+    <p>القرارات، التصريحات، الخطابات، الأحداث والمقالات الدبلوماسية</p>
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="ابحث في المنشورات...">
+        <span class="search-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </span>
     </div>
 </section>
 
-<section class="services">
-    <div class="section-header">
-        <span class="section-label">بوابة الخدمات</span>
-        <h2 class="section-title">اختر منصة الخدمات</h2>
-    </div>
-    <div class="services-grid">
-        <a href="/stock" class="service-card">
-            <div class="service-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 22 3 22 9"/><line x1="10" y1="14" x2="21" y2="3"/><path d="M21 16v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3"/><line x1="9" y1="15" x2="3" y2="9"/></svg>
-            </div>
-            <div class="service-name">بورصة هوستاكا</div>
-            <div class="service-desc">تداول الأسهم، متابعة مؤشرات الدول، وإدارة الثروات داخل اللعبة.</div>
-        </a>
-        <a href="/council" class="service-card">
-            <div class="service-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>
-            </div>
-            <div class="service-name">سجلات الدول</div>
-            <div class="service-desc">قاعدة بيانات شاملة للدول، الإحصائيات، والملفات الخاصة والعامة.</div>
-        </a>
-        <a href="/records" class="service-card">
-            <div class="service-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-            </div>
-            <div class="service-name">المنتدى الدولي</div>
-            <div class="service-desc">القرارات، التصريحات، الخطابات، الأحداث والمقالات الدبلوماسية.</div>
-        </a>
-    </div>
-</section>
-
-<section class="random-post-section">
-    <div class="random-header">
-        <div class="random-title">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/><path d="M6 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M9 12h6"/><path d="M9 8h6"/></svg>
-            منشور عشوائي من المنتدى
-        </div>
-        <button id="refreshRandomPost" class="refresh-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-            منشور آخر
-        </button>
-    </div>
-    <div id="randomPostContainer">
-        <div class="loading-post"><div class="spinner"></div><p>جارٍ اختيار منشور عشوائي...</p></div>
-    </div>
-</section>
+<div id="recordsContainer" class="records-container">
+    <div class="loading-spinner"><div class="spinner"></div> جاري تحميل المنشورات...</div>
+</div>
 
 <footer class="footer">
-    مجتمع مالينز &copy; 2026 · هوستاكا - لعبة الجيوسياسية
+    مجتمع مالينز &copy; 2026 · المنتدى الدولي
 </footer>
 
 <div id="loginModal" class="modal-backdrop">
@@ -285,7 +226,7 @@
 </div>
 
 <script>
-    // -------------------- نظام المصادقة (نفس index) --------------------
+    // -------------------- نظام المصادقة (مطابق) --------------------
     const STORAGE_KEY='malines_user'; let dropdownVisible=false;
     const btnLogin=document.getElementById('btnLogin'), userBadge=document.getElementById('userBadge'), userInitial=document.getElementById('userInitial');
     const userDropdown=document.getElementById('userDropdown'), dropdownUsername=document.getElementById('dropdownUsername');
@@ -316,62 +257,96 @@
     document.addEventListener('click',e=>{ if(!userBadge.contains(e.target)){ userDropdown.classList.remove('show'); dropdownVisible=false; } });
     (function init(){ const stored=localStorage.getItem(STORAGE_KEY); if(stored){ try{ const user=JSON.parse(stored); if(user.username) updateUI(user.username); }catch(e){ clearUser(); } } })();
 
-    // -------------------- المنشور العشوائي (بدون API، مثل wiki.html) --------------------
-    const randomContainer = document.getElementById('randomPostContainer');
-    const refreshBtn = document.getElementById('refreshRandomPost');
+    // -------------------- عرض المنشورات الحقيقية من BNX (بدون API) --------------------
     const MIN_ID = 35001;
-    const MAX_ID = 35099;
-    const MAX_ATTEMPTS = 20;
+    const MAX_ID = 35099;  // يمكنك توسيع النطاق إذا احتجت
+    const container = document.getElementById('recordsContainer');
+    const searchInput = document.getElementById('searchInput');
+    let allPosts = [];
 
-    async function fetchRandomPost() {
-        randomContainer.innerHTML = '<div class="loading-post"><div class="spinner"></div><p>جارٍ اختيار منشور...</p></div>';
-        
-        for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-            const randomId = Math.floor(Math.random() * (MAX_ID - MIN_ID + 1)) + MIN_ID;
-            try {
-                const [txtRes, nameRes] = await Promise.all([
-                    fetch(`/BNX/TXT/${randomId}.txt`),
-                    fetch(`/BNX/NAME/${randomId}.txt`)
-                ]);
-                if (!txtRes.ok || !nameRes.ok) continue;
-                
-                const content = await txtRes.text();
-                const publisher = (await nameRes.text()).trim();
-                if (!content || !publisher) continue;
-                
-                let imgExists = false;
-                try {
-                    const imgCheck = await fetch(`/BNX/JPG/${randomId}.jpg`, { method: 'HEAD' });
-                    imgExists = imgCheck.ok;
-                } catch(e) { imgExists = false; }
-                
-                displayPost(randomId, content, publisher, imgExists);
-                return;
-            } catch(e) {}
+    async function loadAllExistingPosts() {
+        container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div> جاري فحص المنشورات...</div>';
+        const promises = [];
+        for (let id = MIN_ID; id <= MAX_ID; id++) {
+            promises.push(checkAndFetchPost(id));
         }
-        randomContainer.innerHTML = '<div class="loading-post" style="color:var(--red-hover);">⚠️ لم يتم العثور على منشورات. تأكد من وجود ملفات في مجلد BNX.</div>';
+        const results = await Promise.allSettled(promises);
+        allPosts = results.filter(r => r.status === 'fulfilled' && r.value !== null).map(r => r.value);
+        allPosts.sort((a,b) => b.id - a.id);
+        if (allPosts.length === 0) {
+            container.innerHTML = '<div class="no-results">لا توجد منشورات حالياً.</div>';
+        } else {
+            renderPosts(allPosts);
+        }
     }
 
-    function displayPost(id, content, publisher, imgExists) {
-        const avatarLetter = publisher.charAt(0).toUpperCase();
-        const imgHtml = imgExists 
-            ? `<img class="post-image" src="/BNX/JPG/${id}.jpg" alt="صورة المنشور" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'post-placeholder-img\'><svg width=\'40\' height=\'40\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'#666\'><rect x=\'3\' y=\'3\' width=\'18\' height=\'18\' rx=\'2\'/></svg></div>';">`
-            : `<div class="post-placeholder-img"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#666"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>`;
-        
-        const formattedContent = escapeHtml(content).replace(/\n/g, '<br>');
-        
-        randomContainer.innerHTML = `
-            <div class="post-card">
+    async function checkAndFetchPost(id) {
+        try {
+            const [txtRes, nameRes] = await Promise.all([
+                fetch(`/BNX/TXT/${id}.txt`),
+                fetch(`/BNX/NAME/${id}.txt`)
+            ]);
+            if (!txtRes.ok || !nameRes.ok) return null;
+            const content = await txtRes.text();
+            const publisher = (await nameRes.text()).trim();
+            if (!content || !publisher) return null;
+            let imgExists = false;
+            try {
+                const imgCheck = await fetch(`/BNX/JPG/${id}.jpg`, { method: 'HEAD' });
+                imgExists = imgCheck.ok;
+            } catch(e) { imgExists = false; }
+            return { id, content, publisher, imgExists };
+        } catch(e) {
+            return null;
+        }
+    }
+
+    function renderPosts(posts) {
+        container.innerHTML = '';
+        posts.forEach(post => {
+            const card = document.createElement('div');
+            card.className = 'record-card';
+            const avatarLetter = post.publisher.charAt(0).toUpperCase();
+            const imgHtml = post.imgExists
+                ? `<img class="card-img" src="/BNX/JPG/${post.id}.jpg" alt="صورة المنشور" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'img-placeholder\'><svg width=\'40\' height=\'40\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'#666\'><rect x=\'3\' y=\'3\' width=\'18\' height=\'18\' rx=\'2\'/></svg></div>';">`
+                : `<div class="img-placeholder"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#666"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>`;
+            
+            const fullContentHtml = escapeHtml(post.content).replace(/\n/g, '<br>');
+            const isLong = post.content.length > 400;
+            const shortContent = isLong ? fullContentHtml.substring(0, 400) + '...' : fullContentHtml;
+            
+            card.innerHTML = `
                 ${imgHtml}
-                <div class="post-content">
-                    <div class="post-publisher">
-                        <div class="publisher-avatar">${avatarLetter}</div>
-                        <div class="publisher-name">${escapeHtml(publisher)}</div>
+                <div class="card-content">
+                    <div class="publisher-row">
+                        <div class="avatar">${avatarLetter}</div>
+                        <div class="publisher-name">${escapeHtml(post.publisher)}</div>
                     </div>
-                    <div class="post-text">${formattedContent}</div>
+                    <div class="record-text" id="text-${post.id}">${isLong ? shortContent : fullContentHtml}</div>
+                    ${isLong ? `<div class="read-more" data-id="${post.id}">اقرأ المزيد ▼</div>` : ''}
                 </div>
-            </div>
-        `;
+            `;
+            container.appendChild(card);
+        });
+        
+        document.querySelectorAll('.read-more').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(btn.getAttribute('data-id'));
+                const textDiv = document.getElementById(`text-${id}`);
+                const post = allPosts.find(p => p.id === id);
+                if (!post) return;
+                if (textDiv.classList.contains('expanded')) {
+                    const short = escapeHtml(post.content).substring(0, 400) + (post.content.length > 400 ? '...' : '');
+                    textDiv.innerHTML = short.replace(/\n/g, '<br>');
+                    textDiv.classList.remove('expanded');
+                    btn.innerHTML = 'اقرأ المزيد ▼';
+                } else {
+                    textDiv.innerHTML = escapeHtml(post.content).replace(/\n/g, '<br>');
+                    textDiv.classList.add('expanded');
+                    btn.innerHTML = 'عرض أقل ▲';
+                }
+            });
+        });
     }
 
     function escapeHtml(str) {
@@ -383,8 +358,21 @@
         });
     }
 
-    refreshBtn.addEventListener('click', fetchRandomPost);
-    fetchRandomPost();
+    function filterPosts() {
+        const query = searchInput.value.trim().toLowerCase();
+        if (!query) {
+            renderPosts(allPosts);
+            return;
+        }
+        const filtered = allPosts.filter(post => 
+            post.content.toLowerCase().includes(query) || 
+            post.publisher.toLowerCase().includes(query)
+        );
+        renderPosts(filtered);
+    }
+
+    searchInput.addEventListener('input', filterPosts);
+    loadAllExistingPosts();
 </script>
 </body>
 </html>
