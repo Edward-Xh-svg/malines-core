@@ -22,6 +22,11 @@ app.get('/api/articles', (req, res) => {
   }
 });
 
+// Clean URLs
+app.get('/archive', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'wiki.html'));
+});
+
 // SPA fallback
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
