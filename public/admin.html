@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="malines-fivcon.png" type="image/png">
+  <title>لوحة الإدارة | مجتمع مالينز</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --black:#050505; --dark:#0a0a0a; --card:#0f0f10; --border:#232325;
+      --text:#e9e9e9; --muted:#8d8d8d; --red:#c0392b; --red-hover:#e74c3c; --accent:#d4af37;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { background:var(--black); color:var(--text); font-family:'Cairo',sans-serif; min-height:100vh; display:flex; }
+
+    /* Sidebar */
+    .sidebar {
+      width:240px; min-height:100vh; background:rgba(10,10,10,0.98);
+      border-left:1px solid var(--border); display:flex; flex-direction:column;
+      position:fixed; top:0; right:0; bottom:0; z-index:50;
+    }
+    .sidebar-logo { padding:24px 20px; border-bottom:1px solid var(--border); }
+    .sidebar-logo-title { font-weight:900; font-size:1.1rem; color:#fff; }
+    .sidebar-logo-sub { font-size:0.75rem; color:var(--muted); margin-top:2px; }
+    .sidebar-nav { flex:1; padding:12px 8px; overflow-y:auto; }
+    .nav-item {
+      display:flex; align-items:center; gap:10px; padding:10px 14px;
+      border-radius:10px; cursor:pointer; color:var(--muted); font-size:0.9rem;
+      margin-bottom:2px; transition:all 0.2s; border:none; background:none;
+      width:100%; text-align:right; font-family:'Cairo',sans-serif;
+    }
+    .nav-item:hover { background:rgba(255,255,255,0.04); color:var(--text); }
+    .nav-item.active { background:rgba(192,57,43,0.12); color:#fff; border:1px solid rgba(192,57,43,0.2); }
+    .nav-item svg { flex-shrink:0; }
+    .sidebar-footer { padding:16px; border-top:1px solid var(--border); }
+    .user-info { font-size:0.85rem; color:var(--muted); margin-bottom:10px; }
+    .user-info span { color:#fff; font-weight:600; }
+    .btn-logout {
+      width:100%; padding:9px; background:rgba(192,57,43,0.1); border:1px solid rgba(192,57,43,0.2);
+      color:var(--red-hover); border-radius:8px; cursor:pointer; font-family:'Cairo',sans-serif;
+      font-size:0.88rem; transition:all 0.2s;
+    }
+    .btn-logout:hover { background:rgba(192,57,43,0.2); }
+
+    /* Main content */
+    .main { margin-right:240px; flex:1; padding:32px; min-height:100vh; }
+    .page { display:none; }
+    .page.active { display:block; }
+
+    /* Cards */
+    .card {
+      background:rgba(15,15,16,0.95); border:1px solid var(--border);
+      border-radius:16px; padding:24px; margin-bottom:24px;
+    }
+    .card-title { font-size:1.1rem; font-weight:800; color:#fff; margin-bottom:20px; display:flex; align-items:center; gap:10px; }
+
+    /* Stats */
+    .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px; margin-bottom:28px; }
+    .stat-card {
+      background:rgba(15,15,16,0.95); border:1px solid var(--border); border-radius:14px;
+      padding:20px; text-align:center;
+    }
+    .stat-num { font-size:2rem; font-weight:900; color:#fff; }
+    .stat-label { font-size:0.82rem; color:var(--muted); margin-top:4px; }
+
+    /* Table */
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; font-size:0.88rem; }
+    th { padding:10px 14px; text-align:right; color:var(--muted); font-weight:600; border-bottom:1px solid var(--border); white-space:nowrap; }
+    td { padding:12px 14px; border-bottom:1px solid rgba(255,255,255,0.03); vertical-align:middle; }
+    tr:last-child td { border-bottom:none; }
+    tr:hover td { background:rgba(255,255,255,0.02); }
+
+    /* Badges */
+    .badge {
+      display:inline-block; padding:3px 10px; border-radius:999px; font-size:0.75rem; font-weight:700;
+    }
+    .badge-green { background:rgba(34,197,94,0.12); color:#4ade80; border:1px solid rgba(34,197,94,0.2); }
+    .badge-gray  { background:rgba(255,255,255,0.05); color:var(--muted); border:1px solid var(--border); }
+    .badge-red   { background:rgba(192,57,43,0.12); color:var(--red-hover); border:1px solid rgba(192,57,43,0.2); }
+    .badge-gold  { background:rgba(212,175,55,0.12); color:var(--accent); border:1px solid rgba(212,175,55,0.2); }
+
+    /* Buttons */
+    .btn {
+      display:inline-flex; align-items:center; gap:7px; padding:8px 16px; border-radius:9px;
+      cursor:pointer; font-family:'Cairo',sans-serif; font-size:0.85rem; font-weight:700;
+      border:none; transition:all 0.2s;
+    }
+    .btn-primary { background:#fff; color:#000; }
+    .btn-primary:hover { background:#e5e5e5; transform:translateY(-1px); }
+    .btn-red { background:rgba(192,57,43,0.12); color:var(--red-hover); border:1px solid rgba(192,57,43,0.2); }
+    .btn-red:hover { background:rgba(192,57,43,0.25); }
+    .btn-ghost { background:rgba(255,255,255,0.05); color:var(--text); border:1px solid var(--border); }
+    .btn-ghost:hover { background:rgba(255,255,255,0.09); }
+    .btn-sm { padding:5px 12px; font-size:0.8rem; }
+    .btn-gold { background:rgba(212,175,55,0.12); color:var(--accent); border:1px solid rgba(212,175,55,0.25); }
+    .btn-gold:hover { background:rgba(212,175,55,0.22); }
+
+    /* Form */
+    .form-group { margin-bottom:18px; }
+    .form-label { display:block; margin-bottom:7px; color:#aaa; font-size:0.88rem; font-weight:600; }
+    .form-input {
+      width:100%; padding:11px 14px; background:#1a1a1a; border:1px solid rgba(255,255,255,0.08);
+      border-radius:10px; color:#fff; font-family:'Cairo',sans-serif; font-size:0.92rem;
+      transition:border-color 0.2s;
+    }
+    .form-input:focus { outline:none; border-color:rgba(255,255,255,0.25); }
+    .form-input[type="checkbox"] { width:auto; }
+    textarea.form-input { resize:vertical; min-height:120px; }
+    select.form-input { cursor:pointer; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .form-row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+
+    /* Modal */
+    .modal-overlay {
+      position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(10px);
+      display:flex; align-items:center; justify-content:center; z-index:200;
+      opacity:0; visibility:hidden; transition:all 0.25s; padding:20px;
+    }
+    .modal-overlay.show { opacity:1; visibility:visible; }
+    .modal {
+      background:rgba(13,13,14,0.98); border:1px solid var(--border); border-radius:20px;
+      padding:30px; width:100%; max-width:600px; max-height:90vh; overflow-y:auto;
+      transform:translateY(10px); transition:transform 0.25s;
+    }
+    .modal-overlay.show .modal { transform:translateY(0); }
+    .modal-title { font-size:1.2rem; font-weight:800; color:#fff; margin-bottom:24px; }
+    .modal-footer { display:flex; gap:10px; justify-content:flex-end; margin-top:24px; }
+
+    /* Alert */
+    .alert {
+      padding:12px 16px; border-radius:10px; font-size:0.88rem; margin-bottom:16px;
+      display:none; align-items:center; gap:8px;
+    }
+    .alert.show { display:flex; }
+    .alert-error { background:rgba(192,57,43,0.1); color:var(--red-hover); border:1px solid rgba(192,57,43,0.2); }
+    .alert-success { background:rgba(34,197,94,0.08); color:#4ade80; border:1px solid rgba(34,197,94,0.2); }
+
+    /* Toast */
+    #toast {
+      position:fixed; bottom:24px; left:24px; background:rgba(15,15,16,0.98);
+      border:1px solid var(--border); border-radius:12px; padding:14px 20px;
+      color:#fff; font-size:0.9rem; z-index:999;
+      transform:translateY(80px); opacity:0; transition:all 0.3s; pointer-events:none;
+    }
+    #toast.show { transform:translateY(0); opacity:1; }
+    #toast.toast-success { border-color:rgba(34,197,94,0.3); }
+    #toast.toast-error   { border-color:rgba(192,57,43,0.3); }
+
+    /* Login screen */
+    #loginScreen {
+      position:fixed; inset:0; background:var(--black);
+      display:flex; align-items:center; justify-content:center; z-index:999;
+    }
+    .login-box {
+      background:rgba(15,15,16,0.98); border:1px solid var(--border); border-radius:20px;
+      padding:40px 36px; width:100%; max-width:400px; text-align:right;
+    }
+    .login-title { font-size:1.5rem; font-weight:900; color:#fff; margin-bottom:8px; }
+    .login-sub { font-size:0.9rem; color:var(--muted); margin-bottom:28px; }
+    .btn-submit {
+      width:100%; padding:13px; background:#fff; border:none; color:#000;
+      font-weight:800; font-size:0.95rem; border-radius:11px; cursor:pointer;
+      font-family:'Cairo',sans-serif; transition:all 0.2s; margin-top:8px;
+    }
+    .btn-submit:hover { background:#e5e5e5; }
+    .btn-submit:disabled { opacity:0.5; cursor:not-allowed; }
+
+    /* Rich text toggle hint */
+    .content-mode-toggle {
+      display:flex; gap:8px; margin-bottom:10px;
+    }
+    .mode-btn {
+      padding:5px 14px; border-radius:7px; cursor:pointer; font-size:0.8rem;
+      font-family:'Cairo',sans-serif; font-weight:700; border:1px solid var(--border);
+      background:rgba(255,255,255,0.03); color:var(--muted); transition:all 0.2s;
+    }
+    .mode-btn.active { background:rgba(255,255,255,0.08); color:#fff; border-color:rgba(255,255,255,0.2); }
+
+    /* Section header */
+    .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+    .section-title { font-size:1.1rem; font-weight:800; color:#fff; }
+
+    /* Company row */
+    .company-row {
+      display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:10px; align-items:center; margin-bottom:10px;
+    }
+
+    /* Responsive */
+    @media (max-width:768px) {
+      .sidebar { width:100%; min-height:auto; position:relative; flex-direction:row; }
+      .main { margin-right:0; padding:16px; }
+      .form-row, .form-row-3 { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- شاشة تسجيل الدخول -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-title">🔐 لوحة الإدارة</div>
+    <div class="login-sub">هذه المنطقة للمديرين فقط</div>
+    <div class="alert alert-error" id="loginErr"></div>
+    <div class="form-group">
+      <label class="form-label">البريد الإلكتروني</label>
+      <input class="form-input" type="email" id="loginEmail" placeholder="admin@malines.com" dir="ltr">
+    </div>
+    <div class="form-group">
+      <label class="form-label">كلمة المرور</label>
+      <input class="form-input" type="password" id="loginPass" placeholder="••••••••">
+    </div>
+    <button class="btn-submit" id="loginBtn" onclick="doAdminLogin()">دخول</button>
+  </div>
+</div>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar" style="display:none;">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-title">⚙️ مالينز</div>
+    <div class="sidebar-logo-sub">لوحة التحكم</div>
+  </div>
+  <nav class="sidebar-nav">
+    <button class="nav-item active" onclick="showPage('dashboard')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      الرئيسية
+    </button>
+    <button class="nav-item" onclick="showPage('articles')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      المقالات
+    </button>
+    <button class="nav-item" onclick="showPage('countries')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg>
+      الدول والبورصة
+    </button>
+    <button class="nav-item" onclick="showPage('records')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      السجلات
+    </button>
+    <button class="nav-item" onclick="showPage('users')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      المستخدمون
+    </button>
+    <button class="nav-item" onclick="window.open('/', '_blank')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      عرض الموقع
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-info">مسجل كـ: <span id="adminName">—</span></div>
+    <button class="btn-logout" onclick="doLogout()">تسجيل الخروج</button>
+  </div>
+</aside>
+
+<!-- Main Content -->
+<main class="main" id="mainContent" style="display:none;">
+
+  <!-- Dashboard -->
+  <div class="page active" id="page-dashboard">
+    <h1 style="font-size:1.6rem;font-weight:900;color:#fff;margin-bottom:8px;">مرحباً بك في لوحة التحكم 👋</h1>
+    <p style="color:var(--muted);margin-bottom:28px;">إدارة مجتمع مالينز من مكان واحد</p>
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card"><div class="stat-num" id="statArticles">—</div><div class="stat-label">مقال</div></div>
+      <div class="stat-card"><div class="stat-num" id="statCountries">—</div><div class="stat-label">دولة</div></div>
+      <div class="stat-card"><div class="stat-num" id="statUsers">—</div><div class="stat-label">مستخدم</div></div>
+      <div class="stat-card"><div class="stat-num" id="statCompanies">—</div><div class="stat-label">شركة في البورصة</div></div>
+      <div class="stat-card"><div class="stat-num" id="statRecords">—</div><div class="stat-label">سجل منشور</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        روابط سريعة
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;">
+        <button class="btn btn-primary" onclick="showPage('articles');openArticleModal()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          مقال جديد
+        </button>
+        <button class="btn btn-ghost" onclick="showPage('countries');openCountryModal()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          دولة جديدة
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Articles -->
+  <div class="page" id="page-articles">
+    <div class="section-header">
+      <h2 class="section-title">📚 المقالات</h2>
+      <button class="btn btn-primary" onclick="openArticleModal()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        مقال جديد
+      </button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>العنوان</th>
+              <th>التصنيف</th>
+              <th>الحالة</th>
+              <th>التاريخ</th>
+              <th>إجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="articlesTable"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:30px;">جارٍ التحميل...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Countries -->
+  <div class="page" id="page-countries">
+    <div class="section-header">
+      <h2 class="section-title">🌍 الدول والبورصة</h2>
+      <button class="btn btn-primary" onclick="openCountryModal()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        دولة جديدة
+      </button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>الدولة</th>
+              <th>النوع</th>
+              <th>الشركات</th>
+              <th>إجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="countriesTable"><tr><td colspan="4" style="text-align:center;color:var(--muted);padding:30px;">جارٍ التحميل...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Records -->
+  <div class="page" id="page-records">
+    <div class="section-header">
+      <h2 class="section-title">📋 السجلات</h2>
+      <button class="btn btn-primary" onclick="openRecordModal()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        سجل جديد
+      </button>
+    </div>
+    <div class="card">
+      <div id="recordsList"><div style="text-align:center;color:var(--muted);padding:30px;">جارٍ التحميل...</div></div>
+    </div>
+  </div>
+
+  <!-- Users -->
+  <div class="page" id="page-users">
+    <div class="section-header">
+      <h2 class="section-title">👥 المستخدمون</h2>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>المستخدم</th>
+              <th>البريد</th>
+              <th>الصلاحية</th>
+              <th>تاريخ التسجيل</th>
+              <th>إجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="usersTable"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:30px;">جارٍ التحميل...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Modal: مقال -->
+<div class="modal-overlay" id="articleModal">
+  <div class="modal" style="max-width:720px;">
+    <div class="modal-title" id="articleModalTitle">مقال جديد</div>
+    <div class="alert alert-error" id="articleErr"></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">العنوان *</label>
+        <input class="form-input" type="text" id="aTitle" placeholder="عنوان المقال">
+      </div>
+      <div class="form-group">
+        <label class="form-label">التصنيف</label>
+        <input class="form-input" type="text" id="aCategory" placeholder="وثائق، حروب، معاهدات...">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Slug (رابط المقال) *</label>
+      <input class="form-input" type="text" id="aSlug" placeholder="article-name-here" dir="ltr">
+      <small style="color:var(--muted);font-size:0.78rem;">يُستخدم في الرابط — حروف إنجليزية وشرطات فقط</small>
+    </div>
+    <div class="form-group">
+      <label class="form-label">رابط الصورة (اختياري)</label>
+      <input class="form-input" type="text" id="aImage" placeholder="https://..." dir="ltr">
+    </div>
+    <div class="form-group">
+      <label class="form-label">المحتوى * <small style="color:var(--muted);font-weight:400;">(يدعم HTML)</small></label>
+      <textarea class="form-input" id="aContent" rows="10" placeholder="<p>محتوى المقال هنا...</p>" style="min-height:200px;font-family:monospace;font-size:0.85rem;"></textarea>
+    </div>
+    <div class="form-group" style="display:flex;align-items:center;gap:10px;">
+      <input type="checkbox" id="aPublished" checked style="width:18px;height:18px;accent-color:var(--red);cursor:pointer;">
+      <label for="aPublished" class="form-label" style="margin:0;cursor:pointer;">نشر المقال (مرئي للعموم)</label>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('articleModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveArticle()">حفظ المقال</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: دولة -->
+<div class="modal-overlay" id="countryModal">
+  <div class="modal" style="max-width:760px;">
+    <div class="modal-title" id="countryModalTitle">دولة جديدة</div>
+    <div class="alert alert-error" id="countryErr"></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">اسم الدولة *</label>
+        <input class="form-input" type="text" id="cName" placeholder="مثال: المملكة الشمالية">
+      </div>
+      <div class="form-group">
+        <label class="form-label">الرمز / الإيموجي</label>
+        <input class="form-input" type="text" id="cFlag" placeholder="🏴" style="font-size:1.4rem;">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">النوع</label>
+      <select class="form-input" id="cType">
+        <option value="both">كلاهما (مجلس + بورصة)</option>
+        <option value="council">مجلس الدول فقط</option>
+        <option value="stock">بورصة هوستاكا فقط</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">وصف مختصر</label>
+      <input class="form-input" type="text" id="cDesc" placeholder="وصف الدولة...">
+    </div>
+    <div class="form-group" id="councilDataGroup">
+      <label class="form-label">بيانات سجل المجلس <small style="color:var(--muted);font-weight:400;">(Markdown مدعوم)</small></label>
+      <textarea class="form-input" id="cCouncilData" rows="6" placeholder="## اسم الدولة&#10;معلومات الدولة هنا..."></textarea>
+    </div>
+    <div id="stockCompaniesGroup">
+      <div class="section-header" style="margin-bottom:12px;">
+        <div style="font-size:0.95rem;font-weight:700;color:#fff;">شركات البورصة</div>
+        <button class="btn btn-ghost btn-sm" onclick="addCompanyRow()">+ إضافة شركة</button>
+      </div>
+      <div id="companiesRows"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('countryModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveCountry()">حفظ الدولة</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: سجل جديد -->
+<div class="modal-overlay" id="recordModal">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-title">سجل جديد</div>
+    <div class="alert alert-error" id="recordErr"></div>
+    <div class="form-group">
+      <label class="form-label">الناشر / المصدر *</label>
+      <input class="form-input" type="text" id="rPublisher" placeholder="اسم الدولة أو الجهة الناشرة">
+    </div>
+    <div class="form-group">
+      <label class="form-label">المحتوى *</label>
+      <textarea class="form-input" id="rContent" rows="6" placeholder="نص السجل هنا..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">رابط الصورة (اختياري)</label>
+      <input class="form-input" type="text" id="rImage" placeholder="https://..." dir="ltr">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('recordModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveRecord()">نشر السجل</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ==================== State ====================
+let TOKEN = localStorage.getItem('malines_admin_token') || '';
+let currentArticleSlug = null;
+let currentCountryId = null;
+let allCountries = [];
+
+// ==================== Auth ====================
+async function doAdminLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+  const err   = document.getElementById('loginErr');
+  const btn   = document.getElementById('loginBtn');
+  err.style.display = 'none';
+  btn.disabled = true; btn.textContent = 'جارٍ التحقق...';
+  try {
+    const r = await api('/api/login', 'POST', { email, password: pass });
+    if (r.role !== 'admin') { showLoginErr('هذا الحساب ليس لديه صلاحية admin'); btn.disabled=false; btn.textContent='دخول'; return; }
+    TOKEN = r.token;
+    localStorage.setItem('malines_admin_token', TOKEN);
+    localStorage.setItem('malines_admin_user', r.username);
+    initAdmin(r.username);
+  } catch(e) {
+    showLoginErr(e.message || 'فشل تسجيل الدخول');
+    btn.disabled = false; btn.textContent = 'دخول';
+  }
+}
+function showLoginErr(msg) {
+  const el = document.getElementById('loginErr');
+  el.textContent = msg; el.style.display = 'flex';
+}
+async function doLogout() {
+  try { await api('/api/logout', 'POST'); } catch(e) {}
+  TOKEN = '';
+  localStorage.removeItem('malines_admin_token');
+  localStorage.removeItem('malines_admin_user');
+  location.reload();
+}
+function initAdmin(username) {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('sidebar').style.display = 'flex';
+  document.getElementById('mainContent').style.display = 'block';
+  document.getElementById('adminName').textContent = username;
+  loadDashboard();
+}
+// Check existing session
+(async function checkSession() {
+  if (!TOKEN) return;
+  try {
+    const r = await api('/api/me');
+    if (r.role !== 'admin') { TOKEN=''; localStorage.removeItem('malines_admin_token'); return; }
+    initAdmin(r.username);
+  } catch(e) { TOKEN=''; localStorage.removeItem('malines_admin_token'); }
+})();
+
+document.getElementById('loginPass').addEventListener('keydown', e => { if(e.key==='Enter') doAdminLogin(); });
+
+// ==================== Navigation ====================
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  event?.currentTarget?.classList.add('active');
+  if (name === 'articles') loadArticles();
+  if (name === 'countries') loadCountries();
+  if (name === 'records') loadRecords();
+  if (name === 'users') loadUsers();
+  if (name === 'dashboard') loadDashboard();
+}
+
+// ==================== API Helper ====================
+async function api(url, method='GET', body=null) {
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(url, opts);
+  const data = await r.json();
+  if (!r.ok) throw new Error(data.error || 'خطأ في الخادم');
+  return data;
+}
+
+// ==================== Toast ====================
+function toast(msg, type='success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show toast-' + type;
+  setTimeout(() => el.className = '', 3000);
+}
+
+// ==================== Modal ====================
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if(e.target===o) o.classList.remove('show'); });
+});
+
+// ==================== Dashboard ====================
+async function loadDashboard() {
+  try {
+    const [articles, countries, users, records] = await Promise.all([
+      api('/api/admin/articles'),
+      api('/api/admin/countries'),
+      api('/api/admin/users'),
+      api('/api/records'),
+    ]);
+    document.getElementById('statArticles').textContent = articles.length;
+    document.getElementById('statCountries').textContent = countries.length;
+    document.getElementById('statUsers').textContent = users.length;
+    document.getElementById('statRecords').textContent = records.length;
+    const totalCompanies = countries.reduce((s, c) => s + (c.companies?.length || 0), 0);
+    document.getElementById('statCompanies').textContent = totalCompanies;
+  } catch(e) {}
+}
+
+// ==================== Articles ====================
+async function loadArticles() {
+  try {
+    const rows = await api('/api/admin/articles');
+    const tbody = document.getElementById('articlesTable');
+    if (!rows.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:30px;">لا توجد مقالات بعد</td></tr>'; return; }
+    tbody.innerHTML = rows.map(a => `
+      <tr>
+        <td><strong style="color:#fff;">${escHtml(a.title)}</strong><br><small style="color:var(--muted);font-size:0.75rem;">${escHtml(a.slug)}</small></td>
+        <td><span class="badge badge-gray">${escHtml(a.category)}</span></td>
+        <td>${a.published ? '<span class="badge badge-green">منشور</span>' : '<span class="badge badge-gray">مسودة</span>'}</td>
+        <td style="color:var(--muted);font-size:0.82rem;">${fmtDate(a.created_at)}</td>
+        <td>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-ghost btn-sm" onclick="editArticle('${escHtml(a.slug)}')">تعديل</button>
+            <button class="btn btn-red btn-sm" onclick="deleteArticle('${escHtml(a.slug)}','${escHtml(a.title)}')">حذف</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  } catch(e) { toast('فشل تحميل المقالات', 'error'); }
+}
+
+function openArticleModal(slug=null) {
+  currentArticleSlug = slug;
+  document.getElementById('articleModalTitle').textContent = slug ? 'تعديل المقال' : 'مقال جديد';
+  document.getElementById('aTitle').value = '';
+  document.getElementById('aCategory').value = '';
+  document.getElementById('aSlug').value = '';
+  document.getElementById('aImage').value = '';
+  document.getElementById('aContent').value = '';
+  document.getElementById('aPublished').checked = true;
+  document.getElementById('aSlug').disabled = false;
+  document.getElementById('articleErr').style.display = 'none';
+  openModal('articleModal');
+}
+
+async function editArticle(slug) {
+  try {
+    const a = await api('/api/articles/' + slug);
+    currentArticleSlug = slug;
+    document.getElementById('articleModalTitle').textContent = 'تعديل المقال';
+    document.getElementById('aTitle').value = a.title;
+    document.getElementById('aCategory').value = a.category;
+    document.getElementById('aSlug').value = a.slug;
+    document.getElementById('aSlug').disabled = true; // slug لا يتغير
+    document.getElementById('aImage').value = a.image || '';
+    document.getElementById('aContent').value = a.content;
+    document.getElementById('aPublished').checked = !!a.published;
+    document.getElementById('articleErr').style.display = 'none';
+    openModal('articleModal');
+  } catch(e) { toast('فشل تحميل المقال', 'error'); }
+}
+
+async function saveArticle() {
+  const title     = document.getElementById('aTitle').value.trim();
+  const category  = document.getElementById('aCategory').value.trim() || 'عام';
+  const slug      = document.getElementById('aSlug').value.trim();
+  const image     = document.getElementById('aImage').value.trim();
+  const content   = document.getElementById('aContent').value.trim();
+  const published = document.getElementById('aPublished').checked;
+  const errEl     = document.getElementById('articleErr');
+  errEl.style.display = 'none';
+
+  if (!title || !content) { errEl.textContent='العنوان والمحتوى مطلوبان'; errEl.style.display='flex'; return; }
+  if (!currentArticleSlug && !slug) { errEl.textContent='الـ slug مطلوب'; errEl.style.display='flex'; return; }
+
+  try {
+    if (currentArticleSlug) {
+      await api('/api/admin/articles/' + currentArticleSlug, 'PUT', { title, category, content, image, published });
+    } else {
+      await api('/api/admin/articles', 'POST', { slug, title, category, content, image, published });
+    }
+    closeModal('articleModal');
+    toast(currentArticleSlug ? 'تم تحديث المقال ✅' : 'تم نشر المقال ✅');
+    loadArticles();
+  } catch(e) { errEl.textContent=e.message; errEl.style.display='flex'; }
+}
+
+async function deleteArticle(slug, title) {
+  if (!confirm(`هل تريد حذف المقال "${title}"؟`)) return;
+  try {
+    await api('/api/admin/articles/' + slug, 'DELETE');
+    toast('تم حذف المقال');
+    loadArticles();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// Auto-generate slug من العنوان
+document.getElementById('aTitle')?.addEventListener('input', function() {
+  if (currentArticleSlug) return;
+  const slugEl = document.getElementById('aSlug');
+  if (slugEl.dataset.touched) return;
+  slugEl.value = this.value
+    .toLowerCase()
+    .replace(/[\s_]+/g, '-')
+    .replace(/[^a-z0-9\u0600-\u06FF-]/g, '')
+    .replace(/-+/g, '-')
+    .slice(0, 60);
+});
+document.getElementById('aSlug')?.addEventListener('input', function() {
+  this.dataset.touched = this.value ? '1' : '';
+});
+
+// ==================== Countries ====================
+async function loadCountries() {
+  try {
+    allCountries = await api('/api/admin/countries');
+    const tbody = document.getElementById('countriesTable');
+    if (!allCountries.length) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:30px;">لا توجد دول بعد</td></tr>';
+      return;
+    }
+    tbody.innerHTML = allCountries.map(c => `
+      <tr>
+        <td>
+          <strong style="color:#fff;">${c.flag ? escHtml(c.flag) + ' ' : ''}${escHtml(c.name)}</strong>
+          ${c.description ? `<br><small style="color:var(--muted);font-size:0.78rem;">${escHtml(c.description)}</small>` : ''}
+        </td>
+        <td>${typeBadge(c.type)}</td>
+        <td><span class="badge badge-gray">${c.companies?.length || 0} شركة</span></td>
+        <td>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-ghost btn-sm" onclick="editCountry(${c.id})">تعديل</button>
+            <button class="btn btn-red btn-sm" onclick="deleteCountry(${c.id},'${escHtml(c.name)}')">حذف</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  } catch(e) { toast('فشل تحميل الدول', 'error'); }
+}
+
+function typeBadge(type) {
+  if (type==='both') return '<span class="badge badge-gold">كلاهما</span>';
+  if (type==='council') return '<span class="badge badge-gray">مجلس</span>';
+  return '<span class="badge badge-green">بورصة</span>';
+}
+
+function openCountryModal() {
+  currentCountryId = null;
+  document.getElementById('countryModalTitle').textContent = 'دولة جديدة';
+  document.getElementById('cName').value = '';
+  document.getElementById('cFlag').value = '';
+  document.getElementById('cType').value = 'both';
+  document.getElementById('cDesc').value = '';
+  document.getElementById('cCouncilData').value = '';
+  document.getElementById('companiesRows').innerHTML = '';
+  document.getElementById('countryErr').style.display = 'none';
+  openModal('countryModal');
+}
+
+async function editCountry(id) {
+  const c = allCountries.find(x => x.id === id);
+  if (!c) return;
+  currentCountryId = id;
+  document.getElementById('countryModalTitle').textContent = 'تعديل الدولة';
+  document.getElementById('cName').value = c.name;
+  document.getElementById('cFlag').value = c.flag || '';
+  document.getElementById('cType').value = c.type;
+  document.getElementById('cDesc').value = c.description || '';
+  document.getElementById('cCouncilData').value = c.council_data || '';
+  document.getElementById('countryErr').style.display = 'none';
+
+  // تحميل الشركات
+  const rows = document.getElementById('companiesRows');
+  rows.innerHTML = '';
+  (c.companies || []).forEach(comp => addCompanyRow(comp));
+  openModal('countryModal');
+}
+
+function addCompanyRow(comp=null) {
+  const id = Date.now() + Math.random();
+  const div = document.createElement('div');
+  div.className = 'company-row';
+  div.dataset.cid = comp?.id || '';
+  div.innerHTML = `
+    <input class="form-input" type="text" placeholder="اسم الشركة" value="${escHtml(comp?.name||'')}" data-field="name">
+    <input class="form-input" type="text" placeholder="القيمة السوقية" value="${escHtml(comp?.market_value||'')}" data-field="market_value" dir="ltr">
+    <input class="form-input" type="text" placeholder="النمو (مثال: +5%)" value="${escHtml(comp?.growth||'')}" data-field="growth" dir="ltr">
+    <button class="btn btn-red btn-sm" onclick="this.closest('.company-row').remove()" title="حذف">✕</button>
+  `;
+  document.getElementById('companiesRows').appendChild(div);
+}
+
+async function saveCountry() {
+  const name        = document.getElementById('cName').value.trim();
+  const flag        = document.getElementById('cFlag').value.trim();
+  const type        = document.getElementById('cType').value;
+  const description = document.getElementById('cDesc').value.trim();
+  const council_data = document.getElementById('cCouncilData').value.trim();
+  const errEl       = document.getElementById('countryErr');
+  errEl.style.display = 'none';
+
+  if (!name) { errEl.textContent='اسم الدولة مطلوب'; errEl.style.display='flex'; return; }
+
+  // جمع بيانات الشركات
+  const companyRows = document.querySelectorAll('#companiesRows .company-row');
+  const companies = [];
+  let order = 0;
+  companyRows.forEach(row => {
+    const n  = row.querySelector('[data-field="name"]').value.trim();
+    const mv = row.querySelector('[data-field="market_value"]').value.trim();
+    const gr = row.querySelector('[data-field="growth"]').value.trim();
+    if (n) companies.push({ id: row.dataset.cid || null, name: n, market_value: mv||'0', growth: gr||'0%', sort_order: order++ });
+  });
+
+  try {
+    let countryId = currentCountryId;
+    if (currentCountryId) {
+      await api('/api/admin/countries/' + currentCountryId, 'PUT', { name, flag, description, type, council_data });
+    } else {
+      const r = await api('/api/admin/countries', 'POST', { name, flag, description, type, council_data });
+      countryId = r.id;
+    }
+
+    // حذف الشركات القديمة وإضافة الجديدة
+    if (currentCountryId) {
+      // حذف الشركات المحذوفة (غير موجودة في القائمة الجديدة)
+      const existingC = allCountries.find(x=>x.id===currentCountryId)?.companies || [];
+      const newIds = companies.filter(c=>c.id).map(c=>parseInt(c.id));
+      for (const old of existingC) {
+        if (!newIds.includes(old.id)) await api('/api/admin/companies/' + old.id, 'DELETE');
+      }
+    }
+    // تحديث أو إنشاء شركات
+    for (const comp of companies) {
+      if (comp.id && currentCountryId) {
+        await api('/api/admin/companies/' + comp.id, 'PUT', { name: comp.name, market_value: comp.market_value, growth: comp.growth, sort_order: comp.sort_order });
+      } else {
+        await api('/api/admin/companies', 'POST', { country_id: countryId, ...comp });
+      }
+    }
+
+    closeModal('countryModal');
+    toast(currentCountryId ? 'تم تحديث الدولة ✅' : 'تمت إضافة الدولة ✅');
+    loadCountries();
+  } catch(e) { errEl.textContent=e.message; errEl.style.display='flex'; }
+}
+
+async function deleteCountry(id, name) {
+  if (!confirm(`هل تريد حذف دولة "${name}" وكل شركاتها؟`)) return;
+  try {
+    await api('/api/admin/countries/' + id, 'DELETE');
+    toast('تم الحذف');
+    loadCountries();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ==================== Users ====================
+async function loadUsers() {
+  try {
+    const rows = await api('/api/admin/users');
+    const tbody = document.getElementById('usersTable');
+    tbody.innerHTML = rows.map(u => `
+      <tr>
+        <td><strong style="color:#fff;">${escHtml(u.username)}</strong></td>
+        <td style="color:var(--muted);font-size:0.85rem;" dir="ltr">${escHtml(u.email)}</td>
+        <td>${u.role==='admin' ? '<span class="badge badge-red">admin</span>' : '<span class="badge badge-gray">user</span>'}</td>
+        <td style="color:var(--muted);font-size:0.82rem;">${fmtDate(u.created_at)}</td>
+        <td>
+          <div style="display:flex;gap:8px;">
+            ${u.role!=='admin' ? `<button class="btn btn-gold btn-sm" onclick="promoteUser(${u.id})">ترقية لـ admin</button>` : ''}
+            ${u.role!=='admin' ? `<button class="btn btn-red btn-sm" onclick="deleteUser(${u.id},'${escHtml(u.username)}')">حذف</button>` : ''}
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  } catch(e) { toast('فشل تحميل المستخدمين', 'error'); }
+}
+
+async function promoteUser(id) {
+  if (!confirm('ترقية هذا المستخدم لصلاحية admin؟')) return;
+  try {
+    await api('/api/admin/users/' + id + '/role', 'PUT', { role: 'admin' });
+    toast('تمت الترقية ✅');
+    loadUsers();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function deleteUser(id, name) {
+  if (!confirm(`حذف المستخدم "${name}"؟`)) return;
+  try {
+    await api('/api/admin/users/' + id, 'DELETE');
+    toast('تم الحذف');
+    loadUsers();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ==================== Records ====================
+async function loadRecords() {
+  try {
+    const rows = await api('/api/records');
+    const list = document.getElementById('recordsList');
+    if (!rows.length) {
+      list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:30px;">لا توجد سجلات بعد</div>';
+      return;
+    }
+    list.innerHTML = rows.map(r => `
+      <div style="border-bottom:1px solid var(--border);padding:18px 0;display:flex;gap:16px;align-items:flex-start;">
+        ${r.image ? `<img src="${escHtml(r.image)}" style="width:80px;height:60px;object-fit:cover;border-radius:8px;flex-shrink:0;" onerror="this.style.display='none'">` : ''}
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;">
+            <strong style="color:var(--accent);">${escHtml(r.publisher)}</strong>
+            &nbsp;·&nbsp; ${fmtDate(r.created_at)}
+          </div>
+          <div style="color:var(--text);font-size:0.9rem;line-height:1.7;white-space:pre-wrap;">${escHtml(r.content)}</div>
+        </div>
+        <button class="btn btn-red btn-sm" onclick="deleteRecord(${r.id})" style="flex-shrink:0;">حذف</button>
+      </div>
+    `).join('');
+  } catch(e) { toast('فشل تحميل السجلات', 'error'); }
+}
+
+function openRecordModal() {
+  document.getElementById('rPublisher').value = '';
+  document.getElementById('rContent').value = '';
+  document.getElementById('rImage').value = '';
+  document.getElementById('recordErr').style.display = 'none';
+  openModal('recordModal');
+}
+
+async function saveRecord() {
+  const publisher = document.getElementById('rPublisher').value.trim();
+  const content   = document.getElementById('rContent').value.trim();
+  const image     = document.getElementById('rImage').value.trim();
+  const errEl     = document.getElementById('recordErr');
+  errEl.style.display = 'none';
+  if (!publisher || !content) { errEl.textContent='الناشر والمحتوى مطلوبان'; errEl.style.display='flex'; return; }
+  try {
+    await api('/api/admin/records', 'POST', { publisher, content, image });
+    closeModal('recordModal');
+    toast('تم نشر السجل ✅');
+    loadRecords();
+  } catch(e) { errEl.textContent=e.message; errEl.style.display='flex'; }
+}
+
+async function deleteRecord(id) {
+  if (!confirm('هل تريد حذف هذا السجل؟')) return;
+  try {
+    await api('/api/admin/records/' + id, 'DELETE');
+    toast('تم الحذف');
+    loadRecords();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ==================== Helpers ====================
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function fmtDate(s) {
+  if (!s) return '—';
+  return new Date(s).toLocaleDateString('ar-SA', { year:'numeric', month:'short', day:'numeric' });
+}
+</script>
+</body>
+</html>
