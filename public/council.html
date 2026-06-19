@@ -191,6 +191,7 @@
             <div id="userDropdown" class="user-dropdown">
                 <div class="dropdown-name" id="dropdownUsername"></div>
                 <button id="adminPanelBtn" onclick="window.location.href='/admin'" style="display:none;">⚙️ لوحة الإدارة</button>
+                <button onclick="window.location.href='/profile'">👤 الملف الشخصي</button>
                 <button onclick="handleLogout()">تسجيل الخروج</button>
             </div>
         </div>
@@ -308,31 +309,19 @@
     const closeRecordBtn = document.getElementById('closeRecordBtn');
 
     let currentCountry = null;
-    let fallbackCountries = ["Japanese Empire"]; // احتياطي بسيط
-
-    function isHtmlResponse(text) {
-        const trimmed = text.trim();
-        return trimmed.startsWith('<!DOCTYPE') || trimmed.startsWith('<html') || 
-               trimmed.startsWith('<head') || (trimmed.includes('<body') && trimmed.includes('</body>'));
-    }
 
     async function loadCountries() {
         try {
             const response = await fetch('/api/nbn/list');
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const text = await response.text();
-            if (isHtmlResponse(text)) throw new Error('الخادم أعاد HTML بدلاً من JSON');
-            const countries = JSON.parse(text);
+            const countries = await response.json();
             if (Array.isArray(countries) && countries.length > 0) {
                 renderCountries(countries);
             } else {
-                // استخدام قائمة احتياطية مؤقتة (يمكن إزالتها)
-                console.warn('API أعاد مصفوفة فارغة، استخدم القائمة الاحتياطية');
-                renderCountries(fallbackCountries);
+                countriesContainer.innerHTML = '<div class="loading-spinner">لا توجد دول متاحة حالياً.</div>';
             }
         } catch (err) {
-            console.error('loadCountries error:', err);
-            countriesContainer.innerHTML = `<div class="loading-spinner">⚠️ فشل تحميل القائمة: ${err.message}<br>تأكد من تشغيل السيرفر ووجود ملفات في مجلد NBN/NB</div>`;
+            countriesContainer.innerHTML = `<div class="loading-spinner">⚠️ فشل تحميل القائمة: ${err.message}</div>`;
         }
     }
 
