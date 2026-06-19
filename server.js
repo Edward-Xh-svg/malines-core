@@ -5,12 +5,11 @@ const crypto   = require('crypto');
 const { q, initDB } = require('./database');
 
 const app = express();
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '15mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ==================== Sessions ====================
 const sessions = new Map();
-
 function createSession(user) {
   const token = crypto.randomBytes(32).toString('hex');
   sessions.set(token, { userId: user.id, role: user.role, username: user.username });
@@ -42,7 +41,7 @@ app.post('/api/login', async (req, res) => {
     if (!user || !bcrypt.compareSync(password, user.password))
       return res.status(401).json({ error: 'البريد أو كلمة المرور غير صحيحة' });
     const token = createSession(user);
-    res.json({ success: true, token, username: user.username, role: user.role });
+    res.json({ success: true, token, username: user.username, role: user.role, avatar: user.avatar || '' });
   } catch(e) { res.status(500).json({ error: 'خطأ في الخادم' }); }
 });
 
@@ -52,26 +51,72 @@ app.post('/api/register', async (req, res) => {
     if (!username || !email || !password)
       return res.status(400).json({ error: 'جميع الحقول مطلوبة' });
     if (password.length < 6)
-      return res.status(400).json({ error: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' });
+      return res.status(400).json({ error: 'كلمة المرور 6 أحرف على الأقل' });
     const hash = bcrypt.hashSync(password, 10);
-    const result = await q.createUser(username.trim(), email.trim().toLowerCase(), hash, 'user');
-    const user = { id: Number(result.lastInsertRowid), username: username.trim(), role: 'user' };
+    const result = await q.createUser(username.trim(), email.trim().toLowerCase(), hash);
+    const user = { id: Number(result.lastInsertRowid), username: username.trim(), role: 'user', avatar: '' };
     const token = createSession(user);
-    res.json({ success: true, token, username: user.username, role: user.role });
+    res.json({ success: true, token, username: user.username, role: user.role, avatar: '' });
   } catch(e) {
     if (e.message?.includes('UNIQUE')) return res.status(400).json({ error: 'البريد أو اسم المستخدم مستخدم مسبقاً' });
     res.status(500).json({ error: 'خطأ في الخادم' });
   }
 });
 
-app.get('/api/me', requireAuth, (req, res) => {
-  res.json({ username: req.session.username, role: req.session.role });
+app.get('/api/me', requireAuth, async (req, res) => {
+  try {
+    const user = await q.getUserById(req.session.userId);
+    res.json(user || { username: req.session.username, role: req.session.role });
+  } catch(e) { res.json({ username: req.session.username, role: req.session.role }); }
 });
 
 app.post('/api/logout', requireAuth, (req, res) => {
   const token = (req.headers['authorization'] || '').replace('Bearer ', '').trim();
   sessions.delete(token);
   res.json({ success: true });
+});
+
+// ==================== Profile ====================
+app.get('/api/profile/:username', async (req, res) => {
+  try {
+    const user = await q.getPublicProfile(req.params.username);
+    if (!user) return res.status(404).json({ error: 'المستخدم غير موجود' });
+    res.json(user);
+  } catch(e) { res.status(500).json({ error: 'خطأ في الخادم' }); }
+});
+
+app.put('/api/profile', requireAuth, async (req, res) => {
+  try {
+    const { display_name, bio, game_id, avatar } = req.body || {};
+    await q.updateProfile(display_name||'', bio||'', game_id||'', avatar||'', req.session.userId);
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ error: 'خطأ في الخادم' }); }
+});
+
+// ==================== imgbb Upload ====================
+app.post('/api/upload', requireAuth, async (req, res) => {
+  try {
+    const { image } = req.body || {};
+    if (!image) return res.status(400).json({ error: 'لا توجد صورة' });
+
+    const apiKey = process.env.IMGBB_API_KEY;
+    if (!apiKey) return res.status(500).json({ error: 'IMGBB_API_KEY غير مُعدّ' });
+
+    // imgbb يقبل base64 بدون الـ prefix (data:image/...;base64,)
+    const base64 = image.includes(',') ? image.split(',')[1] : image;
+
+    const formData = new URLSearchParams();
+    formData.append('key', apiKey);
+    formData.append('image', base64);
+
+    const response = await fetch('https://api.imgbb.com/1/upload', {
+      method: 'POST',
+      body: formData,
+    });
+    const data = await response.json();
+    if (!data.success) return res.status(500).json({ error: 'فشل الرفع على imgbb' });
+    res.json({ url: data.data.url });
+  } catch(e) { res.status(500).json({ error: 'خطأ في الرفع: ' + e.message }); }
 });
 
 // ==================== Articles ====================
@@ -112,16 +157,14 @@ app.put('/api/admin/articles/:slug', requireAdmin, async (req, res) => {
   try {
     const { title, category, content, image, published } = req.body || {};
     if (!title || !content) return res.status(400).json({ error: 'العنوان والمحتوى مطلوبان' });
-    const result = await q.updateArticle(title.trim(), category||'عام', content, image||'', published?1:0, req.params.slug);
-    if (!result.rowsAffected) return res.status(404).json({ error: 'المقال غير موجود' });
+    await q.updateArticle(title.trim(), category||'عام', content, image||'', published?1:0, req.params.slug);
     res.json({ success: true });
   } catch(e) { res.status(500).json({ error: 'خطأ في الخادم' }); }
 });
 
 app.delete('/api/admin/articles/:slug', requireAdmin, async (req, res) => {
   try {
-    const result = await q.deleteArticle(req.params.slug);
-    if (!result.rowsAffected) return res.status(404).json({ error: 'المقال غير موجود' });
+    await q.deleteArticle(req.params.slug);
     res.json({ success: true });
   } catch(e) { res.status(500).json({ error: 'خطأ في الخادم' }); }
 });
@@ -129,35 +172,35 @@ app.delete('/api/admin/articles/:slug', requireAdmin, async (req, res) => {
 // ==================== Countries ====================
 app.get('/api/nbn/list', async (req, res) => {
   try {
-    const rows = await q.listByType('council');
-    res.json(rows.map(r => r.name));
+    const r = await q.listByType('council');
+    res.json(r.map(x => x.name));
   } catch(e) { res.status(500).json({ error: 'خطأ في الخادم' }); }
 });
 
 app.get('/api/nbn/data/:name', async (req, res) => {
   try {
-    const country = await q.getCountryByName(req.params.name);
-    if (!country) return res.status(404).json({ error: 'الدولة غير موجودة' });
-    res.json({ council_data: country.council_data, description: country.description });
+    const c = await q.getCountryByName(req.params.name);
+    if (!c) return res.status(404).json({ error: 'الدولة غير موجودة' });
+    res.json({ council_data: c.council_data, description: c.description });
   } catch(e) { res.status(500).json({ error: 'خطأ في الخادم' }); }
 });
 
 app.get('/api/inc/list', async (req, res) => {
   try {
-    const rows = await q.listByType('stock');
-    res.json(rows.map(r => r.name));
+    const r = await q.listByType('stock');
+    res.json(r.map(x => x.name));
   } catch(e) { res.status(500).json({ error: 'خطأ في الخادم' }); }
 });
 
 app.get('/api/inc/data/:name', async (req, res) => {
   try {
-    const country = await q.getCountryByName(req.params.name);
-    if (!country) return res.status(404).json({ error: 'الدولة غير موجودة' });
-    const companies = await q.getCompaniesByCountry(country.id);
+    const c = await q.getCountryByName(req.params.name);
+    if (!c) return res.status(404).json({ error: 'الدولة غير موجودة' });
+    const companies = await q.getCompaniesByCountry(c.id);
     res.json({
-      companies: companies.map((c,i) => ({ index: i+1, value: c.name, id: c.id })),
-      values:    companies.map((c,i) => ({ index: i+1, value: c.market_value })),
-      growth:    companies.map((c,i) => ({ index: i+1, value: c.growth })),
+      companies: companies.map((x,i) => ({ index: i+1, value: x.name, id: x.id })),
+      values:    companies.map((x,i) => ({ index: i+1, value: x.market_value })),
+      growth:    companies.map((x,i) => ({ index: i+1, value: x.growth })),
     });
   } catch(e) { res.status(500).json({ error: 'خطأ في الخادم' }); }
 });
@@ -166,12 +209,9 @@ app.get('/api/inc/data/:name', async (req, res) => {
 app.get('/api/admin/countries', requireAdmin, async (req, res) => {
   try {
     const countries = await q.listCountries();
-    const result = await Promise.all(
-      countries.map(async c => ({
-        ...c,
-        companies: await q.getCompaniesByCountry(c.id)
-      }))
-    );
+    const result = await Promise.all(countries.map(async c => ({
+      ...c, companies: await q.getCompaniesByCountry(c.id)
+    })));
     res.json(result);
   } catch(e) { res.status(500).json({ error: 'خطأ في الخادم' }); }
 });
@@ -180,8 +220,8 @@ app.post('/api/admin/countries', requireAdmin, async (req, res) => {
   try {
     const { name, flag, description, type, council_data } = req.body || {};
     if (!name) return res.status(400).json({ error: 'اسم الدولة مطلوب' });
-    const result = await q.createCountry(name.trim(), flag||'', description||'', type||'both', council_data||'');
-    res.json({ success: true, id: Number(result.lastInsertRowid) });
+    const r = await q.createCountry(name.trim(), flag||'', description||'', type||'both', council_data||'');
+    res.json({ success: true, id: Number(r.lastInsertRowid) });
   } catch(e) {
     if (e.message?.includes('UNIQUE')) return res.status(400).json({ error: 'اسم الدولة مستخدم مسبقاً' });
     res.status(500).json({ error: 'خطأ في الخادم' });
@@ -192,16 +232,14 @@ app.put('/api/admin/countries/:id', requireAdmin, async (req, res) => {
   try {
     const { name, flag, description, type, council_data } = req.body || {};
     if (!name) return res.status(400).json({ error: 'اسم الدولة مطلوب' });
-    const result = await q.updateCountry(name.trim(), flag||'', description||'', type||'both', council_data||'', req.params.id);
-    if (!result.rowsAffected) return res.status(404).json({ error: 'الدولة غير موجودة' });
+    await q.updateCountry(name.trim(), flag||'', description||'', type||'both', council_data||'', req.params.id);
     res.json({ success: true });
   } catch(e) { res.status(500).json({ error: 'خطأ في الخادم' }); }
 });
 
 app.delete('/api/admin/countries/:id', requireAdmin, async (req, res) => {
   try {
-    const result = await q.deleteCountry(req.params.id);
-    if (!result.rowsAffected) return res.status(404).json({ error: 'الدولة غير موجودة' });
+    await q.deleteCountry(req.params.id);
     res.json({ success: true });
   } catch(e) { res.status(500).json({ error: 'خطأ في الخادم' }); }
 });
@@ -210,9 +248,9 @@ app.delete('/api/admin/countries/:id', requireAdmin, async (req, res) => {
 app.post('/api/admin/companies', requireAdmin, async (req, res) => {
   try {
     const { country_id, name, market_value, growth, sort_order } = req.body || {};
-    if (!country_id || !name) return res.status(400).json({ error: 'country_id واسم الشركة مطلوبان' });
-    const result = await q.createCompany(country_id, name.trim(), market_value||'0', growth||'0%', sort_order||0);
-    res.json({ success: true, id: Number(result.lastInsertRowid) });
+    if (!country_id || !name) return res.status(400).json({ error: 'البيانات ناقصة' });
+    const r = await q.createCompany(country_id, name.trim(), market_value||'0', growth||'0%', sort_order||0);
+    res.json({ success: true, id: Number(r.lastInsertRowid) });
   } catch(e) { res.status(500).json({ error: 'خطأ في الخادم' }); }
 });
 
@@ -220,16 +258,14 @@ app.put('/api/admin/companies/:id', requireAdmin, async (req, res) => {
   try {
     const { name, market_value, growth, sort_order } = req.body || {};
     if (!name) return res.status(400).json({ error: 'اسم الشركة مطلوب' });
-    const result = await q.updateCompany(name.trim(), market_value||'0', growth||'0%', sort_order||0, req.params.id);
-    if (!result.rowsAffected) return res.status(404).json({ error: 'الشركة غير موجودة' });
+    await q.updateCompany(name.trim(), market_value||'0', growth||'0%', sort_order||0, req.params.id);
     res.json({ success: true });
   } catch(e) { res.status(500).json({ error: 'خطأ في الخادم' }); }
 });
 
 app.delete('/api/admin/companies/:id', requireAdmin, async (req, res) => {
   try {
-    const result = await q.deleteCompany(req.params.id);
-    if (!result.rowsAffected) return res.status(404).json({ error: 'الشركة غير موجودة' });
+    await q.deleteCompany(req.params.id);
     res.json({ success: true });
   } catch(e) { res.status(500).json({ error: 'خطأ في الخادم' }); }
 });
@@ -251,49 +287,59 @@ app.put('/api/admin/users/:id/role', requireAdmin, async (req, res) => {
 
 app.delete('/api/admin/users/:id', requireAdmin, async (req, res) => {
   try {
-    const result = await q.deleteUser(req.params.id);
-    if (!result.rowsAffected) return res.status(404).json({ error: 'المستخدم غير موجود أو هو admin' });
+    await q.deleteUser(req.params.id);
     res.json({ success: true });
   } catch(e) { res.status(500).json({ error: 'خطأ في الخادم' }); }
 });
 
-// ==================== Records ====================
+// ==================== Records (منتدى) ====================
 app.get('/api/records', async (req, res) => {
   try { res.json(await q.listRecords()); }
   catch(e) { res.status(500).json({ error: 'خطأ في الخادم' }); }
 });
 
-app.post('/api/admin/records', requireAdmin, async (req, res) => {
+// أي مستخدم مسجل يمكنه النشر
+app.post('/api/records', requireAuth, async (req, res) => {
   try {
-    const { publisher, content, image } = req.body || {};
-    if (!publisher || !content) return res.status(400).json({ error: 'الناشر والمحتوى مطلوبان' });
-    const result = await q.createRecord(publisher.trim(), content.trim(), image||'');
-    res.json({ success: true, id: Number(result.lastInsertRowid) });
+    const { content, image } = req.body || {};
+    if (!content?.trim()) return res.status(400).json({ error: 'المحتوى مطلوب' });
+    const user = await q.getUserById(req.session.userId);
+    if (!user) return res.status(404).json({ error: 'المستخدم غير موجود' });
+    const publisher   = user.display_name || user.username;
+    const user_role   = user.role === 'admin' ? 'Admin' : 'Member';
+    const user_avatar = user.avatar || '';
+    const r = await q.createRecord(user.id, publisher, user_role, user_avatar, content.trim(), image||'');
+    res.json({ success: true, id: Number(r.lastInsertRowid) });
   } catch(e) { res.status(500).json({ error: 'خطأ في الخادم' }); }
 });
 
-app.delete('/api/admin/records/:id', requireAdmin, async (req, res) => {
+// حذف سجل: Admin يحذف أي شيء، المستخدم يحذف منشوراته فقط
+app.delete('/api/records/:id', requireAuth, async (req, res) => {
   try {
-    const result = await q.deleteRecord(req.params.id);
-    if (!result.rowsAffected) return res.status(404).json({ error: 'السجل غير موجود' });
+    const records = await q.listRecords();
+    const record = records.find(r => r.id == req.params.id);
+    if (!record) return res.status(404).json({ error: 'السجل غير موجود' });
+    if (req.session.role !== 'admin' && record.user_id !== req.session.userId)
+      return res.status(403).json({ error: 'غير مسموح' });
+    await q.deleteRecord(req.params.id);
     res.json({ success: true });
   } catch(e) { res.status(500).json({ error: 'خطأ في الخادم' }); }
 });
 
 // ==================== Pages ====================
-app.get('/admin',    (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
-app.get('/wiki',     (req, res) => res.sendFile(path.join(__dirname, 'public', 'wiki.html')));
-app.get('/archive',  (req, res) => res.sendFile(path.join(__dirname, 'public', 'wiki.html')));
-app.get('/stock',    (req, res) => res.sendFile(path.join(__dirname, 'public', 'stock.html')));
-app.get('/council',  (req, res) => res.sendFile(path.join(__dirname, 'public', 'council.html')));
-app.get('/records',  (req, res) => res.sendFile(path.join(__dirname, 'public', 'records.html')));
-app.get('/hostaka',  (req, res) => res.sendFile(path.join(__dirname, 'public', 'hostaka.html')));
-app.get('*',         (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+app.get('/admin',   (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
+app.get('/wiki',    (req, res) => res.sendFile(path.join(__dirname, 'public', 'wiki.html')));
+app.get('/archive', (req, res) => res.sendFile(path.join(__dirname, 'public', 'wiki.html')));
+app.get('/stock',   (req, res) => res.sendFile(path.join(__dirname, 'public', 'stock.html')));
+app.get('/council', (req, res) => res.sendFile(path.join(__dirname, 'public', 'council.html')));
+app.get('/records', (req, res) => res.sendFile(path.join(__dirname, 'public', 'records.html')));
+app.get('/hostaka', (req, res) => res.sendFile(path.join(__dirname, 'public', 'hostaka.html')));
+app.get('/profile', (req, res) => res.sendFile(path.join(__dirname, 'public', 'profile.html')));
+app.get('*',        (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
-// ==================== Start ====================
 const PORT = process.env.PORT || 3000;
 initDB()
   .then(() => app.listen(PORT, () => console.log(`🚀 Malines on port ${PORT}`)))
-  .catch(err => { console.error('❌ فشل تهيئة قاعدة البيانات:', err); process.exit(1); });
+  .catch(err => { console.error('❌ DB init failed:', err); process.exit(1); });
 
 module.exports = app;

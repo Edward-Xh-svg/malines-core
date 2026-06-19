@@ -1,13 +1,19 @@
 const { createClient } = require('@libsql/client');
 const bcrypt = require('bcryptjs');
 
-// ==================== اتصال Turso ====================
 const db = createClient({
   url:       process.env.TURSO_DATABASE_URL,
   authToken: process.env.TURSO_AUTH_TOKEN,
 });
 
-// ==================== إنشاء الجداول ====================
+function rows(result) {
+  return result.rows.map(r => Object.fromEntries(Object.entries(r)));
+}
+function firstRow(result) {
+  const r = result.rows[0];
+  return r ? Object.fromEntries(Object.entries(r)) : null;
+}
+
 async function initDB() {
   await db.executeMultiple(`
     CREATE TABLE IF NOT EXISTS users (
@@ -16,6 +22,10 @@ async function initDB() {
       email       TEXT    NOT NULL UNIQUE,
       password    TEXT    NOT NULL,
       role        TEXT    NOT NULL DEFAULT 'user',
+      avatar      TEXT    DEFAULT '',
+      bio         TEXT    DEFAULT '',
+      game_id     TEXT    DEFAULT '',
+      display_name TEXT   DEFAULT '',
       created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
     );
 
@@ -56,53 +66,49 @@ async function initDB() {
 
     CREATE TABLE IF NOT EXISTS records (
       id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id     INTEGER REFERENCES users(id),
       publisher   TEXT    NOT NULL,
+      user_role   TEXT    NOT NULL DEFAULT 'Member',
+      user_avatar TEXT    DEFAULT '',
       content     TEXT    NOT NULL,
       image       TEXT    DEFAULT '',
       created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
     );
   `);
 
-  // admin افتراضي
-  const res = await db.execute("SELECT id FROM users WHERE role = 'admin' LIMIT 1");
-  if (res.rows.length === 0) {
-    const hash = bcrypt.hashSync('admin123', 10);
+  // تحديث admin أو إنشاؤه
+  const adminRes = await db.execute("SELECT id FROM users WHERE email = 'misha@malines.nc' LIMIT 1");
+  if (adminRes.rows.length === 0) {
+    // حذف admin قديم إن وجد
+    await db.execute("DELETE FROM users WHERE role = 'admin'");
+    const hash = bcrypt.hashSync('60dbedfd4f3247bfa11fc32bb2acd9', 10);
     await db.execute({
-      sql: "INSERT OR IGNORE INTO users (username, email, password, role) VALUES (?,?,?,?)",
-      args: ['admin', 'admin@malines.com', hash, 'admin']
+      sql: "INSERT OR REPLACE INTO users (username, email, password, role, display_name) VALUES (?,?,?,?,?)",
+      args: ['misha', 'misha@malines.nc', hash, 'admin', 'Misha']
     });
-    console.log('✅ admin افتراضي: admin@malines.com / admin123');
+    console.log('✅ admin: misha@malines.nc');
   }
 
-  console.log('✅ قاعدة البيانات جاهزة');
+  console.log('✅ DB ready');
 }
 
-// ==================== DB Helper ====================
-// يعيد صفوف كـ plain objects
-function rows(result) {
-  return result.rows.map(r => Object.fromEntries(
-    Object.entries(r).map(([k,v]) => [k, v])
-  ));
-}
-function firstRow(result) {
-  const r = result.rows[0];
-  return r ? Object.fromEntries(Object.entries(r)) : null;
-}
-
-// ==================== Query Functions ====================
 const q = {
   // Users
-  getUserByEmail:  (email) =>
+  getUserByEmail:   (email) =>
     db.execute({ sql: 'SELECT * FROM users WHERE email = ?', args: [email] }).then(firstRow),
-  getUserById:     (id) =>
-    db.execute({ sql: 'SELECT id,username,email,role,created_at FROM users WHERE id = ?', args: [id] }).then(firstRow),
-  createUser:      (username, email, password, role) =>
-    db.execute({ sql: 'INSERT INTO users (username,email,password,role) VALUES (?,?,?,?)', args: [username,email,password,role] }),
-  listUsers:       () =>
-    db.execute('SELECT id,username,email,role,created_at FROM users ORDER BY created_at DESC').then(rows),
-  deleteUser:      (id) =>
+  getUserById:      (id) =>
+    db.execute({ sql: 'SELECT id,username,email,role,avatar,bio,game_id,display_name,created_at FROM users WHERE id = ?', args: [id] }).then(firstRow),
+  getPublicProfile: (username) =>
+    db.execute({ sql: 'SELECT id,username,display_name,avatar,bio,game_id,role,created_at FROM users WHERE username = ?', args: [username] }).then(firstRow),
+  createUser:       (username, email, password) =>
+    db.execute({ sql: 'INSERT INTO users (username,email,password,role) VALUES (?,?,?,?)', args: [username, email, password, 'user'] }),
+  updateProfile:    (display_name, bio, game_id, avatar, id) =>
+    db.execute({ sql: 'UPDATE users SET display_name=?,bio=?,game_id=?,avatar=? WHERE id=?', args: [display_name, bio, game_id, avatar, id] }),
+  listUsers:        () =>
+    db.execute('SELECT id,username,email,role,avatar,display_name,created_at FROM users ORDER BY created_at DESC').then(rows),
+  deleteUser:       (id) =>
     db.execute({ sql: 'DELETE FROM users WHERE id = ? AND role != "admin"', args: [id] }),
-  updateUserRole:  (role, id) =>
+  updateUserRole:   (role, id) =>
     db.execute({ sql: 'UPDATE users SET role = ? WHERE id = ?', args: [role, id] }),
 
   // Articles
@@ -133,7 +139,7 @@ const q = {
   deleteCountry:   (id) =>
     db.execute({ sql: 'DELETE FROM countries WHERE id = ?', args: [id] }),
 
-  // Stock Companies
+  // Stock
   getCompaniesByCountry: (country_id) =>
     db.execute({ sql: 'SELECT * FROM stock_companies WHERE country_id = ? ORDER BY sort_order ASC, id ASC', args: [country_id] }).then(rows),
   createCompany:   (country_id,name,market_value,growth,sort_order) =>
@@ -146,8 +152,8 @@ const q = {
   // Records
   listRecords:     () =>
     db.execute('SELECT * FROM records ORDER BY created_at DESC').then(rows),
-  createRecord:    (publisher,content,image) =>
-    db.execute({ sql: 'INSERT INTO records (publisher,content,image) VALUES (?,?,?)', args: [publisher,content,image] }),
+  createRecord:    (user_id, publisher, user_role, user_avatar, content, image) =>
+    db.execute({ sql: 'INSERT INTO records (user_id,publisher,user_role,user_avatar,content,image) VALUES (?,?,?,?,?,?)', args: [user_id, publisher, user_role, user_avatar, content, image] }),
   deleteRecord:    (id) =>
     db.execute({ sql: 'DELETE FROM records WHERE id = ?', args: [id] }),
 };
