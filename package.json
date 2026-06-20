@@ -1,6 +1,6 @@
 {
   "name": "malines-archive",
-  "version": "3.0.0",
+  "version": "5.0.0",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"
@@ -8,6 +8,7 @@
   "dependencies": {
     "express": "^4.18.2",
     "@libsql/client": "^0.14.0",
-    "bcryptjs": "^2.4.3"
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2"
   }
 }
