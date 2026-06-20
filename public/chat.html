@@ -166,11 +166,7 @@ function renderChatLayout() {
   document.getElementById('chatLayout').innerHTML = `
     <div class="conv-sidebar">
       <div class="sidebar-header">
-        <span class="sidebar-title">المحادثات</span>
-        <button class="btn-new-chat" onclick="openSearch()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          جديد
-        </button>
+        <span class="sidebar-title">الرسائل</span>
       </div>
       <div class="conv-list" id="convList"></div>
     </div>
@@ -188,24 +184,47 @@ async function loadConversations() {
   conversations = Array.isArray(data) ? data : [];
   const list = document.getElementById('convList');
   if (!list) return;
-  if (!conversations.length) {
-    list.innerHTML = '<div class="conv-empty">لا توجد محادثات بعد</div>';
-    return;
-  }
-  list.innerHTML = conversations.map(c => {
+
+  // جلب كل المستخدمين
+  const allUsers = await api('/api/users');
+  const others = Array.isArray(allUsers) ? allUsers.filter(u => u.username !== ME?.username) : [];
+
+  // بناء قائمة محادثات موجودة
+  const convUsernames = new Set();
+  const convHtml = conversations.map(c => {
     const isFrom = c.from_id == ME?.id;
     const peerName = isFrom ? c.to_name : c.from_name;
     const peerAvatar = isFrom ? (c.to_avatar||'') : (c.from_avatar||'');
-    const peerUsername = isFrom ? c.to_name : c.from_name;
+    convUsernames.add(peerName);
     const avatarHtml = peerAvatar ? `<img src="${esc(peerAvatar)}" alt="">` : peerName.charAt(0).toUpperCase();
-    return `<div class="conv-item ${currentPeer===peerUsername?'active':''}" onclick="openConversation('${esc(peerUsername)}')">
+    return `<div class="conv-item ${currentPeer===peerName?'active':''}" onclick="openConversation('${esc(peerName)}')">
       <div class="conv-avatar">${avatarHtml}</div>
       <div class="conv-info">
         <div class="conv-name">${esc(peerName)}</div>
-        <div class="conv-last">${esc(c.content?.slice(0,40)||'')}</div>
+        <div class="conv-last">${esc(c.content?.slice(0,36)||'')}</div>
       </div>
     </div>`;
   }).join('');
+
+  // بناء قائمة كل المستخدمين الآخرين
+  const usersHtml = others.map(u => {
+    const avatarHtml = u.avatar ? `<img src="${esc(u.avatar)}" alt="">` : (u.display_name||u.username).charAt(0).toUpperCase();
+    const roleBadge = u.role==='admin' ? '<span style="font-size:0.68rem;color:var(--red-h);font-weight:700;">Admin</span>' : '';
+    return `<div class="conv-item ${currentPeer===u.username?'active':''}" onclick="openConversation('${esc(u.username)}')">
+      <div class="conv-avatar">${avatarHtml}</div>
+      <div class="conv-info">
+        <div class="conv-name">${esc(u.display_name||u.username)} ${roleBadge}</div>
+        <div class="conv-last">@${esc(u.username)}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  list.innerHTML = `
+    <div style="padding:8px 12px;font-size:0.75rem;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border);">المحادثات الأخيرة</div>
+    ${convHtml || '<div class="conv-empty" style="padding:12px 16px;font-size:0.82rem;">لا توجد محادثات بعد</div>'}
+    <div style="padding:8px 12px;font-size:0.75rem;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border);margin-top:8px;">جميع الأعضاء</div>
+    ${usersHtml || '<div class="conv-empty" style="padding:12px 16px;font-size:0.82rem;">لا يوجد أعضاء</div>'}
+  `;
 }
 
 async function openConversation(username) {
