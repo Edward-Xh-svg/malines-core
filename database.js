@@ -140,7 +140,14 @@ const q = {
   createSession: (token, user_id, username, role, expires_at) =>
     db.execute({ sql: 'INSERT INTO sessions (token,user_id,username,role,expires_at) VALUES (?,?,?,?,?)', args: [token,user_id,username,role,expires_at] }),
   getSession: (token) =>
-    db.execute({ sql: "SELECT * FROM sessions WHERE token=? AND expires_at > datetime('now')", args: [token] }).then(first),
+    db.execute({ sql: 'SELECT * FROM sessions WHERE token=?', args: [token] })
+      .then(r => {
+        const row = first(r);
+        if (!row) return null;
+        // تحقق من انتهاء الصلاحية في JavaScript لتجنب مشاكل timezone
+        if (new Date(row.expires_at) < new Date()) return null;
+        return row;
+      }),
   deleteSession: (token) =>
     db.execute({ sql: 'DELETE FROM sessions WHERE token=?', args: [token] }),
 
