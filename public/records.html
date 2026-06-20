@@ -272,7 +272,26 @@ const REACTIONS = [
 
 // ── Init ──
 (async function init() {
-  if (ME) setLoggedInUI(ME);
+  // تحقق من الـ session أولاً عبر API
+  if (TOKEN) {
+    try {
+      const r = await fetch('/api/me', { headers:{'Authorization':'Bearer '+TOKEN} });
+      const u = await r.json();
+      if (u && !u.error) {
+        // تحديث localStorage بالبيانات الحديثة
+        ME = { username: u.username, role: u.role, avatar: u.avatar||'', id: u.id };
+        localStorage.setItem('malines_user', JSON.stringify(ME));
+        setLoggedInUI(ME);
+      } else {
+        // Token منتهي أو غير صالح
+        localStorage.removeItem('malines_token');
+        localStorage.removeItem('malines_user');
+        ME = null;
+      }
+    } catch(e) {
+      if (ME) setLoggedInUI(ME);
+    }
+  }
   await loadPosts();
   if (ME && TOKEN) loadUnread();
 })();

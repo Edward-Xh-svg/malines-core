@@ -77,13 +77,15 @@ try{ if(stored) ME=JSON.parse(stored); }catch(e){}
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 async function init(){
-  if(!TOKEN||!ME){ renderNotLogged(); return; }
+  if(!TOKEN){ renderNotLogged(); return; }
   try{
     const r=await fetch('/api/me',{headers:{'Authorization':'Bearer '+TOKEN}});
+    if(!r.ok){ renderNotLogged(); return; }
     const u=await r.json();
     if(u.error){ renderNotLogged(); return; }
+    ME = u;
     render(u);
-  }catch(e){ render(ME); }
+  }catch(e){ renderNotLogged(); }
 }
 
 function renderNotLogged(){

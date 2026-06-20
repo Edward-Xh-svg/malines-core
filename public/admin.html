@@ -492,7 +492,7 @@
 
 <script>
 // ==================== State ====================
-let TOKEN = localStorage.getItem('malines_admin_token') || '';
+let TOKEN = localStorage.getItem('malines_token') || '';
 let currentArticleSlug = null;
 let currentCountryId = null;
 let allCountries = [];
@@ -509,7 +509,7 @@ async function doAdminLogin() {
     const r = await api('/api/login', 'POST', { email, password: pass });
     if (r.role !== 'admin') { showLoginErr('هذا الحساب ليس لديه صلاحية admin'); btn.disabled=false; btn.textContent='دخول'; return; }
     TOKEN = r.token;
-    localStorage.setItem('malines_admin_token', TOKEN);
+    localStorage.setItem('malines_token', TOKEN);
     localStorage.setItem('malines_admin_user', r.username);
     initAdmin(r.username);
   } catch(e) {
@@ -524,7 +524,7 @@ function showLoginErr(msg) {
 async function doLogout() {
   try { await api('/api/logout', 'POST'); } catch(e) {}
   TOKEN = '';
-  localStorage.removeItem('malines_admin_token');
+  localStorage.removeItem('malines_token');
   localStorage.removeItem('malines_admin_user');
   location.reload();
 }
@@ -540,9 +540,14 @@ function initAdmin(username) {
   if (!TOKEN) return;
   try {
     const r = await api('/api/me');
-    if (r.role !== 'admin') { TOKEN=''; localStorage.removeItem('malines_admin_token'); return; }
+    if (r.error || r.role !== 'admin') {
+      TOKEN='';
+      localStorage.removeItem('malines_token');
+      return;
+    }
+    localStorage.setItem('malines_admin_user', r.username);
     initAdmin(r.username);
-  } catch(e) { TOKEN=''; localStorage.removeItem('malines_admin_token'); }
+  } catch(e) { TOKEN=''; localStorage.removeItem('malines_token'); }
 })();
 
 document.getElementById('loginPass').addEventListener('keydown', e => { if(e.key==='Enter') doAdminLogin(); });
