@@ -221,7 +221,7 @@
 <!-- Sidebar -->
 <aside class="sidebar" id="sidebar" style="display:none;">
   <div class="sidebar-logo">
-    <div class="sidebar-logo-title">⚙️ مالينز</div>
+    <div class="sidebar-logo-title">مالينز</div>
     <div class="sidebar-logo-sub">لوحة التحكم</div>
   </div>
   <nav class="sidebar-nav">
@@ -261,7 +261,7 @@
 
   <!-- Dashboard -->
   <div class="page active" id="page-dashboard">
-    <h1 style="font-size:1.6rem;font-weight:900;color:#fff;margin-bottom:8px;">مرحباً بك في لوحة التحكم 👋</h1>
+    <h1 style="font-size:1.6rem;font-weight:900;color:#fff;margin-bottom:8px;">مرحباً بك في لوحة التحكم</h1>
     <p style="color:var(--muted);margin-bottom:28px;">إدارة مجتمع مالينز من مكان واحد</p>
     <div class="stats-grid" id="statsGrid">
       <div class="stat-card"><div class="stat-num" id="statArticles">—</div><div class="stat-label">مقال</div></div>
@@ -291,7 +291,7 @@
   <!-- Articles -->
   <div class="page" id="page-articles">
     <div class="section-header">
-      <h2 class="section-title">📚 المقالات</h2>
+      <h2 class="section-title">المقالات</h2>
       <button class="btn btn-primary" onclick="openArticleModal()">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         مقال جديد
@@ -318,7 +318,7 @@
   <!-- Countries -->
   <div class="page" id="page-countries">
     <div class="section-header">
-      <h2 class="section-title">🌍 الدول والبورصة</h2>
+      <h2 class="section-title">الدول والبورصة</h2>
       <button class="btn btn-primary" onclick="openCountryModal()">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         دولة جديدة
@@ -344,7 +344,7 @@
   <!-- Records -->
   <div class="page" id="page-records">
     <div class="section-header">
-      <h2 class="section-title">📋 السجلات</h2>
+      <h2 class="section-title">السجلات</h2>
       <button class="btn btn-primary" onclick="openRecordModal()">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         سجل جديد
@@ -358,7 +358,7 @@
   <!-- Users -->
   <div class="page" id="page-users">
     <div class="section-header">
-      <h2 class="section-title">👥 المستخدمون</h2>
+      <h2 class="section-title">المستخدمون</h2>
     </div>
     <div class="card">
       <div class="table-wrap">
@@ -680,7 +680,7 @@ async function saveArticle() {
       await api('/api/admin/articles', 'POST', { slug, title, category, content, image, published });
     }
     closeModal('articleModal');
-    toast(currentArticleSlug ? 'تم تحديث المقال ✅' : 'تم نشر المقال ✅');
+    toast(currentArticleSlug ? 'تم تحديث المقال' : 'تم نشر المقال');
     loadArticles();
   } catch(e) { errEl.textContent=e.message; errEl.style.display='flex'; }
 }
@@ -840,7 +840,7 @@ async function saveCountry() {
     }
 
     closeModal('countryModal');
-    toast(currentCountryId ? 'تم تحديث الدولة ✅' : 'تمت إضافة الدولة ✅');
+    toast(currentCountryId ? 'تم تحديث الدولة' : 'تمت إضافة الدولة');
     loadCountries();
   } catch(e) { errEl.textContent=e.message; errEl.style.display='flex'; }
 }
@@ -880,7 +880,7 @@ async function promoteUser(id) {
   if (!confirm('ترقية هذا المستخدم لصلاحية admin؟')) return;
   try {
     await api('/api/admin/users/' + id + '/role', 'PUT', { role: 'admin' });
-    toast('تمت الترقية ✅');
+    toast('تمت الترقية');
     loadUsers();
   } catch(e) { toast(e.message, 'error'); }
 }
@@ -937,7 +937,7 @@ async function saveRecord() {
   try {
     await api('/api/admin/records', 'POST', { publisher, content, image });
     closeModal('recordModal');
-    toast('تم نشر السجل ✅');
+    toast('تم نشر السجل');
     loadRecords();
   } catch(e) { errEl.textContent=e.message; errEl.style.display='flex'; }
 }
