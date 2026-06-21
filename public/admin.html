@@ -539,14 +539,14 @@ function initAdmin(username) {
 (async function checkSession() {
   if (!TOKEN) return;
   try {
-    const r = await api('/api/me');
-    if (r.error || r.role !== 'admin') {
-      TOKEN='';
-      localStorage.removeItem('malines_token');
-      return;
+    const r = await fetch('/api/auth/me', { headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN} });
+    if (!r.ok) { TOKEN=''; localStorage.removeItem('malines_token'); return; }
+    const u = await r.json();
+    if (!u || u.error || u.role !== 'admin') {
+      TOKEN=''; localStorage.removeItem('malines_token'); return;
     }
-    localStorage.setItem('malines_admin_user', r.username);
-    initAdmin(r.username);
+    localStorage.setItem('malines_admin_user', u.username);
+    initAdmin(u.username);
   } catch(e) { TOKEN=''; localStorage.removeItem('malines_token'); }
 })();
 

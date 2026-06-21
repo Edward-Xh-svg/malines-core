@@ -272,25 +272,23 @@ const REACTIONS = [
 
 // ── Init ──
 (async function init() {
-  // تحقق من الـ session أولاً عبر API
   if (TOKEN) {
     try {
-      const r = await fetch('/api/me', { headers:{'Authorization':'Bearer '+TOKEN} });
-      const u = await r.json();
-      if (u && !u.error) {
-        // تحديث localStorage بالبيانات الحديثة
-        ME = { username: u.username, role: u.role, avatar: u.avatar||'', id: u.id };
-        localStorage.setItem('malines_user', JSON.stringify(ME));
-        setLoggedInUI(ME);
-      } else {
-        // Token منتهي أو غير صالح
-        localStorage.removeItem('malines_token');
-        localStorage.removeItem('malines_user');
-        ME = null;
+      // تحقق سريع من JWT بدون DB
+      const r = await fetch('/api/auth/me', { headers:{'Authorization':'Bearer '+TOKEN} });
+      if (r.ok) {
+        const u = await r.json();
+        if (u && !u.error) {
+          ME = { username: u.username, role: u.role, avatar: u.avatar||'', id: u.id };
+          localStorage.setItem('malines_user', JSON.stringify(ME));
+          setLoggedInUI(ME);
+        } else {
+          localStorage.removeItem('malines_token');
+          localStorage.removeItem('malines_user');
+          ME = null;
+        }
       }
-    } catch(e) {
-      if (ME) setLoggedInUI(ME);
-    }
+    } catch(e) { if (ME) setLoggedInUI(ME); }
   }
   await loadPosts();
   if (ME && TOKEN) loadUnread();
@@ -300,7 +298,9 @@ function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 function fmtDate(s){ if(!s) return ''; return new Date(s).toLocaleDateString('ar-SA',{year:'numeric',month:'short',day:'numeric'}); }
 
 async function apiFetch(url, method='GET', body=null){
-  const opts = { method, headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN} };
+  // نقرأ التوكن في كل طلب لضمان أحدث قيمة
+  const token = localStorage.getItem('malines_token') || '';
+  const opts = { method, headers:{'Content-Type':'application/json','Authorization':'Bearer '+token} };
   if(body) opts.body = JSON.stringify(body);
   const r = await fetch(url, opts);
   return r.json();

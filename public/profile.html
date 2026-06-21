@@ -69,7 +69,8 @@
 <input type="file" id="avFile" accept="image/*" style="display:none;" onchange="onAvatar(event)">
 
 <script>
-const TOKEN = localStorage.getItem('malines_token')||'';
+// TOKEN يُقرأ ديناميكياً في كل طلب
+const getToken = () => localStorage.getItem('malines_token')||'';
 const stored = localStorage.getItem('malines_user');
 let ME = null; let newAvBase64 = '';
 try{ if(stored) ME=JSON.parse(stored); }catch(e){}
@@ -79,12 +80,18 @@ function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 async function init(){
   if(!TOKEN){ renderNotLogged(); return; }
   try{
-    const r=await fetch('/api/me',{headers:{'Authorization':'Bearer '+TOKEN}});
-    if(!r.ok){ renderNotLogged(); return; }
-    const u=await r.json();
-    if(u.error){ renderNotLogged(); return; }
-    ME = u;
-    render(u);
+    // أولاً تحقق سريع من JWT بدون DB
+    const quick = await fetch('/api/auth/me',{headers:{'Authorization':'Bearer '+getToken()}});
+    if(!quick.ok){ renderNotLogged(); return; }
+    const quickUser = await quick.json();
+    // عرض الصفحة فوراً بالبيانات السريعة
+    render(quickUser);
+    // ثم جلب أحدث البيانات من DB في الخلفية
+    const full = await fetch('/api/me',{headers:{'Authorization':'Bearer '+getToken()}});
+    if(full.ok){
+      const fullUser = await full.json();
+      if(!fullUser.error){ ME=fullUser; render(fullUser); }
+    }
   }catch(e){ renderNotLogged(); }
 }
 
@@ -156,11 +163,11 @@ async function save(){
   try{
     let avatarUrl=ME?.avatar||'';
     if(newAvBase64){
-      const up=await fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},body:JSON.stringify({image:newAvBase64})});
+      const up=await fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},body:JSON.stringify({image:newAvBase64})});
       const ud=await up.json();
       if(ud.url) avatarUrl=ud.url;
     }
-    const r=await fetch('/api/profile',{method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},body:JSON.stringify({display_name,bio,game_id,avatar:avatarUrl})});
+    const r=await fetch('/api/profile',{method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},body:JSON.stringify({display_name,bio,game_id,avatar:avatarUrl})});
     const d=await r.json();
     if(d.success){
       if(ME){ ME.avatar=avatarUrl; ME.display_name=display_name; localStorage.setItem('malines_user',JSON.stringify(ME)); }

@@ -143,20 +143,25 @@ function fmtTime(s) { if(!s) return ''; return new Date(s).toLocaleTimeString('a
 function fmtDate(s) { if(!s) return ''; const d=new Date(s); return d.toLocaleDateString('ar-SA',{month:'short',day:'numeric'}); }
 
 async function api(url, method='GET', body=null) {
-  const opts = { method, headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN} };
+  const token = localStorage.getItem('malines_token')||''; const opts = { method, headers:{'Content-Type':'application/json','Authorization':'Bearer '+token} };
   if (body) opts.body = JSON.stringify(body);
   const r = await fetch(url, opts);
   return r.json();
 }
 
 async function init() {
-  if (!TOKEN || !ME) { document.getElementById('notLogged').style.display='flex'; return; }
+  if (!TOKEN) { document.getElementById('notLogged').style.display='flex'; return; }
+  try {
+    const r = await fetch('/api/auth/me', { headers:{'Authorization':'Bearer '+TOKEN} });
+    if (!r.ok) { document.getElementById('notLogged').style.display='flex'; return; }
+    const u = await r.json();
+    if (!u || u.error) { document.getElementById('notLogged').style.display='flex'; return; }
+    ME = u;
+  } catch(e) { document.getElementById('notLogged').style.display='flex'; return; }
   document.getElementById('topbarUser').textContent = ME.username;
   renderChatLayout();
   await loadConversations();
   loadUnread();
-
-  // فتح محادثة مباشرة إذا كان هناك ?with=username في الرابط
   const params = new URLSearchParams(location.search);
   const withUser = params.get('with');
   if (withUser) openConversation(withUser);
