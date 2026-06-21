@@ -71,9 +71,16 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
+// /api/auth/me - سريع من JWT بدون DB (للتحقق الفوري)
+app.get('/api/auth/me', (req, res) => {
+  const user = verifyToken(req);
+  if (!user) return res.status(401).json({ error: 'غير مصرح' });
+  res.json({ id:user.id, username:user.username, role:user.role, avatar:user.avatar||'' });
+});
+
+// /api/me - يجلب أحدث البيانات من DB
 app.get('/api/me', requireAuth, async (req, res) => {
   try {
-    // نجلب أحدث بيانات المستخدم من DB (avatar/bio قد تتغير)
     const user = await q.getUserById(req.user.id);
     res.json(user || req.user);
   } catch(e) { res.json(req.user); }
@@ -263,14 +270,42 @@ app.delete('/api/admin/users/:id', requireAdmin, async (req, res) => {
 app.get('/api/records', async (req, res) => {
   try {
     const records = await q.listRecords();
+    if (!records.length) return res.json([]);
+
     const u = verifyToken(req);
-    const enriched = await Promise.all(records.map(async r => {
-      const [reactions, comments] = await Promise.all([q.getReactions(r.id), q.getComments(r.id)]);
-      const userReaction = u ? (await q.getUserReaction(r.id, u.id))?.emoji || null : null;
-      return { ...r, reactions, comments, userReaction };
+
+    // جلب كل الـ reactions والـ comments دفعة واحدة بدل N+1 queries
+    const [allReactions, allComments, userReactions] = await Promise.all([
+      q.getAllReactions(),
+      q.getAllComments(),
+      u ? q.getUserAllReactions(u.id) : Promise.resolve([]),
+    ]);
+
+    // تجميع البيانات في memory بدل استدعاء DB لكل منشور
+    const reactionsMap = {};
+    allReactions.forEach(r => {
+      if (!reactionsMap[r.record_id]) reactionsMap[r.record_id] = [];
+      reactionsMap[r.record_id].push({ emoji: r.emoji, count: r.count });
+    });
+
+    const commentsMap = {};
+    allComments.forEach(c => {
+      if (!commentsMap[c.record_id]) commentsMap[c.record_id] = [];
+      commentsMap[c.record_id].push(c);
+    });
+
+    const userReactionMap = {};
+    userReactions.forEach(r => { userReactionMap[r.record_id] = r.emoji; });
+
+    const enriched = records.map(r => ({
+      ...r,
+      reactions:    reactionsMap[r.id]    || [],
+      comments:     commentsMap[r.id]     || [],
+      userReaction: userReactionMap[r.id] || null,
     }));
+
     res.json(enriched);
-  } catch(e) { res.status(500).json({ error:'خطأ' }); }
+  } catch(e) { console.error(e); res.status(500).json({ error:'خطأ' }); }
 });
 
 app.post('/api/records', requireAuth, async (req, res) => {
@@ -315,6 +350,11 @@ app.post('/api/records/:id/react', requireAuth, async (req, res) => {
 });
 
 // Comments
+app.get('/api/records/:id/comments', async (req, res) => {
+  try { res.json(await q.getComments(req.params.id)); }
+  catch(e) { res.status(500).json({ error:'خطأ' }); }
+});
+
 app.post('/api/records/:id/comments', requireAuth, async (req, res) => {
   try {
     const { content } = req.body||{};

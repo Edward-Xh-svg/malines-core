@@ -1,10 +1,14 @@
 const { createClient } = require('@libsql/client');
 const bcrypt = require('bcryptjs');
 
-const db = createClient({
-  url:       process.env.TURSO_DATABASE_URL,
-  authToken: process.env.TURSO_AUTH_TOKEN,
-});
+// Cache الاتصال عالمياً لتجنب إعادة الاتصال في كل Vercel function call
+if (!global._tursoClient) {
+  global._tursoClient = createClient({
+    url:       process.env.TURSO_DATABASE_URL,
+    authToken: process.env.TURSO_AUTH_TOKEN,
+  });
+}
+const db = global._tursoClient;
 
 function rows(r)  { return r.rows.map(row => Object.fromEntries(Object.entries(row))); }
 function first(r) { const row = r.rows[0]; return row ? Object.fromEntries(Object.entries(row)) : null; }
@@ -156,15 +160,18 @@ const q = {
   getRecord:    (id) => db.execute({ sql:'SELECT * FROM records WHERE id=?', args:[id] }).then(first),
 
   // Reactions
-  getReactions:    (rid) => db.execute({ sql:'SELECT emoji,COUNT(*) as count FROM record_reactions WHERE record_id=? GROUP BY emoji', args:[rid] }).then(rows),
-  getUserReaction: (rid,uid) => db.execute({ sql:'SELECT emoji FROM record_reactions WHERE record_id=? AND user_id=?', args:[rid,uid] }).then(first),
-  addReaction:     (rid,uid,emoji) => db.execute({ sql:'INSERT OR REPLACE INTO record_reactions (record_id,user_id,emoji) VALUES (?,?,?)', args:[rid,uid,emoji] }),
-  removeReaction:  (rid,uid) => db.execute({ sql:'DELETE FROM record_reactions WHERE record_id=? AND user_id=?', args:[rid,uid] }),
+  getReactions:       (rid) => db.execute({ sql:'SELECT emoji,COUNT(*) as count FROM record_reactions WHERE record_id=? GROUP BY emoji', args:[rid] }).then(rows),
+  getAllReactions:     ()    => db.execute('SELECT record_id,emoji,COUNT(*) as count FROM record_reactions GROUP BY record_id,emoji').then(rows),
+  getUserReaction:    (rid,uid) => db.execute({ sql:'SELECT emoji FROM record_reactions WHERE record_id=? AND user_id=?', args:[rid,uid] }).then(first),
+  getUserAllReactions:(uid)  => db.execute({ sql:'SELECT record_id,emoji FROM record_reactions WHERE user_id=?', args:[uid] }).then(rows),
+  addReaction:        (rid,uid,emoji) => db.execute({ sql:'INSERT OR REPLACE INTO record_reactions (record_id,user_id,emoji) VALUES (?,?,?)', args:[rid,uid,emoji] }),
+  removeReaction:     (rid,uid) => db.execute({ sql:'DELETE FROM record_reactions WHERE record_id=? AND user_id=?', args:[rid,uid] }),
 
   // Comments
-  getComments:   (rid) => db.execute({ sql:'SELECT * FROM record_comments WHERE record_id=? ORDER BY created_at ASC', args:[rid] }).then(rows),
-  addComment:    (rid,uid,username,display_name,avatar,user_role,content) => db.execute({ sql:'INSERT INTO record_comments (record_id,user_id,username,display_name,avatar,user_role,content) VALUES (?,?,?,?,?,?,?)', args:[rid,uid,username,display_name,avatar,user_role,content] }),
-  deleteComment: (id,uid,role) => role==='admin'
+  getComments:    (rid) => db.execute({ sql:'SELECT * FROM record_comments WHERE record_id=? ORDER BY created_at ASC', args:[rid] }).then(rows),
+  getAllComments:  ()    => db.execute('SELECT * FROM record_comments ORDER BY record_id ASC, created_at ASC').then(rows),
+  addComment:     (rid,uid,username,display_name,avatar,user_role,content) => db.execute({ sql:'INSERT INTO record_comments (record_id,user_id,username,display_name,avatar,user_role,content) VALUES (?,?,?,?,?,?,?)', args:[rid,uid,username,display_name,avatar,user_role,content] }),
+  deleteComment:  (id,uid,role) => role==='admin'
     ? db.execute({ sql:'DELETE FROM record_comments WHERE id=?', args:[id] })
     : db.execute({ sql:'DELETE FROM record_comments WHERE id=? AND user_id=?', args:[id,uid] }),
 
