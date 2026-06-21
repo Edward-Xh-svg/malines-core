@@ -127,11 +127,24 @@
     .btn-submit{width:100%;padding:12px;background:#fff;color:#000;font-weight:800;border:none;border-radius:9px;cursor:pointer;font-family:'Cairo';font-size:0.92rem;transition:0.2s;margin-top:4px;}
     .btn-submit:hover{background:#e5e5e5;}
     .btn-submit:disabled{opacity:0.5;cursor:not-allowed;}
-    textarea.fg-ta{width:100%;padding:13px;background:#1a1a1a;border:1px solid rgba(255,255,255,0.07);border-radius:12px;color:#fff;font-family:'Amiri',serif;font-size:1rem;resize:vertical;min-height:130px;line-height:1.8;}
-    textarea.fg-ta:focus{outline:none;border-color:rgba(255,255,255,0.2);}
-    .upload-area{border:2px dashed var(--border);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:0.2s;margin-bottom:14px;}
-    .upload-area:hover{border-color:rgba(255,255,255,0.2);}
-    .img-preview{max-width:100%;border-radius:9px;max-height:180px;object-fit:cover;display:none;margin-top:10px;}
+    .post-editor{width:100%;min-height:150px;max-height:340px;overflow-y:auto;padding:13px;background:#1a1a1a;border:1px solid rgba(255,255,255,0.07);border-radius:12px;color:#fff;font-family:'Amiri',serif;font-size:1rem;line-height:1.8;outline:none;}
+    .post-editor:focus{border-color:rgba(255,255,255,0.2);}
+    .post-editor[placeholder]:empty:before{content:attr(placeholder);color:#555;pointer-events:none;}
+    .post-editor h2{font-size:1.3rem;font-weight:800;color:#fff;margin:8px 0 4px;}
+    .post-editor h3{font-size:1.1rem;font-weight:700;color:#ddd;margin:6px 0 4px;}
+    .post-editor blockquote{border-right:3px solid var(--red);padding-right:12px;color:#aaa;margin:8px 0;font-style:italic;}
+    .post-editor ul{padding-right:20px;margin:6px 0;}
+    .post-editor hr{border:none;border-top:1px solid var(--border);margin:10px 0;}
+    .fmt-btn{background:rgba(255,255,255,0.04);border:1px solid var(--border);color:#aaa;padding:5px 10px;border-radius:7px;cursor:pointer;font-family:'Cairo';font-size:0.8rem;font-weight:700;transition:0.15s;display:flex;align-items:center;justify-content:center;min-width:30px;}
+    .fmt-btn:hover{background:rgba(255,255,255,0.09);color:#fff;}
+    /* عرض المحتوى في الكروت */
+    .post-html h2{font-size:1.2rem;font-weight:800;color:#fff;margin:8px 0 4px;}
+    .post-html h3{font-size:1rem;font-weight:700;color:#ddd;margin:6px 0 4px;}
+    .post-html blockquote{border-right:3px solid var(--red);padding-right:12px;color:#aaa;margin:8px 0;font-style:italic;}
+    .post-html ul{padding-right:20px;margin:6px 0;}
+    .post-html hr{border:none;border-top:1px solid var(--border);margin:10px 0;}
+    .post-html b,.post-html strong{color:#fff;}
+    .post-html em{color:#ccc;}
     .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
     .btn-ghost{padding:10px 18px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;color:#ccc;cursor:pointer;font-family:'Cairo';font-size:0.88rem;}
 
@@ -228,15 +241,33 @@
   <div class="modal-box wide">
     <div class="modal-t">منشور جديد</div>
     <div class="err" id="postErr"></div>
-    <div class="fg">
-      <label>المحتوى</label>
-      <textarea class="fg-ta" id="postContent" placeholder="اكتب منشورك هنا..."></textarea>
+    <!-- شريط التنسيق -->
+    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+      <button class="fmt-btn" onclick="fmt('bold')" title="غامق">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg>
+      </button>
+      <button class="fmt-btn" onclick="fmt('italic')" title="مائل">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg>
+      </button>
+      <button class="fmt-btn" onclick="fmt('underline')" title="تسطير">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"/><line x1="4" y1="21" x2="20" y2="21"/></svg>
+      </button>
+      <div style="width:1px;background:var(--border);margin:0 4px;"></div>
+      <button class="fmt-btn" onclick="fmtBlock('h2')" title="عنوان كبير">H1</button>
+      <button class="fmt-btn" onclick="fmtBlock('h3')" title="عنوان صغير">H2</button>
+      <div style="width:1px;background:var(--border);margin:0 4px;"></div>
+      <button class="fmt-btn" onclick="fmtList('ul')" title="قائمة نقطية">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      </button>
+      <button class="fmt-btn" onclick="fmtLine()" title="فاصل أفقي">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <button class="fmt-btn" onclick="fmtQuote()" title="اقتباس">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
+      </button>
     </div>
-    <div class="upload-area" onclick="document.getElementById('imgFile').click()">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.8" style="display:block;margin:0 auto 8px;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-      <div style="color:#666;font-size:0.85rem;">اضغط لإرفاق صورة (اختياري)</div>
-      <img id="imgPreview" class="img-preview">
-      <input type="file" id="imgFile" accept="image/*" style="display:none;" onchange="onImgSelect(event)">
+    <div class="fg">
+      <div id="postEditor" class="post-editor" contenteditable="true" dir="auto" placeholder="اكتب منشورك هنا..."></div>
     </div>
     <div class="modal-footer">
       <button class="btn-ghost" onclick="closeModal('postModal')">إلغاء</button>
@@ -250,7 +281,6 @@ const TOKEN  = localStorage.getItem('malines_token') || '';
 const stored = localStorage.getItem('malines_user');
 let ME = null;
 let allPosts = [];
-let imgBase64 = '';
 let dropVisible = false;
 
 try { if(stored) ME = JSON.parse(stored); } catch(e) {}
@@ -470,7 +500,7 @@ function renderPost(p){
           ${canDel ? `<button class="btn-icon" onclick="delPost(${p.id})" title="حذف">${SVG.delete}</button>` : ''}
         </div>
       </div>
-      <div class="post-text">${esc(p.content)}</div>
+      <div class="post-text post-html" style="font-family:'Amiri',serif;line-height:2;color:#ccc;font-size:1rem;margin-bottom:16px;">${p.content}</div>
       <div class="reactions-row">
         ${reactionHtml}
         <button class="react-btn" onclick="toggleComments(${p.id})" id="cmtToggle-${p.id}">
@@ -492,21 +522,45 @@ document.getElementById('searchInput').addEventListener('input', function(){
 });
 
 // ── Post ──
-function openPostModal(){ if(!ME){openAuth();return;} document.getElementById('postContent').value=''; document.getElementById('imgPreview').style.display='none'; document.getElementById('postErr').style.display='none'; imgBase64=''; document.getElementById('postModal').classList.add('show'); }
-function onImgSelect(e){ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=ev=>{ imgBase64=ev.target.result; const p=document.getElementById('imgPreview'); p.src=imgBase64; p.style.display='block'; }; r.readAsDataURL(f); }
+function openPostModal(){ if(!ME){openAuth();return;} const ed=document.getElementById('postEditor'); if(ed) ed.innerHTML=''; document.getElementById('postErr').style.display='none'; document.getElementById('postModal').classList.add('show'); setTimeout(()=>document.getElementById('postEditor')?.focus(),100); }
+
+// ── دوال التنسيق ──
+function fmt(cmd){ document.execCommand(cmd, false, null); document.getElementById('postEditor')?.focus(); }
+function fmtBlock(tag){
+  const sel = window.getSelection();
+  if(!sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  const el = document.createElement(tag);
+  el.appendChild(range.extractContents());
+  range.insertNode(el);
+  document.getElementById('postEditor')?.focus();
+}
+function fmtList(type){
+  document.execCommand(type==='ul'?'insertUnorderedList':'insertOrderedList', false, null);
+  document.getElementById('postEditor')?.focus();
+}
+function fmtLine(){
+  document.execCommand('insertHorizontalRule', false, null);
+  document.getElementById('postEditor')?.focus();
+}
+function fmtQuote(){
+  const sel = window.getSelection();
+  if(!sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  const bq = document.createElement('blockquote');
+  bq.appendChild(range.extractContents());
+  range.insertNode(bq);
+  document.getElementById('postEditor')?.focus();
+}
 
 async function submitPost(){
-  const content=document.getElementById('postContent').value.trim();
-  const errEl=document.getElementById('postErr'); errEl.style.display='none';
-  if(!content){errEl.textContent='المحتوى مطلوب';errEl.style.display='block';return;}
+  const editor = document.getElementById('postEditor');
+  const content = editor?.innerHTML?.trim();
+  const errEl = document.getElementById('postErr'); errEl.style.display='none';
+  if(!content || content==='<br>'){ errEl.textContent='المحتوى مطلوب'; errEl.style.display='block'; return; }
   const btn=document.getElementById('postBtn'); btn.disabled=true; btn.textContent='...';
   try {
-    let imageUrl='';
-    if(imgBase64){
-      const up=await apiFetch('/api/upload','POST',{image:imgBase64});
-      if(up.url) imageUrl=up.url;
-    }
-    const d=await apiFetch('/api/records','POST',{content,image:imageUrl});
+    const d=await apiFetch('/api/records','POST',{content});
     if(d.success){ closeModal('postModal'); await loadPosts(); }
     else { errEl.textContent=d.error||'فشل النشر'; errEl.style.display='block'; }
   } catch(e){ errEl.textContent='تعذر الاتصال'; errEl.style.display='block'; }
