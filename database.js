@@ -105,6 +105,17 @@ async function initDB() {
     );
   `);
 
+  // ── Migrations: إضافة أعمدة مفقودة لجدول users القديم ──
+  const migrations = [
+    "ALTER TABLE users ADD COLUMN avatar       TEXT DEFAULT ''",
+    "ALTER TABLE users ADD COLUMN bio          TEXT DEFAULT ''",
+    "ALTER TABLE users ADD COLUMN game_id      TEXT DEFAULT ''",
+    "ALTER TABLE users ADD COLUMN display_name TEXT DEFAULT ''",
+  ];
+  for (const sql of migrations) {
+    try { await db.execute(sql); } catch(e) { /* العمود موجود مسبقاً */ }
+  }
+
   // إنشاء/تحديث admin
   const ADMIN_EMAIL = 'misha@malines.nc';
   const ADMIN_PASS  = '60dbedfd4f3247bfa11fc32bb2acd9';
