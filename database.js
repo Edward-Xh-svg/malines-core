@@ -105,15 +105,25 @@ async function initDB() {
     );
   `);
 
-  // ── Migrations: إضافة أعمدة مفقودة لجدول users القديم ──
+  // ── Migrations: إضافة أعمدة مفقودة لجميع الجداول ──
   const migrations = [
+    // users
     "ALTER TABLE users ADD COLUMN avatar       TEXT DEFAULT ''",
     "ALTER TABLE users ADD COLUMN bio          TEXT DEFAULT ''",
     "ALTER TABLE users ADD COLUMN game_id      TEXT DEFAULT ''",
     "ALTER TABLE users ADD COLUMN display_name TEXT DEFAULT ''",
+    // records
+    "ALTER TABLE records ADD COLUMN user_id     INTEGER",
+    "ALTER TABLE records ADD COLUMN user_role   TEXT DEFAULT 'Member'",
+    "ALTER TABLE records ADD COLUMN user_avatar TEXT DEFAULT ''",
+    "ALTER TABLE records ADD COLUMN image       TEXT DEFAULT ''",
+    // record_comments
+    "ALTER TABLE record_comments ADD COLUMN display_name TEXT DEFAULT ''",
+    "ALTER TABLE record_comments ADD COLUMN avatar       TEXT DEFAULT ''",
+    "ALTER TABLE record_comments ADD COLUMN user_role    TEXT DEFAULT 'Member'",
   ];
   for (const sql of migrations) {
-    try { await db.execute(sql); } catch(e) { /* العمود موجود مسبقاً */ }
+    try { await db.execute(sql); } catch(e) { /* العمود موجود مسبقاً — تجاهل */ }
   }
 
   // إنشاء/تحديث admin
@@ -166,7 +176,21 @@ const q = {
 
   // Records
   listRecords:  () => db.execute('SELECT * FROM records ORDER BY created_at DESC').then(rows),
-  createRecord: (user_id,publisher,user_role,user_avatar,content,image) => db.execute({ sql:'INSERT INTO records (user_id,publisher,user_role,user_avatar,content,image) VALUES (?,?,?,?,?,?)', args:[user_id,publisher,user_role,user_avatar,content,image] }),
+  createRecord: async (user_id, publisher, user_role, user_avatar, content, image) => {
+    // محاولة الإدراج بالشكل الجديد أولاً
+    try {
+      return await db.execute({
+        sql: 'INSERT INTO records (user_id,publisher,user_role,user_avatar,content,image) VALUES (?,?,?,?,?,?)',
+        args: [user_id, publisher, user_role, user_avatar, content, image]
+      });
+    } catch(e) {
+      // إذا فشل (أعمدة مفقودة)، نستخدم الشكل القديم
+      return await db.execute({
+        sql: 'INSERT INTO records (publisher,content,image) VALUES (?,?,?)',
+        args: [publisher, content, image]
+      });
+    }
+  },
   deleteRecord: (id) => db.execute({ sql:'DELETE FROM records WHERE id=?', args:[id] }),
   getRecord:    (id) => db.execute({ sql:'SELECT * FROM records WHERE id=?', args:[id] }).then(first),
 
@@ -181,7 +205,13 @@ const q = {
   // Comments
   getComments:    (rid) => db.execute({ sql:'SELECT * FROM record_comments WHERE record_id=? ORDER BY created_at ASC', args:[rid] }).then(rows),
   getAllComments:  ()    => db.execute('SELECT * FROM record_comments ORDER BY record_id ASC, created_at ASC').then(rows),
-  addComment:     (rid,uid,username,display_name,avatar,user_role,content) => db.execute({ sql:'INSERT INTO record_comments (record_id,user_id,username,display_name,avatar,user_role,content) VALUES (?,?,?,?,?,?,?)', args:[rid,uid,username,display_name,avatar,user_role,content] }),
+  addComment: async (rid,uid,username,display_name,avatar,user_role,content) => {
+    try {
+      return await db.execute({ sql:'INSERT INTO record_comments (record_id,user_id,username,display_name,avatar,user_role,content) VALUES (?,?,?,?,?,?,?)', args:[rid,uid,username,display_name,avatar,user_role,content] });
+    } catch(e) {
+      return await db.execute({ sql:'INSERT INTO record_comments (record_id,user_id,username,content) VALUES (?,?,?,?)', args:[rid,uid,username,content] });
+    }
+  },
   deleteComment:  (id,uid,role) => role==='admin'
     ? db.execute({ sql:'DELETE FROM record_comments WHERE id=?', args:[id] })
     : db.execute({ sql:'DELETE FROM record_comments WHERE id=? AND user_id=?', args:[id,uid] }),
