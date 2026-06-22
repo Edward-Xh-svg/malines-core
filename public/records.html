@@ -78,10 +78,17 @@
 
     /* Reactions */
     .reactions-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
-    .react-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,0.03);color:var(--muted);cursor:pointer;font-family:'Cairo';font-size:0.82rem;transition:0.18s;}
-    .react-btn:hover{border-color:rgba(255,255,255,0.2);color:#fff;}
-    .react-btn.active{background:rgba(192,57,43,0.12);border-color:rgba(192,57,43,0.3);color:var(--red-h);}
-    .react-count{font-weight:700;}
+    .react-wrap{position:relative;display:inline-flex;align-items:center;}
+    .react-main-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,0.03);color:var(--muted);cursor:pointer;font-family:'Cairo';font-size:0.82rem;transition:0.18s;}
+    .react-main-btn:hover{border-color:rgba(255,255,255,0.2);color:#fff;}
+    .react-main-btn.reacted{background:rgba(192,57,43,0.1);border-color:rgba(192,57,43,0.25);color:var(--red-h);}
+    .react-menu{position:absolute;bottom:calc(100% + 8px);right:0;background:rgba(15,15,16,0.98);border:1px solid var(--border);border-radius:999px;padding:6px 10px;display:none;gap:4px;backdrop-filter:blur(20px);z-index:10;white-space:nowrap;}
+    .react-menu.show{display:flex;}
+    .react-emoji-btn{background:none;border:none;font-size:1.35rem;cursor:pointer;padding:4px 6px;border-radius:8px;transition:0.15s;line-height:1;}
+    .react-emoji-btn:hover{background:rgba(255,255,255,0.08);transform:scale(1.25);}
+    .react-emoji-btn.active{background:rgba(192,57,43,0.15);}
+    .pub-name-link{cursor:pointer;transition:0.15s;}
+    .pub-name-link:hover{color:var(--red-h)!important;}
 
     /* Comments */
     .comments-section{border-top:1px solid rgba(255,255,255,0.04);padding-top:14px;margin-top:4px;}
@@ -296,8 +303,11 @@ const SVG = {
 };
 
 const REACTIONS = [
-  { emoji:'like',  label:'إعجاب', svg: SVG.like  },
-  { emoji:'heart', label:'أحب',   svg: SVG.heart },
+  { emoji:'like',    label:'أعجبني',  icon:'👍' },
+  { emoji:'heart',   label:'أحببته',  icon:'❤️' },
+  { emoji:'haha',    label:'أضحكني',  icon:'😄' },
+  { emoji:'sad',     label:'أحزنني',  icon:'😢' },
+  { emoji:'angry',   label:'أغضبني',  icon:'😠' },
 ];
 
 // ── Init ──
@@ -450,14 +460,18 @@ function renderPost(p){
   const imgHtml    = p.image ? `<img class="card-img" src="${esc(p.image)}" loading="lazy" onerror="this.style.display='none'">` : '';
 
   // Reactions
-  const reactionHtml = REACTIONS.map(r=>{
-    const rc = (p.reactions||[]).find(x=>x.emoji===r.emoji);
-    const count = rc?.count||0;
-    const isActive = ME && p.userReaction===r.emoji;
-    return `<button class="react-btn ${isActive?'active':''}" onclick="toggleReact(${p.id},'${r.emoji}')" title="${r.label}">
-      ${r.svg}<span class="react-count">${count||''}</span>
-    </button>`;
-  }).join('');
+  const totalReactions = (p.reactions||[]).reduce((s,r)=>s+(r.count||0),0);
+  const userR = p.userReaction;
+  const activeR = userR ? REACTIONS.find(r=>r.emoji===userR) : null;
+  const reactionHtml = `<div class="react-wrap">
+    <button class="react-main-btn ${userR?'reacted':''}" onclick="toggleReactMenu(${p.id})">
+      ${activeR ? activeR.icon : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>'}
+      <span>${totalReactions||'تفاعل'}</span>
+    </button>
+    <div class="react-menu" id="rmenu-${p.id}">
+      ${REACTIONS.map(r=>`<button class="react-emoji-btn ${p.userReaction===r.emoji?'active':''}" onclick="toggleReact(${p.id},'${r.emoji}')" title="${r.label}">${r.icon}</button>`).join('')}
+    </div>
+  </div>`;
 
   // Comments count
   const commCount = (p.comments||[]).length;
@@ -575,8 +589,20 @@ async function delPost(id){
 }
 
 // ── Reactions ──
+function toggleReactMenu(postId){
+  if(!ME){openAuth();return;}
+  const menu = document.getElementById('rmenu-'+postId);
+  if(!menu) return;
+  document.querySelectorAll('.react-menu.show').forEach(m=>{ if(m!==menu) m.classList.remove('show'); });
+  menu.classList.toggle('show');
+}
+document.addEventListener('click', e=>{
+  if(!e.target.closest('.react-wrap')) document.querySelectorAll('.react-menu.show').forEach(m=>m.classList.remove('show'));
+});
+
 async function toggleReact(postId, emoji){
   if(!ME){openAuth();return;}
+  document.querySelectorAll('.react-menu.show').forEach(m=>m.classList.remove('show'));
   const d=await apiFetch('/api/records/'+postId+'/react','POST',{emoji});
   if(!d.success) return;
   const post=allPosts.find(p=>p.id===postId);

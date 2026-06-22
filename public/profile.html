@@ -5,140 +5,253 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="malines-fivcon.png" type="image/png">
   <title>الملف الشخصي | مجتمع مالينز</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    :root{--black:#050505;--border:#232325;--text:#e9e9e9;--muted:#8d8d8d;--red:#c0392b;--red-h:#e74c3c;}
+    :root{--black:#050505;--border:#232325;--text:#e9e9e9;--muted:#8d8d8d;--red:#c0392b;--red-h:#e74c3c;--card:#0f0f10;}
     *{margin:0;padding:0;box-sizing:border-box;}
-    body{background:radial-gradient(circle at 20% 20%,rgba(192,57,43,0.07),transparent 30%),var(--black);color:var(--text);font-family:'Cairo',sans-serif;min-height:100vh;}
-    .topbar{position:fixed;top:0;left:0;right:0;height:62px;background:rgba(5,5,5,0.75);backdrop-filter:blur(22px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;z-index:100;}
-    .back-btn{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:#ccc;padding:7px 14px;border-radius:999px;cursor:pointer;font-family:'Cairo';font-size:0.85rem;text-decoration:none;transition:0.2s;}
+    body{background:radial-gradient(circle at 20% 15%,rgba(192,57,43,0.07),transparent 28%),var(--black);color:var(--text);font-family:'Cairo',sans-serif;min-height:100vh;}
+    a{color:inherit;text-decoration:none;}
+
+    /* Topbar */
+    .topbar{position:fixed;top:0;left:0;right:0;height:60px;background:rgba(5,5,5,0.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:100;}
+    .back-btn{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:#ccc;padding:7px 14px;border-radius:999px;font-family:'Cairo';font-size:0.84rem;cursor:pointer;transition:0.2s;text-decoration:none;}
     .back-btn:hover{background:rgba(255,255,255,0.08);color:#fff;}
-    .topbar-title{font-weight:800;font-size:0.98rem;color:#fff;}
+    .topbar-title{font-weight:800;font-size:0.96rem;color:#fff;}
 
-    .wrap{max-width:660px;margin:90px auto 60px;padding:0 22px;}
-    .card{background:rgba(15,15,16,0.95);border:1px solid var(--border);border-radius:22px;padding:36px;margin-bottom:22px;}
+    /* Layout */
+    .wrap{max-width:720px;margin:78px auto 60px;padding:0 18px;}
 
-    .avatar-row{display:flex;align-items:center;gap:22px;margin-bottom:30px;}
-    .avatar-big{width:88px;height:88px;border-radius:50%;background:linear-gradient(145deg,var(--red),#8e2a1f);display:flex;align-items:center;justify-content:center;font-size:2.1rem;font-weight:800;color:#fff;flex-shrink:0;overflow:hidden;position:relative;cursor:pointer;}
+    /* Profile Card */
+    .profile-card{background:rgba(15,15,16,0.96);border:1px solid var(--border);border-radius:22px;padding:32px;margin-bottom:22px;}
+    .avatar-row{display:flex;align-items:flex-start;gap:22px;margin-bottom:26px;}
+    .avatar-big{width:86px;height:86px;border-radius:50%;background:linear-gradient(145deg,var(--red),#8e2a1f);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;color:#fff;flex-shrink:0;overflow:hidden;position:relative;cursor:pointer;}
     .avatar-big img{width:100%;height:100%;object-fit:cover;}
     .av-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:0.2s;border-radius:50%;}
     .avatar-big:hover .av-overlay{opacity:1;}
-    .av-info h2{font-size:1.35rem;font-weight:900;color:#fff;}
-    .av-un{font-size:0.85rem;color:var(--muted);margin-top:3px;}
-    .role-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:0.75rem;font-weight:700;margin-top:7px;}
+    .av-meta{flex:1;}
+    .av-name{font-size:1.3rem;font-weight:900;color:#fff;}
+    .av-un{font-size:0.84rem;color:var(--muted);margin-top:3px;}
+    .role-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:0.72rem;font-weight:700;margin-top:8px;}
     .badge-admin{background:rgba(192,57,43,0.14);color:var(--red-h);border:1px solid rgba(192,57,43,0.22);}
     .badge-member{background:rgba(255,255,255,0.04);color:var(--muted);border:1px solid var(--border);}
+    .av-stats{display:flex;gap:24px;margin-top:14px;}
+    .stat{text-align:center;}
+    .stat-n{font-size:1.2rem;font-weight:800;color:#fff;}
+    .stat-l{font-size:0.75rem;color:var(--muted);}
+    .av-bio{color:#bbb;font-size:0.9rem;line-height:1.7;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+    .av-gameid{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:0.82rem;margin-top:8px;}
+    .av-gameid svg{flex-shrink:0;}
+    .av-joined{color:#555;font-size:0.78rem;margin-top:6px;}
 
-    .sec-title{font-size:0.95rem;font-weight:800;color:#fff;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);}
-    .fg{margin-bottom:16px;}
-    .fg label{display:block;margin-bottom:6px;color:#999;font-size:0.85rem;font-weight:600;}
-    .fg input,.fg textarea{width:100%;padding:11px 13px;background:#1a1a1a;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#fff;font-family:'Cairo';font-size:0.9rem;}
+    /* Edit form */
+    .edit-card{background:rgba(15,15,16,0.96);border:1px solid var(--border);border-radius:22px;padding:28px;margin-bottom:22px;}
+    .sec-title{font-size:0.92rem;font-weight:800;color:#fff;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+    .fg{margin-bottom:14px;}
+    .fg label{display:block;margin-bottom:5px;color:#888;font-size:0.82rem;font-weight:600;}
+    .fg input,.fg textarea{width:100%;padding:10px 13px;background:#181818;border:1px solid rgba(255,255,255,0.07);border-radius:9px;color:#fff;font-family:'Cairo';font-size:0.9rem;}
     .fg input:focus,.fg textarea:focus{outline:none;border-color:rgba(255,255,255,0.18);}
-    .fg textarea{resize:vertical;min-height:90px;}
-    .fg-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-    .alert{padding:11px 14px;border-radius:9px;font-size:0.85rem;margin-bottom:14px;display:none;}
+    .fg textarea{resize:vertical;min-height:80px;}
+    .fg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .alert{padding:10px 13px;border-radius:8px;font-size:0.84rem;margin-bottom:12px;display:none;}
     .alert-err{background:rgba(192,57,43,0.1);color:var(--red-h);border:1px solid rgba(192,57,43,0.2);}
     .alert-ok{background:rgba(34,197,94,0.08);color:#4ade80;border:1px solid rgba(34,197,94,0.18);}
-    .btn-save{display:inline-flex;align-items:center;gap:8px;padding:11px 26px;background:#fff;color:#000;border:none;border-radius:10px;cursor:pointer;font-family:'Cairo';font-weight:800;font-size:0.9rem;transition:0.2s;}
+    .btn-save{display:inline-flex;align-items:center;gap:7px;padding:10px 22px;background:#fff;color:#000;border:none;border-radius:9px;cursor:pointer;font-family:'Cairo';font-weight:800;font-size:0.88rem;transition:0.2s;}
     .btn-save:hover{background:#e8e8e8;}
     .btn-save:disabled{opacity:0.5;cursor:not-allowed;}
+
+    /* Posts */
+    .posts-section{background:rgba(15,15,16,0.96);border:1px solid var(--border);border-radius:22px;overflow:hidden;}
+    .posts-header{padding:18px 24px;border-bottom:1px solid var(--border);font-weight:800;font-size:0.95rem;color:#fff;display:flex;align-items:center;gap:8px;}
+    .post-item{padding:18px 24px;border-bottom:1px solid rgba(255,255,255,0.03);}
+    .post-item:last-child{border-bottom:none;}
+    .post-item:hover{background:rgba(255,255,255,0.02);}
+    .post-content{font-family:'Amiri',serif;color:#ccc;font-size:0.95rem;line-height:1.8;margin-bottom:8px;}
+    .post-content h2{font-size:1.1rem;font-weight:800;color:#fff;margin:4px 0;}
+    .post-content h3{font-size:0.95rem;font-weight:700;color:#ddd;}
+    .post-content blockquote{border-right:3px solid var(--red);padding-right:10px;color:#aaa;font-style:italic;margin:4px 0;}
+    .post-meta{display:flex;align-items:center;gap:10px;font-size:0.75rem;color:var(--muted);}
+    .post-empty{padding:40px;text-align:center;color:var(--muted);}
+
+    /* Not logged */
     .not-logged{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 24px;gap:14px;text-align:center;}
-    .not-logged h2{font-size:1.3rem;font-weight:800;color:#fff;}
-    .btn-go{display:inline-block;padding:11px 24px;background:#fff;color:#000;border-radius:10px;font-weight:800;text-decoration:none;font-family:'Cairo';}
-    @media(max-width:580px){.fg-row{grid-template-columns:1fr;}.avatar-row{flex-direction:column;text-align:center;}}
+    .not-logged h2{font-size:1.2rem;font-weight:800;color:#fff;}
+    .btn-go{display:inline-block;padding:10px 22px;background:#fff;color:#000;border-radius:9px;font-weight:800;font-size:0.88rem;}
+
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .spin{width:36px;height:36px;border:3px solid #222;border-top-color:var(--red);border-radius:50%;animation:spin 0.9s linear infinite;margin:0 auto 14px;}
+    @media(max-width:580px){.fg-row{grid-template-columns:1fr;}.avatar-row{flex-direction:column;align-items:center;text-align:center;}.av-stats{justify-content:center;}.av-bio{text-align:center;}}
   </style>
 </head>
 <body>
 <header class="topbar">
   <a href="javascript:history.back()" class="back-btn">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
     رجوع
   </a>
   <span class="topbar-title">الملف الشخصي</span>
-  <div style="width:80px;"></div>
+  <div style="width:70px;"></div>
 </header>
 
 <div class="wrap" id="wrap">
-  <div style="text-align:center;padding:80px;color:var(--muted);">
-    <div style="width:38px;height:38px;border:3px solid #222;border-top-color:var(--red);border-radius:50%;animation:spin 0.9s linear infinite;margin:0 auto 14px;"></div>
-    جارٍ التحميل...
+  <div style="text-align:center;padding:80px;">
+    <div class="spin"></div>
+    <div style="color:var(--muted);">جارٍ التحميل...</div>
   </div>
 </div>
-<style>@keyframes spin{to{transform:rotate(360deg);}}</style>
+
 <input type="file" id="avFile" accept="image/*" style="display:none;" onchange="onAvatar(event)">
 
 <script>
-// TOKEN يُقرأ ديناميكياً في كل طلب
 const getToken = () => localStorage.getItem('malines_token')||'';
-const stored = localStorage.getItem('malines_user');
-let ME = null; let newAvBase64 = '';
-try{ if(stored) ME=JSON.parse(stored); }catch(e){}
+let ME = null;
+let newAvBase64 = '';
+// هل نعرض ملف مستخدم آخر؟
+const urlParams = new URLSearchParams(location.search);
+const viewUsername = urlParams.get('u'); // /profile?u=username
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDate(s){ if(!s) return ''; return new Date(s).toLocaleDateString('ar-SA',{year:'numeric',month:'long'}); }
 
 async function init(){
-  if(!TOKEN){ renderNotLogged(); return; }
+  const token = getToken();
+
+  if (viewUsername) {
+    // عرض ملف مستخدم آخر
+    try {
+      const [profileRes, postsRes] = await Promise.all([
+        fetch('/api/profile/' + encodeURIComponent(viewUsername)),
+        fetch('/api/user/' + encodeURIComponent(viewUsername) + '/posts')
+      ]);
+      const profile = await profileRes.json();
+      const posts   = await postsRes.json();
+      if (profile.error) { renderNotLogged(); return; }
+      renderPublicProfile(profile, posts);
+    } catch(e) { renderNotLogged(); }
+    return;
+  }
+
+  // ملف المستخدم نفسه
+  if(!token){ renderNotLogged(); return; }
   try{
-    // أولاً تحقق سريع من JWT بدون DB
-    const quick = await fetch('/api/auth/me',{headers:{'Authorization':'Bearer '+getToken()}});
-    if(!quick.ok){ renderNotLogged(); return; }
-    const quickUser = await quick.json();
-    // عرض الصفحة فوراً بالبيانات السريعة
-    render(quickUser);
-    // ثم جلب أحدث البيانات من DB في الخلفية
-    const full = await fetch('/api/me',{headers:{'Authorization':'Bearer '+getToken()}});
-    if(full.ok){
-      const fullUser = await full.json();
-      if(!fullUser.error){ ME=fullUser; render(fullUser); }
-    }
+    const r = await fetch('/api/auth/me',{headers:{'Authorization':'Bearer '+token}});
+    if(!r.ok){ renderNotLogged(); return; }
+    const u = await r.json();
+    if(!u || u.error){ renderNotLogged(); return; }
+    ME = u;
+    renderMyProfile(u, []);
+    // جلب البيانات الكاملة في الخلفية
+    Promise.all([
+      fetch('/api/me',{headers:{'Authorization':'Bearer '+token}}).then(r=>r.ok?r.json():null),
+      fetch('/api/user/'+u.username+'/posts').then(r=>r.ok?r.json():[])
+    ]).then(([full, posts]) => {
+      if(full && !full.error){ ME=full; renderMyProfile(full, posts||[]); }
+    }).catch(()=>{});
   }catch(e){ renderNotLogged(); }
 }
 
 function renderNotLogged(){
   document.getElementById('wrap').innerHTML=`<div class="not-logged">
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    <h2>يجب تسجيل الدخول</h2>
-    <p style="color:var(--muted);">سجّل دخولك لعرض ملفك الشخصي</p>
+    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <h2>المستخدم غير موجود</h2>
+    <p style="color:var(--muted);">أو يجب تسجيل الدخول</p>
     <a href="/" class="btn-go">الرئيسية</a>
   </div>`;
 }
 
-function render(user){
-  const isAdmin=user.role==='admin';
-  const badgeCls=isAdmin?'badge-admin':'badge-member';
-  const badgeLabel=isAdmin?'Admin':'Member';
-  const avHtml=user.avatar
-    ?`<img src="${esc(user.avatar)}" alt=""><div class="av-overlay"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>`
-    :`${esc((user.username||'?').charAt(0).toUpperCase())}<div class="av-overlay"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>`;
+function avatarHtml(user, size=86){
+  const s = `width:${size}px;height:${size}px;`;
+  if(user.avatar) return `<div class="avatar-big" style="${s}cursor:default;"><img src="${esc(user.avatar)}" alt=""></div>`;
+  return `<div class="avatar-big" style="${s}cursor:default;font-size:${size*0.4}px;">${esc((user.display_name||user.username||'?').charAt(0).toUpperCase())}</div>`;
+}
 
+function roleBadge(role){
+  if(role==='admin') return `<span class="role-badge badge-admin"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Admin</span>`;
+  return `<span class="role-badge badge-member"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Member</span>`;
+}
+
+function postsHtml(posts){
+  if(!posts||!posts.length) return `<div class="post-empty">لا توجد منشورات بعد</div>`;
+  return posts.map(p=>`
+    <div class="post-item">
+      <div class="post-content">${p.content}</div>
+      <div class="post-meta">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        ${fmtDate(p.created_at)}
+      </div>
+    </div>`).join('');
+}
+
+function renderPublicProfile(user, posts){
   document.getElementById('wrap').innerHTML=`
-    <div class="card">
+    <div class="profile-card">
       <div class="avatar-row">
-        <div class="avatar-big" id="avBig" onclick="document.getElementById('avFile').click()" title="تغيير الصورة">${avHtml}</div>
-        <div class="av-info">
-          <h2>${esc(user.display_name||user.username)}</h2>
+        ${avatarHtml(user)}
+        <div class="av-meta">
+          <div class="av-name">${esc(user.display_name||user.username)}</div>
           <div class="av-un">@${esc(user.username)}</div>
-          <div class="role-badge ${badgeCls}">
-            ${isAdmin
-              ?`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`
-              :`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`}
-            ${badgeLabel}
+          ${roleBadge(user.role)}
+          <div class="av-stats">
+            <div class="stat"><div class="stat-n">${posts.length}</div><div class="stat-l">منشور</div></div>
           </div>
         </div>
       </div>
+      ${user.bio?`<div class="av-bio">${esc(user.bio)}</div>`:''}
+      ${user.game_id?`<div class="av-gameid"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>معرّف اللعبة: <strong style="color:#fff;">${esc(user.game_id)}</strong></div>`:''}
+      <div class="av-joined">عضو منذ ${fmtDate(user.created_at)}</div>
+      ${getToken()?`<div style="margin-top:16px;"><a href="/chat?with=${esc(user.username)}" style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:rgba(192,57,43,0.1);border:1px solid rgba(192,57,43,0.22);color:var(--red-h);border-radius:10px;font-size:0.88rem;font-weight:700;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>مراسلة</a></div>`:''}
+    </div>
+    <div class="posts-section">
+      <div class="posts-header">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        المنشورات (${posts.length})
+      </div>
+      ${postsHtml(posts)}
+    </div>`;
+}
+
+function renderMyProfile(user, posts){
+  document.getElementById('wrap').innerHTML=`
+    <div class="profile-card">
+      <div class="avatar-row">
+        <div class="avatar-big" id="avBig" onclick="document.getElementById('avFile').click()" style="cursor:pointer;" title="تغيير الصورة">
+          ${user.avatar?`<img src="${esc(user.avatar)}" alt=""><div class="av-overlay"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>`
+          :`${esc((user.display_name||user.username||'?').charAt(0).toUpperCase())}<div class="av-overlay"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>`}
+        </div>
+        <div class="av-meta">
+          <div class="av-name">${esc(user.display_name||user.username)}</div>
+          <div class="av-un">@${esc(user.username)}</div>
+          ${roleBadge(user.role)}
+          <div class="av-stats">
+            <div class="stat"><div class="stat-n">${posts.length}</div><div class="stat-l">منشور</div></div>
+          </div>
+        </div>
+      </div>
+      ${user.bio?`<div class="av-bio">${esc(user.bio)}</div>`:''}
+      ${user.game_id?`<div class="av-gameid"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>معرّف اللعبة: <strong style="color:#fff;">${esc(user.game_id)}</strong></div>`:''}
+      <div class="av-joined">عضو منذ ${fmtDate(user.created_at)}</div>
+    </div>
+
+    <div class="edit-card">
       <div class="sec-title">تعديل الملف الشخصي</div>
       <div class="alert alert-err" id="pErr"></div>
       <div class="alert alert-ok"  id="pOk"></div>
       <div class="fg-row">
         <div class="fg"><label>الاسم المعروض</label><input type="text" id="fName" value="${esc(user.display_name||'')}"></div>
-        <div class="fg"><label>المعرّف داخل اللعبة</label><input type="text" id="fGame" value="${esc(user.game_id||'')}" dir="ltr" placeholder="#0000"></div>
+        <div class="fg"><label>معرّف اللعبة</label><input type="text" id="fGame" value="${esc(user.game_id||'')}" dir="ltr" placeholder="#0000"></div>
       </div>
       <div class="fg"><label>نبذة شخصية</label><textarea id="fBio">${esc(user.bio||'')}</textarea></div>
       <button class="btn-save" id="saveBtn" onclick="save()">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         حفظ التغييرات
       </button>
+    </div>
+
+    <div class="posts-section">
+      <div class="posts-header">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        منشوراتي (${posts.length})
+      </div>
+      ${postsHtml(posts)}
     </div>`;
 }
 
@@ -148,7 +261,7 @@ function onAvatar(e){
   r.onload=ev=>{
     newAvBase64=ev.target.result;
     const el=document.getElementById('avBig');
-    if(el) el.innerHTML=`<img src="${newAvBase64}" alt=""><div class="av-overlay"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>`;
+    if(el) el.innerHTML=`<img src="${newAvBase64}" alt=""><div class="av-overlay"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>`;
   };
   r.readAsDataURL(f);
 }
@@ -160,24 +273,26 @@ async function save(){
   const errEl=document.getElementById('pErr'), okEl=document.getElementById('pOk');
   errEl.style.display='none'; okEl.style.display='none';
   const btn=document.getElementById('saveBtn'); btn.disabled=true; btn.textContent='جارٍ الحفظ...';
+  const token=getToken();
   try{
     let avatarUrl=ME?.avatar||'';
     if(newAvBase64){
-      const up=await fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},body:JSON.stringify({image:newAvBase64})});
+      const up=await fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({image:newAvBase64})});
       const ud=await up.json();
       if(ud.url) avatarUrl=ud.url;
     }
-    const r=await fetch('/api/profile',{method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},body:JSON.stringify({display_name,bio,game_id,avatar:avatarUrl})});
+    const r=await fetch('/api/profile',{method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({display_name,bio,game_id,avatar:avatarUrl})});
     const d=await r.json();
     if(d.success){
-      if(ME){ ME.avatar=avatarUrl; ME.display_name=display_name; localStorage.setItem('malines_user',JSON.stringify(ME)); }
-      okEl.textContent='تم الحفظ بنجاح'; okEl.style.display='block';
+      const stored=localStorage.getItem('malines_user');
+      if(stored){ try{ const u=JSON.parse(stored); u.avatar=avatarUrl; u.display_name=display_name; localStorage.setItem('malines_user',JSON.stringify(u)); }catch(e){} }
+      okEl.textContent='تم الحفظ'; okEl.style.display='block';
       newAvBase64='';
     } else { errEl.textContent=d.error||'فشل الحفظ'; errEl.style.display='block'; }
   }catch(e){ errEl.textContent='تعذر الاتصال'; errEl.style.display='block'; }
   finally{
     btn.disabled=false;
-    btn.innerHTML=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> حفظ التغييرات`;
+    btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> حفظ التغييرات`;
   }
 }
 init();
