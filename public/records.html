@@ -458,7 +458,8 @@ function renderFeed(posts){
 }
 
 function renderPost(p){
-  const avatarHtml = p.user_avatar ? `<img src="${esc(p.user_avatar)}" alt="">` : esc((p.publisher||'?').charAt(0).toUpperCase());
+  const name       = p.publisher_name || p.publisher || '?';
+  const avatarHtml = p.user_avatar ? `<img src="${esc(p.user_avatar)}" alt="">` : esc(name.charAt(0).toUpperCase());
   const badgeCls   = p.user_role==='Admin' ? 'badge-admin' : 'badge-member';
   const canDel     = ME && (ME.role==='admin' || p.user_id==ME?.id);
   const imgHtml    = p.image ? `<img class="card-img" src="${esc(p.image)}" loading="lazy" onerror="this.style.display='none'">` : '';
@@ -508,7 +509,7 @@ function renderPost(p){
           <div>
             <div class="pub-name">
               <span class="role-badge ${badgeCls}">${esc(p.user_role)}</span>
-              ${esc(p.publisher)}
+              ${esc(name)}
             </div>
             <div class="pub-date">${fmtDate(p.created_at)}</div>
           </div>
