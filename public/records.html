@@ -314,7 +314,6 @@ const REACTIONS = [
 (async function init() {
   if (TOKEN) {
     try {
-      // تحقق سريع من JWT بدون DB
       const r = await fetch('/api/auth/me', { headers:{'Authorization':'Bearer '+TOKEN} });
       if (r.ok) {
         const u = await r.json();
@@ -322,6 +321,11 @@ const REACTIONS = [
           ME = { username: u.username, role: u.role, avatar: u.avatar||'', id: u.id };
           localStorage.setItem('malines_user', JSON.stringify(ME));
           setLoggedInUI(ME);
+          // جلب أحدث بيانات (avatar من DB) في الخلفية
+          fetch('/api/me', { headers:{'Authorization':'Bearer '+TOKEN} })
+            .then(r=>r.ok?r.json():null)
+            .then(full=>{ if(full&&!full.error&&full.avatar){ ME.avatar=full.avatar; setLoggedInUI(ME); } })
+            .catch(()=>{});
         } else {
           localStorage.removeItem('malines_token');
           localStorage.removeItem('malines_user');
