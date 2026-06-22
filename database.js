@@ -188,9 +188,9 @@ const q = {
   listRecords: () => db.execute(`
     SELECT r.*,
            COALESCE(u.avatar, r.user_avatar, '') as user_avatar,
-           COALESCE(u.display_name, r.publisher, '') as display_name
+           COALESCE(u.display_name, u.username, r.publisher, '') as publisher_name
     FROM records r
-    LEFT JOIN users u ON u.id = r.user_id
+    LEFT JOIN users u ON (u.id = r.user_id) OR (r.user_id IS NULL AND u.username = r.publisher)
     ORDER BY r.created_at DESC
   `).then(rows),
   createRecord: async (user_id, publisher, user_role, user_avatar, content, image) => {
