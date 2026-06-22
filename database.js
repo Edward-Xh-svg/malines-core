@@ -185,7 +185,14 @@ const q = {
   deleteCompany:   (id) => db.execute({ sql:'DELETE FROM stock_companies WHERE id=?', args:[id] }),
 
   // Records
-  listRecords:  () => db.execute('SELECT * FROM records ORDER BY created_at DESC').then(rows),
+  listRecords: () => db.execute(`
+    SELECT r.*,
+           COALESCE(u.avatar, r.user_avatar, '') as user_avatar,
+           COALESCE(u.display_name, r.publisher, '') as display_name
+    FROM records r
+    LEFT JOIN users u ON u.id = r.user_id
+    ORDER BY r.created_at DESC
+  `).then(rows),
   createRecord: async (user_id, publisher, user_role, user_avatar, content, image) => {
     // محاولة الإدراج بالشكل الجديد أولاً
     try {
@@ -213,8 +220,23 @@ const q = {
   removeReaction:     (rid,uid) => db.execute({ sql:'DELETE FROM record_reactions WHERE record_id=? AND user_id=?', args:[rid,uid] }),
 
   // Comments
-  getComments:    (rid) => db.execute({ sql:'SELECT * FROM record_comments WHERE record_id=? ORDER BY created_at ASC', args:[rid] }).then(rows),
-  getAllComments:  ()    => db.execute('SELECT * FROM record_comments ORDER BY record_id ASC, created_at ASC').then(rows),
+  getComments:   (rid) => db.execute({
+    sql: `SELECT rc.*,
+                 COALESCE(u.avatar, rc.avatar, '') as avatar,
+                 COALESCE(u.display_name, rc.display_name, '') as display_name
+          FROM record_comments rc
+          LEFT JOIN users u ON u.id = rc.user_id
+          WHERE rc.record_id=? ORDER BY rc.created_at ASC`,
+    args: [rid]
+  }).then(rows),
+  getAllComments: () => db.execute(`
+    SELECT rc.*,
+           COALESCE(u.avatar, rc.avatar, '') as avatar,
+           COALESCE(u.display_name, rc.display_name, '') as display_name
+    FROM record_comments rc
+    LEFT JOIN users u ON u.id = rc.user_id
+    ORDER BY rc.record_id ASC, rc.created_at ASC
+  `).then(rows),
   addComment: async (rid,uid,username,display_name,avatar,user_role,content) => {
     try {
       return await db.execute({ sql:'INSERT INTO record_comments (record_id,user_id,username,display_name,avatar,user_role,content) VALUES (?,?,?,?,?,?,?)', args:[rid,uid,username,display_name,avatar,user_role,content] });
@@ -238,7 +260,14 @@ const q = {
       GROUP BY CASE WHEN from_id=? THEN to_id ELSE from_id END
     )
     ORDER BY m.created_at DESC`, args:[uid,uid,uid] }).then(rows),
-  getMessages:  (uid,oid) => db.execute({ sql:'SELECT m.*,u.avatar as from_avatar FROM messages m JOIN users u ON u.id=m.from_id WHERE (from_id=? AND to_id=?) OR (from_id=? AND to_id=?) ORDER BY created_at ASC', args:[uid,oid,oid,uid] }).then(rows),
+  getMessages:  (uid,oid) => db.execute({
+    sql: `SELECT m.*, u.avatar as from_avatar
+          FROM messages m
+          JOIN users u ON u.id = m.from_id
+          WHERE (m.from_id=? AND m.to_id=?) OR (m.from_id=? AND m.to_id=?)
+          ORDER BY m.created_at ASC`,
+    args:[uid,oid,oid,uid]
+  }).then(rows),
   sendMessage:  (fid,tid,fn,tn,content) => db.execute({ sql:'INSERT INTO messages (from_id,to_id,from_name,to_name,content) VALUES (?,?,?,?,?)', args:[fid,tid,fn,tn,content] }),
   markRead:     (fid,tid) => db.execute({ sql:'UPDATE messages SET read=1 WHERE from_id=? AND to_id=?', args:[fid,tid] }),
   unreadCount:  (uid) => db.execute({ sql:'SELECT COUNT(*) as count FROM messages WHERE to_id=? AND read=0', args:[uid] }).then(first),
