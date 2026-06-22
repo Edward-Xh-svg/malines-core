@@ -374,6 +374,32 @@ app.delete('/api/comments/:id', requireAuth, async (req, res) => {
   } catch(e) { res.status(500).json({ error:'خطأ' }); }
 });
 
+// ==================== Message Reactions ====================
+app.post('/api/messages/react/:id', requireAuth, async (req, res) => {
+  try {
+    const { emoji } = req.body||{};
+    const existing = await q.getUserMsgReaction(req.params.id, req.user.id);
+    if (existing && existing.emoji === emoji) {
+      await q.removeMsgReaction(req.params.id, req.user.id);
+    } else {
+      await q.addMsgReaction(req.params.id, req.user.id, emoji||'heart');
+    }
+    const reactions = await q.getMsgReactions(req.params.id);
+    const userReaction = await q.getUserMsgReaction(req.params.id, req.user.id);
+    res.json({ success:true, reactions, userReaction: userReaction?.emoji||null });
+  } catch(e) { res.status(500).json({ error:'خطأ' }); }
+});
+
+// ==================== User Profile Posts ====================
+app.get('/api/user/:username/posts', async (req, res) => {
+  try {
+    const user = await q.getPublicProfile(req.params.username);
+    if (!user) return res.status(404).json({ error:'المستخدم غير موجود' });
+    const posts = await q.getUserPosts(user.id);
+    res.json(posts);
+  } catch(e) { res.status(500).json({ error:'خطأ' }); }
+});
+
 // ==================== Messages ====================
 app.get('/api/messages/unread', requireAuth, async (req, res) => {
   try { res.json(await q.unreadCount(req.user.id)); } catch(e) { res.status(500).json({ error:'خطأ' }); }

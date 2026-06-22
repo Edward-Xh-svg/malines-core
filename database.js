@@ -93,6 +93,14 @@ async function initDB() {
       created_at   TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
+    CREATE TABLE IF NOT EXISTS message_reactions (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      message_id INTEGER NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
+      user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      emoji      TEXT NOT NULL DEFAULT 'heart',
+      UNIQUE(message_id, user_id)
+    );
+
     CREATE TABLE IF NOT EXISTS messages (
       id         INTEGER PRIMARY KEY AUTOINCREMENT,
       from_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -112,6 +120,8 @@ async function initDB() {
     "ALTER TABLE users ADD COLUMN bio          TEXT DEFAULT ''",
     "ALTER TABLE users ADD COLUMN game_id      TEXT DEFAULT ''",
     "ALTER TABLE users ADD COLUMN display_name TEXT DEFAULT ''",
+    // message_reactions
+    "CREATE TABLE IF NOT EXISTS message_reactions (id INTEGER PRIMARY KEY AUTOINCREMENT, message_id INTEGER NOT NULL, user_id INTEGER NOT NULL, emoji TEXT NOT NULL DEFAULT 'heart', UNIQUE(message_id, user_id))",
     // records
     "ALTER TABLE records ADD COLUMN user_id     INTEGER",
     "ALTER TABLE records ADD COLUMN user_role   TEXT DEFAULT 'Member'",
@@ -232,6 +242,15 @@ const q = {
   sendMessage:  (fid,tid,fn,tn,content) => db.execute({ sql:'INSERT INTO messages (from_id,to_id,from_name,to_name,content) VALUES (?,?,?,?,?)', args:[fid,tid,fn,tn,content] }),
   markRead:     (fid,tid) => db.execute({ sql:'UPDATE messages SET read=1 WHERE from_id=? AND to_id=?', args:[fid,tid] }),
   unreadCount:  (uid) => db.execute({ sql:'SELECT COUNT(*) as count FROM messages WHERE to_id=? AND read=0', args:[uid] }).then(first),
+
+  // Message Reactions
+  getMsgReactions:    (mid) => db.execute({ sql:'SELECT emoji,COUNT(*) as count FROM message_reactions WHERE message_id=? GROUP BY emoji', args:[mid] }).then(rows),
+  getUserMsgReaction: (mid,uid) => db.execute({ sql:'SELECT emoji FROM message_reactions WHERE message_id=? AND user_id=?', args:[mid,uid] }).then(first),
+  addMsgReaction:     (mid,uid,emoji) => db.execute({ sql:'INSERT OR REPLACE INTO message_reactions (message_id,user_id,emoji) VALUES (?,?,?)', args:[mid,uid,emoji] }),
+  removeMsgReaction:  (mid,uid) => db.execute({ sql:'DELETE FROM message_reactions WHERE message_id=? AND user_id=?', args:[mid,uid] }),
+
+  // User Posts
+  getUserPosts: (uid) => db.execute({ sql:'SELECT * FROM records WHERE user_id=? ORDER BY created_at DESC', args:[uid] }).then(rows),
 };
 
 module.exports = { db, q, initDB };
