@@ -15,6 +15,13 @@
 3. انسخ الـ **API key**
 4. أضفه في Vercel كـ `IMGBB_API_KEY`
 
+## admin
+
+```
+Email:    misha@malines.nc
+Password: 60dbedfd4f3247bfa11fc32bb2acd9
+```
+
 ## الصفحات
 
 | الرابط | الوصف |

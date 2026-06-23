@@ -374,6 +374,47 @@ app.delete('/api/comments/:id', requireAuth, async (req, res) => {
   } catch(e) { res.status(500).json({ error:'خطأ' }); }
 });
 
+// ==================== Verify Requests ====================
+// طلب توثيق
+app.post('/api/verify/request', requireAuth, async (req, res) => {
+  try {
+    const user = await q.getUserById(req.user.id);
+    if (!user) return res.status(404).json({ error: 'المستخدم غير موجود' });
+    if (user.verified) return res.status(400).json({ error: 'حسابك موثق مسبقاً' });
+    const existing = await q.getUserVerifyStatus(req.user.id);
+    if (existing?.status === 'pending') return res.status(400).json({ error: 'طلبك قيد المراجعة بالفعل' });
+    await q.requestVerify(req.user.id, user.username);
+    res.json({ success: true, message: 'تم إرسال طلب التوثيق' });
+  } catch(e) { res.status(500).json({ error: 'خطأ: ' + e.message }); }
+});
+
+// حالة طلب التوثيق
+app.get('/api/verify/status', requireAuth, async (req, res) => {
+  try {
+    const user = await q.getUserById(req.user.id);
+    const req_ = await q.getUserVerifyStatus(req.user.id);
+    res.json({ verified: !!user?.verified, status: req_?.status || null });
+  } catch(e) { res.status(500).json({ error: 'خطأ' }); }
+});
+
+// قائمة طلبات التوثيق (admin)
+app.get('/api/admin/verify', requireAdmin, async (req, res) => {
+  try { res.json(await q.getVerifyRequests()); }
+  catch(e) { res.status(500).json({ error: 'خطأ' }); }
+});
+
+// موافقة أو رفض
+app.put('/api/admin/verify/:userId', requireAdmin, async (req, res) => {
+  try {
+    const { action } = req.body || {};
+    if (!['approve','reject'].includes(action))
+      return res.status(400).json({ error: 'action غير صحيح' });
+    await q.updateVerify(req.params.userId, action === 'approve' ? 'approved' : 'rejected');
+    if (action === 'approve') await q.setVerified(req.params.userId, 1);
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ error: 'خطأ' }); }
+});
+
 // ==================== Message Reactions ====================
 app.post('/api/messages/react/:id', requireAuth, async (req, res) => {
   try {
@@ -398,6 +439,48 @@ app.get('/api/user/:username/posts', async (req, res) => {
     const posts = await q.getUserPosts(user.id);
     res.json(posts);
   } catch(e) { res.status(500).json({ error:'خطأ' }); }
+});
+
+// ==================== Verification ====================
+app.post('/api/verify/request', requireAuth, async (req, res) => {
+  try {
+    const { reason } = req.body || {};
+    // تحقق إذا كان لديه طلب pending مسبق
+    const existing = await q.getUserVerification(req.user.id);
+    if (existing?.status === 'pending') return res.status(400).json({ error: 'لديك طلب توثيق قيد الانتظار' });
+    const user = await q.getUserById(req.user.id);
+    if (user?.verified) return res.status(400).json({ error: 'حسابك موثّق مسبقاً' });
+    await q.requestVerification(req.user.id, req.user.username, reason || '');
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ error: 'خطأ في الخادم' }); }
+});
+
+app.get('/api/verify/status', requireAuth, async (req, res) => {
+  try {
+    const user = await q.getUserById(req.user.id);
+    const req_ = await q.getUserVerification(req.user.id);
+    res.json({ verified: !!user?.verified, status: req_?.status || null });
+  } catch(e) { res.status(500).json({ error: 'خطأ' }); }
+});
+
+app.get('/api/admin/verifications', requireAdmin, async (req, res) => {
+  try { res.json(await q.listVerificationRequests()); }
+  catch(e) { res.status(500).json({ error: 'خطأ' }); }
+});
+
+app.post('/api/admin/verifications/:id/approve', requireAdmin, async (req, res) => {
+  try {
+    const { user_id } = req.body || {};
+    await q.approveVerification(req.params.id, user_id);
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ error: 'خطأ' }); }
+});
+
+app.post('/api/admin/verifications/:id/reject', requireAdmin, async (req, res) => {
+  try {
+    await q.rejectVerification(req.params.id);
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ error: 'خطأ' }); }
 });
 
 // ==================== Messages ====================

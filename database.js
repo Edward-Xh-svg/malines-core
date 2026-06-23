@@ -93,6 +93,15 @@ async function initDB() {
       created_at   TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
+    CREATE TABLE IF NOT EXISTS verify_requests (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      username   TEXT NOT NULL,
+      status     TEXT NOT NULL DEFAULT 'pending',
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      UNIQUE(user_id)
+    );
+
     CREATE TABLE IF NOT EXISTS message_reactions (
       id         INTEGER PRIMARY KEY AUTOINCREMENT,
       message_id INTEGER NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
@@ -111,6 +120,14 @@ async function initDB() {
       read       INTEGER NOT NULL DEFAULT 0,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
+    CREATE TABLE IF NOT EXISTS verification_requests (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      username   TEXT NOT NULL,
+      reason     TEXT DEFAULT '',
+      status     TEXT NOT NULL DEFAULT 'pending',
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
   `);
 
   // ── Migrations: إضافة أعمدة مفقودة لجميع الجداول ──
@@ -120,9 +137,9 @@ async function initDB() {
     "ALTER TABLE users ADD COLUMN bio          TEXT DEFAULT ''",
     "ALTER TABLE users ADD COLUMN game_id      TEXT DEFAULT ''",
     "ALTER TABLE users ADD COLUMN display_name TEXT DEFAULT ''",
+    "ALTER TABLE users ADD COLUMN verified     INTEGER DEFAULT 0",
     // message_reactions
     "CREATE TABLE IF NOT EXISTS message_reactions (id INTEGER PRIMARY KEY AUTOINCREMENT, message_id INTEGER NOT NULL, user_id INTEGER NOT NULL, emoji TEXT NOT NULL DEFAULT 'heart', UNIQUE(message_id, user_id))",
-    // records
     "ALTER TABLE records ADD COLUMN user_id     INTEGER",
     "ALTER TABLE records ADD COLUMN user_role   TEXT DEFAULT 'Member'",
     "ALTER TABLE records ADD COLUMN user_avatar TEXT DEFAULT ''",
@@ -153,11 +170,11 @@ const q = {
   // Users
   getUserByEmail:   (email)    => db.execute({ sql:'SELECT * FROM users WHERE email=?', args:[email] }).then(first),
   getUserById:      (id)       => db.execute({ sql:'SELECT id,username,email,role,avatar,bio,game_id,display_name,created_at FROM users WHERE id=?', args:[id] }).then(first),
-  getPublicProfile: (username) => db.execute({ sql:'SELECT id,username,display_name,avatar,bio,game_id,role,created_at FROM users WHERE username=?', args:[username] }).then(first),
+  getPublicProfile: (username) => db.execute({ sql:'SELECT id,username,display_name,avatar,bio,game_id,role,verified,created_at FROM users WHERE username=?', args:[username] }).then(first),
   createUser:       (username,email,password) => db.execute({ sql:'INSERT INTO users (username,email,password) VALUES (?,?,?)', args:[username,email,password] }),
   updateProfile:    (display_name,bio,game_id,avatar,id) => db.execute({ sql:'UPDATE users SET display_name=?,bio=?,game_id=?,avatar=? WHERE id=?', args:[display_name,bio,game_id,avatar,id] }),
   listUsers:        () => db.execute('SELECT id,username,email,role,avatar,display_name,created_at FROM users ORDER BY created_at DESC').then(rows),
-  listPublicUsers:  () => db.execute("SELECT id,username,display_name,avatar,role FROM users ORDER BY username ASC").then(rows),
+  listPublicUsers:  () => db.execute("SELECT id,username,display_name,avatar,role,verified FROM users ORDER BY username ASC").then(rows),
   deleteUser:       (id) => db.execute({ sql:"DELETE FROM users WHERE id=? AND role!='admin'", args:[id] }),
   updateUserRole:   (role,id) => db.execute({ sql:'UPDATE users SET role=? WHERE id=?', args:[role,id] }),
   searchUsers:      (q) => db.execute({ sql:"SELECT id,username,display_name,avatar,role FROM users WHERE username LIKE ? OR display_name LIKE ? LIMIT 15", args:['%'+q+'%','%'+q+'%'] }).then(rows),
@@ -188,7 +205,8 @@ const q = {
   listRecords: () => db.execute(`
     SELECT r.*,
            COALESCE(u.avatar, r.user_avatar, '') as user_avatar,
-           COALESCE(u.display_name, u.username, r.publisher, '') as publisher_name
+           COALESCE(u.display_name, u.username, r.publisher, '') as publisher_name,
+           COALESCE(u.verified, 0) as publisher_verified
     FROM records r
     LEFT JOIN users u ON (u.id = r.user_id) OR (r.user_id IS NULL AND u.username = r.publisher)
     ORDER BY r.created_at DESC
@@ -248,6 +266,17 @@ const q = {
     ? db.execute({ sql:'DELETE FROM record_comments WHERE id=?', args:[id] })
     : db.execute({ sql:'DELETE FROM record_comments WHERE id=? AND user_id=?', args:[id,uid] }),
 
+  // Verification
+  requestVerification: (user_id, username, reason) => db.execute({ sql:'INSERT INTO verification_requests (user_id,username,reason) VALUES (?,?,?)', args:[user_id,username,reason] }),
+  listVerificationRequests: () => db.execute("SELECT * FROM verification_requests WHERE status='pending' ORDER BY created_at ASC").then(rows),
+  approveVerification: async (request_id, user_id) => {
+    await db.execute({ sql:"UPDATE users SET verified=1 WHERE id=?", args:[user_id] });
+    await db.execute({ sql:"UPDATE verification_requests SET status='approved' WHERE id=?", args:[request_id] });
+  },
+  rejectVerification: (request_id) => db.execute({ sql:"UPDATE verification_requests SET status='rejected' WHERE id=?", args:[request_id] }),
+  getUserVerification: (user_id) => db.execute({ sql:"SELECT status FROM verification_requests WHERE user_id=? ORDER BY created_at DESC LIMIT 1", args:[user_id] }).then(first),
+  setVerified: (user_id, val) => db.execute({ sql:"UPDATE users SET verified=? WHERE id=?", args:[val, user_id] }),
+
   // Messages
   getConversations: (uid) => db.execute({ sql:`
     SELECT m.*,u1.avatar as from_avatar,u2.avatar as to_avatar
@@ -271,6 +300,13 @@ const q = {
   sendMessage:  (fid,tid,fn,tn,content) => db.execute({ sql:'INSERT INTO messages (from_id,to_id,from_name,to_name,content) VALUES (?,?,?,?,?)', args:[fid,tid,fn,tn,content] }),
   markRead:     (fid,tid) => db.execute({ sql:'UPDATE messages SET read=1 WHERE from_id=? AND to_id=?', args:[fid,tid] }),
   unreadCount:  (uid) => db.execute({ sql:'SELECT COUNT(*) as count FROM messages WHERE to_id=? AND read=0', args:[uid] }).then(first),
+
+  // Verify Requests
+  requestVerify:    (uid, username) => db.execute({ sql:'INSERT OR REPLACE INTO verify_requests (user_id,username,status) VALUES (?,?,?)', args:[uid,username,'pending'] }),
+  getVerifyRequests:()  => db.execute("SELECT vr.*,u.avatar,u.display_name FROM verify_requests vr JOIN users u ON u.id=vr.user_id WHERE vr.status='pending' ORDER BY vr.created_at DESC").then(rows),
+  updateVerify:     (uid, status) => db.execute({ sql:'UPDATE verify_requests SET status=? WHERE user_id=?', args:[status,uid] }),
+  setVerified:      (uid, val)    => db.execute({ sql:'UPDATE users SET verified=? WHERE id=?', args:[val,uid] }),
+  getUserVerifyStatus: (uid)      => db.execute({ sql:'SELECT status FROM verify_requests WHERE user_id=?', args:[uid] }).then(first),
 
   // Message Reactions
   getMsgReactions:    (mid) => db.execute({ sql:'SELECT emoji,COUNT(*) as count FROM message_reactions WHERE message_id=? GROUP BY emoji', args:[mid] }).then(rows),
