@@ -184,21 +184,21 @@ const q = {
   listPublished: () => db.execute('SELECT id,slug,title,category,image,created_at FROM articles WHERE published=1 ORDER BY created_at DESC').then(rows),
   getArticle:    (slug) => db.execute({ sql:'SELECT * FROM articles WHERE slug=?', args:[slug] }).then(first),
   createArticle: (slug,title,category,content,image,published,author_id) => db.execute({ sql:'INSERT INTO articles (slug,title,category,content,image,published,author_id) VALUES (?,?,?,?,?,?,?)', args:[slug,title,category,content,image,published,author_id] }),
-  updateArticle: (title,category,content,image,published,slug) => db.execute({ sql:'UPDATE articles SET title=?,category=?,content=?,image=?,published=?,updated_at=datetime("now") WHERE slug=?', args:[title,category,content,image,published,slug] }),
+  updateArticle: (title,category,content,image,published,slug) => db.execute({ sql:"UPDATE articles SET title=?,category=?,content=?,image=?,published=?,updated_at=datetime('now') WHERE slug=?", args:[title,category,content,image,published,slug] }),
   deleteArticle: (slug) => db.execute({ sql:'DELETE FROM articles WHERE slug=?', args:[slug] }),
 
   // Countries
   listCountries:    () => db.execute('SELECT * FROM countries ORDER BY name ASC').then(rows),
-  listByType:       (type) => db.execute({ sql:'SELECT * FROM countries WHERE type=? OR type="both" ORDER BY name ASC', args:[type] }).then(rows),
+  listByType:       (type) => db.execute({ sql:"SELECT * FROM countries WHERE type=? OR type='both' ORDER BY name ASC", args:[type] }).then(rows),
   getCountryByName: (name) => db.execute({ sql:'SELECT * FROM countries WHERE name=?', args:[name] }).then(first),
   createCountry:    (name,flag,description,type,council_data) => db.execute({ sql:'INSERT INTO countries (name,flag,description,type,council_data) VALUES (?,?,?,?,?)', args:[name,flag,description,type,council_data] }),
-  updateCountry:    (name,flag,description,type,council_data,id) => db.execute({ sql:'UPDATE countries SET name=?,flag=?,description=?,type=?,council_data=?,updated_at=datetime("now") WHERE id=?', args:[name,flag,description,type,council_data,id] }),
+  updateCountry:    (name,flag,description,type,council_data,id) => db.execute({ sql:"UPDATE countries SET name=?,flag=?,description=?,type=?,council_data=?,updated_at=datetime('now') WHERE id=?", args:[name,flag,description,type,council_data,id] }),
   deleteCountry:    (id) => db.execute({ sql:'DELETE FROM countries WHERE id=?', args:[id] }),
 
   // Stock
   getCompaniesByCountry: (cid) => db.execute({ sql:'SELECT * FROM stock_companies WHERE country_id=? ORDER BY sort_order ASC,id ASC', args:[cid] }).then(rows),
   createCompany:   (cid,name,mv,gr,so) => db.execute({ sql:'INSERT INTO stock_companies (country_id,name,market_value,growth,sort_order) VALUES (?,?,?,?,?)', args:[cid,name,mv,gr,so] }),
-  updateCompany:   (name,mv,gr,so,id)  => db.execute({ sql:'UPDATE stock_companies SET name=?,market_value=?,growth=?,sort_order=?,updated_at=datetime("now") WHERE id=?', args:[name,mv,gr,so,id] }),
+  updateCompany:   (name,mv,gr,so,id)  => db.execute({ sql:"UPDATE stock_companies SET name=?,market_value=?,growth=?,sort_order=?,updated_at=datetime('now') WHERE id=?", args:[name,mv,gr,so,id] }),
   deleteCompany:   (id) => db.execute({ sql:'DELETE FROM stock_companies WHERE id=?', args:[id] }),
 
   // Records
