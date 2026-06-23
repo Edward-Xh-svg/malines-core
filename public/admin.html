@@ -237,6 +237,10 @@
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg>
       الدول والبورصة
     </button>
+    <button class="nav-item" onclick="showPage('verify')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      التوثيق <span id="verifyCount" style="background:var(--red);color:#fff;font-size:0.68rem;padding:1px 6px;border-radius:999px;margin-right:4px;display:none;"></span>
+    </button>
     <button class="nav-item" onclick="showPage('records')">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       السجلات
@@ -338,6 +342,16 @@
           <tbody id="countriesTable"><tr><td colspan="4" style="text-align:center;color:var(--muted);padding:30px;">جارٍ التحميل...</td></tr></tbody>
         </table>
       </div>
+    </div>
+  </div>
+
+  <!-- Verify -->
+  <div class="page" id="page-verify">
+    <div class="section-header">
+      <h2 class="section-title">طلبات التوثيق</h2>
+    </div>
+    <div class="card">
+      <div id="verifyList"><div style="text-align:center;color:var(--muted);padding:30px;">جارٍ التحميل...</div></div>
     </div>
   </div>
 
@@ -561,6 +575,7 @@ function showPage(name) {
   if (name === 'articles') loadArticles();
   if (name === 'countries') loadCountries();
   if (name === 'records') loadRecords();
+  if (name === 'verify') loadVerify();
   if (name === 'users') loadUsers();
   if (name === 'dashboard') loadDashboard();
 }
@@ -596,12 +611,15 @@ document.querySelectorAll('.modal-overlay').forEach(o => {
 // ==================== Dashboard ====================
 async function loadDashboard() {
   try {
-    const [articles, countries, users, records] = await Promise.all([
+    const [articles, countries, users, records, verifyReqs] = await Promise.all([
       api('/api/admin/articles'),
       api('/api/admin/countries'),
       api('/api/admin/users'),
       api('/api/records'),
+      api('/api/admin/verify'),
     ]);
+    const vb = document.getElementById('verifyCount');
+    if(vb && verifyReqs.length){ vb.textContent=verifyReqs.length; vb.style.display='inline'; }
     document.getElementById('statArticles').textContent = articles.length;
     document.getElementById('statCountries').textContent = countries.length;
     document.getElementById('statUsers').textContent = users.length;
@@ -897,6 +915,48 @@ async function deleteUser(id, name) {
     toast('تم الحذف');
     loadUsers();
   } catch(e) { toast(e.message, 'error'); }
+}
+
+// ==================== Verify ====================
+async function loadVerify(){
+  try{
+    const rows = await api('/api/admin/verify');
+    const list = document.getElementById('verifyList');
+    const badge = document.getElementById('verifyCount');
+    if(badge){ if(rows.length){ badge.textContent=rows.length; badge.style.display='inline'; } else { badge.style.display='none'; } }
+    if(!rows.length){ list.innerHTML='<div style="text-align:center;color:var(--muted);padding:30px;">لا توجد طلبات معلقة</div>'; return; }
+    list.innerHTML=rows.map(r=>`
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);">
+        <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(145deg,var(--red),#8e2a1f);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;overflow:hidden;">
+          ${r.avatar?`<img src="${escHtml(r.avatar)}" style="width:100%;height:100%;object-fit:cover;">`:(r.display_name||r.username||'?').charAt(0).toUpperCase()}
+        </div>
+        <div style="flex:1;">
+          <strong style="color:#fff;">${escHtml(r.display_name||r.username)}</strong>
+          <div style="font-size:0.78rem;color:var(--muted);">@${escHtml(r.username)} · ${fmtDate(r.created_at)}</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-primary btn-sm" onclick="approveVerify(${r.user_id})">موافقة</button>
+          <button class="btn btn-red btn-sm" onclick="rejectVerify(${r.user_id})">رفض</button>
+        </div>
+      </div>`).join('');
+  }catch(e){ toast('فشل تحميل الطلبات','error'); }
+}
+
+async function approveVerify(userId){
+  try{
+    await api('/api/admin/verify/'+userId,'PUT',{action:'approve'});
+    toast('تم منح التوثيق');
+    loadVerify();
+  }catch(e){ toast(e.message,'error'); }
+}
+
+async function rejectVerify(userId){
+  if(!confirm('رفض طلب التوثيق؟')) return;
+  try{
+    await api('/api/admin/verify/'+userId,'PUT',{action:'reject'});
+    toast('تم الرفض');
+    loadVerify();
+  }catch(e){ toast(e.message,'error'); }
 }
 
 // ==================== Records ====================
