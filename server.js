@@ -102,8 +102,8 @@ app.get('/api/profile/:username', async (req, res) => {
 
 app.put('/api/profile', requireAuth, async (req, res) => {
   try {
-    const { display_name, bio, game_id, avatar } = req.body || {};
-    await q.updateProfile(display_name||'', bio||'', game_id||'', avatar||'', req.user.id);
+    const { display_name, bio, game_id, avatar, cover } = req.body || {};
+    await q.updateProfile(display_name||'', bio||'', game_id||'', avatar||'', cover||'', req.user.id);
     res.json({ success:true });
   } catch(e) { res.status(500).json({ error: 'خطأ في الخادم' }); }
 });
@@ -415,6 +415,127 @@ app.put('/api/admin/verify/:userId', requireAdmin, async (req, res) => {
   } catch(e) { res.status(500).json({ error: 'خطأ' }); }
 });
 
+// ==================== Groups ====================
+app.get('/api/groups', requireAuth, async (req, res) => {
+  try { res.json(await q.getUserGroups(req.user.id)); }
+  catch(e) { res.status(500).json({ error:'خطأ' }); }
+});
+
+app.post('/api/groups', requireAuth, async (req, res) => {
+  try {
+    const { name, description, avatar, theme, members } = req.body||{};
+    if (!name?.trim()) return res.status(400).json({ error:'اسم المجموعة مطلوب' });
+    const r = await q.createGroup(name.trim(), description||'', avatar||'', theme||'default', req.user.id);
+    const gid = Number(r.lastInsertRowid);
+    await q.addGroupMember(gid, req.user.id, 'admin');
+    if (Array.isArray(members)) {
+      for (const uid of members) {
+        if (uid !== req.user.id) await q.addGroupMember(gid, uid, 'member');
+      }
+    }
+    res.json({ success:true, id:gid });
+  } catch(e) { res.status(500).json({ error:'خطأ' }); }
+});
+
+app.get('/api/groups/:id', requireAuth, async (req, res) => {
+  try {
+    const member = await q.isMember(req.params.id, req.user.id);
+    if (!member) return res.status(403).json({ error:'لست عضواً في هذه المجموعة' });
+    const [group, members] = await Promise.all([q.getGroup(req.params.id), q.getGroupMembers(req.params.id)]);
+    res.json({ ...group, members });
+  } catch(e) { res.status(500).json({ error:'خطأ' }); }
+});
+
+app.put('/api/groups/:id', requireAuth, async (req, res) => {
+  try {
+    const m = await q.isMember(req.params.id, req.user.id);
+    if (!m || m.role === 'member') return res.status(403).json({ error:'غير مسموح' });
+    const { name, description, avatar, theme } = req.body||{};
+    await q.updateGroup(req.params.id, name||'', description||'', avatar||'', theme||'default');
+    res.json({ success:true });
+  } catch(e) { res.status(500).json({ error:'خطأ' }); }
+});
+
+app.delete('/api/groups/:id', requireAuth, async (req, res) => {
+  try {
+    const m = await q.isMember(req.params.id, req.user.id);
+    if (!m || m.role !== 'admin') return res.status(403).json({ error:'فقط admin المجموعة يمكنه الحذف' });
+    await q.deleteGroup(req.params.id);
+    res.json({ success:true });
+  } catch(e) { res.status(500).json({ error:'خطأ' }); }
+});
+
+app.post('/api/groups/:id/members', requireAuth, async (req, res) => {
+  try {
+    const m = await q.isMember(req.params.id, req.user.id);
+    if (!m || m.role === 'member') return res.status(403).json({ error:'غير مسموح' });
+    const { user_id, role } = req.body||{};
+    await q.addGroupMember(req.params.id, user_id, role||'member');
+    res.json({ success:true });
+  } catch(e) { res.status(500).json({ error:'خطأ' }); }
+});
+
+app.delete('/api/groups/:id/members/:uid', requireAuth, async (req, res) => {
+  try {
+    const m = await q.isMember(req.params.id, req.user.id);
+    const isSelf = req.params.uid == req.user.id;
+    if (!isSelf && (!m || m.role === 'member')) return res.status(403).json({ error:'غير مسموح' });
+    await q.removeGroupMember(req.params.id, req.params.uid);
+    res.json({ success:true });
+  } catch(e) { res.status(500).json({ error:'خطأ' }); }
+});
+
+app.put('/api/groups/:id/members/:uid/role', requireAuth, async (req, res) => {
+  try {
+    const m = await q.isMember(req.params.id, req.user.id);
+    if (!m || m.role !== 'admin') return res.status(403).json({ error:'فقط admin' });
+    const { role } = req.body||{};
+    await q.updateMemberRole(req.params.id, req.params.uid, role||'member');
+    res.json({ success:true });
+  } catch(e) { res.status(500).json({ error:'خطأ' }); }
+});
+
+app.put('/api/groups/:id/members/:uid/nickname', requireAuth, async (req, res) => {
+  try {
+    const { nickname } = req.body||{};
+    await q.updateMemberNick(req.params.id, req.params.uid, nickname||'');
+    res.json({ success:true });
+  } catch(e) { res.status(500).json({ error:'خطأ' }); }
+});
+
+// Group Messages
+app.get('/api/groups/:id/messages', requireAuth, async (req, res) => {
+  try {
+    const m = await q.isMember(req.params.id, req.user.id);
+    if (!m) return res.status(403).json({ error:'لست عضواً' });
+    res.json(await q.getGroupMessages(req.params.id));
+  } catch(e) { res.status(500).json({ error:'خطأ' }); }
+});
+
+app.post('/api/groups/:id/messages', requireAuth, async (req, res) => {
+  try {
+    const m = await q.isMember(req.params.id, req.user.id);
+    if (!m) return res.status(403).json({ error:'لست عضواً' });
+    const { content, image } = req.body||{};
+    if (!content?.trim() && !image) return res.status(400).json({ error:'الرسالة فارغة' });
+    const user = await q.getUserById(req.user.id);
+    await q.sendGroupMessage(req.params.id, user.id, user.display_name||user.username, user.avatar||'', content?.trim()||'', image||'');
+    res.json({ success:true });
+  } catch(e) { res.status(500).json({ error:'خطأ' }); }
+});
+
+app.post('/api/groups/:gid/messages/:mid/react', requireAuth, async (req, res) => {
+  try {
+    const { emoji } = req.body||{};
+    const existing = await q.getUserGroupMsgReaction(req.params.mid, req.user.id);
+    if (existing && existing.emoji === emoji) await q.removeGroupMsgReaction(req.params.mid, req.user.id);
+    else await q.addGroupMsgReaction(req.params.mid, req.user.id, emoji||'heart');
+    const reactions = await q.getGroupMsgReactions(req.params.mid);
+    const userReaction = await q.getUserGroupMsgReaction(req.params.mid, req.user.id);
+    res.json({ success:true, reactions, userReaction: userReaction?.emoji||null });
+  } catch(e) { res.status(500).json({ error:'خطأ' }); }
+});
+
 // ==================== Message Reactions ====================
 app.post('/api/messages/react/:id', requireAuth, async (req, res) => {
   try {
@@ -500,12 +621,12 @@ app.get('/api/messages/:username', requireAuth, async (req, res) => {
 });
 app.post('/api/messages/:username', requireAuth, async (req, res) => {
   try {
-    const { content } = req.body||{};
-    if (!content?.trim()) return res.status(400).json({ error:'الرسالة فارغة' });
+    const { content, image } = req.body||{};
+    if (!content?.trim() && !image) return res.status(400).json({ error:'الرسالة فارغة' });
     const other = await q.getPublicProfile(req.params.username);
     if (!other) return res.status(404).json({ error:'المستخدم غير موجود' });
     const me = await q.getUserById(req.user.id);
-    await q.sendMessage(me.id, other.id, me.display_name||me.username, other.display_name||other.username, content.trim());
+    await q.sendMessageWithImage(me.id, other.id, me.display_name||me.username, other.display_name||other.username, content?.trim()||'', image||'');
     res.json({ success:true });
   } catch(e) { res.status(500).json({ error:'خطأ' }); }
 });
@@ -519,6 +640,7 @@ app.get('/council', (_,res)=>res.sendFile(path.join(__dirname,'public','council.
 app.get('/records', (_,res)=>res.sendFile(path.join(__dirname,'public','records.html')));
 app.get('/hostaka', (_,res)=>res.sendFile(path.join(__dirname,'public','hostaka.html')));
 app.get('/profile', (_,res)=>res.sendFile(path.join(__dirname,'public','profile.html')));
+app.get('/group',   (_,res)=>res.sendFile(path.join(__dirname,'public','group.html')));
 app.get('/chat',    (_,res)=>res.sendFile(path.join(__dirname,'public','chat.html')));
 app.get('*',        (_,res)=>res.sendFile(path.join(__dirname,'public','index.html')));
 

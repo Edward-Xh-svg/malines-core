@@ -102,6 +102,45 @@ async function initDB() {
       UNIQUE(user_id)
     );
 
+    CREATE TABLE IF NOT EXISTS groups (
+      id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      name        TEXT NOT NULL,
+      description TEXT DEFAULT '',
+      avatar      TEXT DEFAULT '',
+      theme       TEXT DEFAULT 'default',
+      created_by  INTEGER NOT NULL REFERENCES users(id),
+      created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS group_members (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      group_id   INTEGER NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
+      user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      nickname   TEXT DEFAULT '',
+      role       TEXT NOT NULL DEFAULT 'member',
+      joined_at  TEXT NOT NULL DEFAULT (datetime('now')),
+      UNIQUE(group_id, user_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS group_messages (
+      id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      group_id    INTEGER NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
+      user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      from_name   TEXT NOT NULL,
+      from_avatar TEXT DEFAULT '',
+      content     TEXT NOT NULL,
+      image       TEXT DEFAULT '',
+      created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS group_message_reactions (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      message_id INTEGER NOT NULL REFERENCES group_messages(id) ON DELETE CASCADE,
+      user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      emoji      TEXT NOT NULL DEFAULT 'heart',
+      UNIQUE(message_id, user_id)
+    );
+
     CREATE TABLE IF NOT EXISTS message_reactions (
       id         INTEGER PRIMARY KEY AUTOINCREMENT,
       message_id INTEGER NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
@@ -148,6 +187,19 @@ async function initDB() {
     "ALTER TABLE record_comments ADD COLUMN display_name TEXT DEFAULT ''",
     "ALTER TABLE record_comments ADD COLUMN avatar       TEXT DEFAULT ''",
     "ALTER TABLE record_comments ADD COLUMN user_role    TEXT DEFAULT 'Member'",
+    // countries
+    "ALTER TABLE countries ADD COLUMN flag         TEXT DEFAULT ''",
+    "ALTER TABLE countries ADD COLUMN description  TEXT DEFAULT ''",
+    "ALTER TABLE countries ADD COLUMN type         TEXT DEFAULT 'both'",
+    "ALTER TABLE countries ADD COLUMN council_data TEXT DEFAULT ''",
+    // stock_companies
+    "ALTER TABLE stock_companies ADD COLUMN market_value TEXT DEFAULT '0'",
+    "ALTER TABLE stock_companies ADD COLUMN growth       TEXT DEFAULT '0%'",
+    "ALTER TABLE stock_companies ADD COLUMN sort_order   INTEGER DEFAULT 0",
+    "ALTER TABLE messages ADD COLUMN image TEXT DEFAULT ''",
+    "ALTER TABLE group_messages ADD COLUMN image TEXT DEFAULT ''",
+    // verify_requests
+    "CREATE TABLE IF NOT EXISTS verify_requests (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, username TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending', created_at TEXT NOT NULL DEFAULT (datetime('now')), UNIQUE(user_id))",
   ];
   for (const sql of migrations) {
     try { await db.execute(sql); } catch(e) { /* العمود موجود مسبقاً — تجاهل */ }
@@ -169,10 +221,10 @@ async function initDB() {
 const q = {
   // Users
   getUserByEmail:   (email)    => db.execute({ sql:'SELECT * FROM users WHERE email=?', args:[email] }).then(first),
-  getUserById:      (id)       => db.execute({ sql:'SELECT id,username,email,role,avatar,bio,game_id,display_name,created_at FROM users WHERE id=?', args:[id] }).then(first),
-  getPublicProfile: (username) => db.execute({ sql:'SELECT id,username,display_name,avatar,bio,game_id,role,verified,created_at FROM users WHERE username=?', args:[username] }).then(first),
+  getUserById:      (id)       => db.execute({ sql:'SELECT id,username,email,role,avatar,bio,game_id,display_name,cover,verified,created_at FROM users WHERE id=?', args:[id] }).then(first),
+  getPublicProfile: (username) => db.execute({ sql:'SELECT id,username,display_name,avatar,bio,game_id,role,verified,cover,created_at FROM users WHERE username=?', args:[username] }).then(first),
   createUser:       (username,email,password) => db.execute({ sql:'INSERT INTO users (username,email,password) VALUES (?,?,?)', args:[username,email,password] }),
-  updateProfile:    (display_name,bio,game_id,avatar,id) => db.execute({ sql:'UPDATE users SET display_name=?,bio=?,game_id=?,avatar=? WHERE id=?', args:[display_name,bio,game_id,avatar,id] }),
+  updateProfile:    (display_name,bio,game_id,avatar,cover,id) => db.execute({ sql:'UPDATE users SET display_name=?,bio=?,game_id=?,avatar=?,cover=? WHERE id=?', args:[display_name,bio,game_id,avatar,cover,id] }),
   listUsers:        () => db.execute('SELECT id,username,email,role,avatar,display_name,created_at FROM users ORDER BY created_at DESC').then(rows),
   listPublicUsers:  () => db.execute("SELECT id,username,display_name,avatar,role,verified FROM users ORDER BY username ASC").then(rows),
   deleteUser:       (id) => db.execute({ sql:"DELETE FROM users WHERE id=? AND role!='admin'", args:[id] }),
@@ -184,21 +236,21 @@ const q = {
   listPublished: () => db.execute('SELECT id,slug,title,category,image,created_at FROM articles WHERE published=1 ORDER BY created_at DESC').then(rows),
   getArticle:    (slug) => db.execute({ sql:'SELECT * FROM articles WHERE slug=?', args:[slug] }).then(first),
   createArticle: (slug,title,category,content,image,published,author_id) => db.execute({ sql:'INSERT INTO articles (slug,title,category,content,image,published,author_id) VALUES (?,?,?,?,?,?,?)', args:[slug,title,category,content,image,published,author_id] }),
-  updateArticle: (title,category,content,image,published,slug) => db.execute({ sql:"UPDATE articles SET title=?,category=?,content=?,image=?,published=?,updated_at=datetime('now') WHERE slug=?", args:[title,category,content,image,published,slug] }),
+  updateArticle: (title,category,content,image,published,slug) => db.execute({ sql:'UPDATE articles SET title=?,category=?,content=?,image=?,published=?,updated_at=datetime("now") WHERE slug=?', args:[title,category,content,image,published,slug] }),
   deleteArticle: (slug) => db.execute({ sql:'DELETE FROM articles WHERE slug=?', args:[slug] }),
 
   // Countries
   listCountries:    () => db.execute('SELECT * FROM countries ORDER BY name ASC').then(rows),
-  listByType:       (type) => db.execute({ sql:"SELECT * FROM countries WHERE type=? OR type='both' ORDER BY name ASC", args:[type] }).then(rows),
+  listByType:       (type) => db.execute({ sql:'SELECT * FROM countries WHERE type=? OR type="both" ORDER BY name ASC', args:[type] }).then(rows),
   getCountryByName: (name) => db.execute({ sql:'SELECT * FROM countries WHERE name=?', args:[name] }).then(first),
   createCountry:    (name,flag,description,type,council_data) => db.execute({ sql:'INSERT INTO countries (name,flag,description,type,council_data) VALUES (?,?,?,?,?)', args:[name,flag,description,type,council_data] }),
-  updateCountry:    (name,flag,description,type,council_data,id) => db.execute({ sql:"UPDATE countries SET name=?,flag=?,description=?,type=?,council_data=?,updated_at=datetime('now') WHERE id=?", args:[name,flag,description,type,council_data,id] }),
+  updateCountry:    (name,flag,description,type,council_data,id) => db.execute({ sql:'UPDATE countries SET name=?,flag=?,description=?,type=?,council_data=?,updated_at=datetime("now") WHERE id=?', args:[name,flag,description,type,council_data,id] }),
   deleteCountry:    (id) => db.execute({ sql:'DELETE FROM countries WHERE id=?', args:[id] }),
 
   // Stock
   getCompaniesByCountry: (cid) => db.execute({ sql:'SELECT * FROM stock_companies WHERE country_id=? ORDER BY sort_order ASC,id ASC', args:[cid] }).then(rows),
   createCompany:   (cid,name,mv,gr,so) => db.execute({ sql:'INSERT INTO stock_companies (country_id,name,market_value,growth,sort_order) VALUES (?,?,?,?,?)', args:[cid,name,mv,gr,so] }),
-  updateCompany:   (name,mv,gr,so,id)  => db.execute({ sql:"UPDATE stock_companies SET name=?,market_value=?,growth=?,sort_order=?,updated_at=datetime('now') WHERE id=?", args:[name,mv,gr,so,id] }),
+  updateCompany:   (name,mv,gr,so,id)  => db.execute({ sql:'UPDATE stock_companies SET name=?,market_value=?,growth=?,sort_order=?,updated_at=datetime("now") WHERE id=?', args:[name,mv,gr,so,id] }),
   deleteCompany:   (id) => db.execute({ sql:'DELETE FROM stock_companies WHERE id=?', args:[id] }),
 
   // Records
@@ -300,6 +352,30 @@ const q = {
   sendMessage:  (fid,tid,fn,tn,content) => db.execute({ sql:'INSERT INTO messages (from_id,to_id,from_name,to_name,content) VALUES (?,?,?,?,?)', args:[fid,tid,fn,tn,content] }),
   markRead:     (fid,tid) => db.execute({ sql:'UPDATE messages SET read=1 WHERE from_id=? AND to_id=?', args:[fid,tid] }),
   unreadCount:  (uid) => db.execute({ sql:'SELECT COUNT(*) as count FROM messages WHERE to_id=? AND read=0', args:[uid] }).then(first),
+
+  // Groups
+  createGroup:       (name,description,avatar,theme,created_by) => db.execute({ sql:'INSERT INTO groups (name,description,avatar,theme,created_by) VALUES (?,?,?,?,?)', args:[name,description,avatar,theme,created_by] }),
+  getGroup:          (id) => db.execute({ sql:'SELECT * FROM groups WHERE id=?', args:[id] }).then(first),
+  updateGroup:       (id,name,description,avatar,theme) => db.execute({ sql:'UPDATE groups SET name=?,description=?,avatar=?,theme=? WHERE id=?', args:[name,description,avatar,theme,id] }),
+  deleteGroup:       (id) => db.execute({ sql:'DELETE FROM groups WHERE id=?', args:[id] }),
+  getUserGroups:     (uid) => db.execute({ sql:'SELECT g.*,gm.role as my_role,gm.nickname FROM groups g JOIN group_members gm ON gm.group_id=g.id WHERE gm.user_id=? ORDER BY g.created_at DESC', args:[uid] }).then(rows),
+  getGroupMembers:   (gid) => db.execute({ sql:'SELECT gm.*,u.username,u.display_name,u.avatar,u.verified FROM group_members gm JOIN users u ON u.id=gm.user_id WHERE gm.group_id=? ORDER BY gm.role DESC,gm.joined_at ASC', args:[gid] }).then(rows),
+  addGroupMember:    (gid,uid,role) => db.execute({ sql:'INSERT OR IGNORE INTO group_members (group_id,user_id,role) VALUES (?,?,?)', args:[gid,uid,role||'member'] }),
+  removeGroupMember: (gid,uid) => db.execute({ sql:'DELETE FROM group_members WHERE group_id=? AND user_id=?', args:[gid,uid] }),
+  updateMemberRole:  (gid,uid,role) => db.execute({ sql:'UPDATE group_members SET role=? WHERE group_id=? AND user_id=?', args:[role,gid,uid] }),
+  updateMemberNick:  (gid,uid,nick) => db.execute({ sql:'UPDATE group_members SET nickname=? WHERE group_id=? AND user_id=?', args:[nick,gid,uid] }),
+  isMember:          (gid,uid) => db.execute({ sql:'SELECT role FROM group_members WHERE group_id=? AND user_id=?', args:[gid,uid] }).then(first),
+
+  // Group Messages
+  getGroupMessages:  (gid) => db.execute({ sql:'SELECT * FROM group_messages WHERE group_id=? ORDER BY created_at ASC', args:[gid] }).then(rows),
+  sendGroupMessage:  (gid,uid,from_name,from_avatar,content,image) => db.execute({ sql:'INSERT INTO group_messages (group_id,user_id,from_name,from_avatar,content,image) VALUES (?,?,?,?,?,?)', args:[gid,uid,from_name,from_avatar,content,image] }),
+  getGroupMsgReactions:   (mid) => db.execute({ sql:'SELECT emoji,COUNT(*) as count FROM group_message_reactions WHERE message_id=? GROUP BY emoji', args:[mid] }).then(rows),
+  getUserGroupMsgReaction:(mid,uid) => db.execute({ sql:'SELECT emoji FROM group_message_reactions WHERE message_id=? AND user_id=?', args:[mid,uid] }).then(first),
+  addGroupMsgReaction:    (mid,uid,emoji) => db.execute({ sql:'INSERT OR REPLACE INTO group_message_reactions (message_id,user_id,emoji) VALUES (?,?,?)', args:[mid,uid,emoji] }),
+  removeGroupMsgReaction: (mid,uid) => db.execute({ sql:'DELETE FROM group_message_reactions WHERE message_id=? AND user_id=?', args:[mid,uid] }),
+
+  // Message Images (إضافة عمود image للرسائل)
+  sendMessageWithImage: (fid,tid,fn,tn,content,image) => db.execute({ sql:'INSERT INTO messages (from_id,to_id,from_name,to_name,content,image) VALUES (?,?,?,?,?,?)', args:[fid,tid,fn,tn,content,image] }),
 
   // Verify Requests
   requestVerify:    (uid, username) => db.execute({ sql:'INSERT OR REPLACE INTO verify_requests (user_id,username,status) VALUES (?,?,?)', args:[uid,username,'pending'] }),
