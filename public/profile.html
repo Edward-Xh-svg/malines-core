@@ -5,50 +5,78 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="malines-fivcon.png" type="image/png">
   <title>الملف الشخصي | مجتمع مالينز</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root{--black:#050505;--border:#232325;--text:#e9e9e9;--muted:#8d8d8d;--red:#c0392b;--red-h:#e74c3c;--card:#0f0f10;}
     *{margin:0;padding:0;box-sizing:border-box;}
-    body{background:radial-gradient(circle at 20% 15%,rgba(192,57,43,0.07),transparent 28%),var(--black);color:var(--text);font-family:'Cairo',sans-serif;min-height:100vh;}
-    a{color:inherit;text-decoration:none;}
+    body{background:var(--black);color:var(--text);font-family:'Cairo',sans-serif;min-height:100vh;}
 
     /* Topbar */
-    .topbar{position:fixed;top:0;left:0;right:0;height:60px;background:rgba(5,5,5,0.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:100;}
-    .back-btn{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:#ccc;padding:7px 14px;border-radius:999px;font-family:'Cairo';font-size:0.84rem;cursor:pointer;transition:0.2s;text-decoration:none;}
+    .topbar{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(5,5,5,0.85);backdrop-filter:blur(22px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 22px;z-index:100;}
+    .back-btn{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:#ccc;padding:7px 14px;border-radius:999px;cursor:pointer;font-family:'Cairo';font-size:0.83rem;text-decoration:none;transition:0.2s;}
     .back-btn:hover{background:rgba(255,255,255,0.08);color:#fff;}
-    .topbar-title{font-weight:800;font-size:0.96rem;color:#fff;}
+    .topbar-title{font-weight:800;font-size:0.95rem;color:#fff;}
 
-    /* Layout */
-    .wrap{max-width:720px;margin:78px auto 60px;padding:0 18px;}
+    /* Cover */
+    .cover-wrap{position:relative;width:100%;height:220px;margin-top:58px;background:#111;overflow:hidden;cursor:pointer;}
+    .cover-img{width:100%;height:100%;object-fit:cover;}
+    .cover-placeholder{width:100%;height:100%;background:linear-gradient(135deg,#0d0d0e 0%,#1a1a1e 50%,#0d0d0e 100%);display:flex;align-items:center;justify-content:center;color:#333;}
+    .cover-edit-btn{position:absolute;bottom:12px;left:12px;background:rgba(0,0,0,0.7);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:7px 14px;border-radius:8px;cursor:pointer;font-family:'Cairo';font-size:0.8rem;display:none;align-items:center;gap:6px;transition:0.2s;}
+    .cover-edit-btn:hover{background:rgba(0,0,0,0.9);}
+    .cover-wrap:hover .cover-edit-btn{display:flex;}
 
-    /* Profile Card */
-    .profile-card{background:rgba(15,15,16,0.96);border:1px solid var(--border);border-radius:22px;padding:32px;margin-bottom:22px;}
-    .avatar-row{display:flex;align-items:flex-start;gap:22px;margin-bottom:26px;}
-    .avatar-big{width:86px;height:86px;border-radius:50%;background:linear-gradient(145deg,var(--red),#8e2a1f);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;color:#fff;flex-shrink:0;overflow:hidden;position:relative;cursor:pointer;}
+    /* Profile section */
+    .profile-section{max-width:720px;margin:0 auto;padding:0 18px;}
+    .avatar-pull{position:relative;margin-top:-52px;margin-bottom:12px;display:flex;align-items:flex-end;justify-content:space-between;}
+    .avatar-big{width:100px;height:100px;border-radius:50%;background:linear-gradient(145deg,var(--red),#8e2a1f);display:flex;align-items:center;justify-content:center;font-size:2.4rem;font-weight:800;color:#fff;overflow:hidden;border:3px solid var(--black);flex-shrink:0;position:relative;cursor:pointer;}
     .avatar-big img{width:100%;height:100%;object-fit:cover;}
     .av-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:0.2s;border-radius:50%;}
     .avatar-big:hover .av-overlay{opacity:1;}
-    .av-meta{flex:1;}
-    .av-name{font-size:1.3rem;font-weight:900;color:#fff;}
-    .av-un{font-size:0.84rem;color:var(--muted);margin-top:3px;}
-    .role-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:0.72rem;font-weight:700;margin-top:8px;}
+    .profile-actions{display:flex;gap:8px;padding-bottom:4px;}
+    .btn-edit{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:9px;color:#ccc;cursor:pointer;font-family:'Cairo';font-size:0.84rem;font-weight:700;transition:0.18s;}
+    .btn-edit:hover{background:rgba(255,255,255,0.1);color:#fff;}
+    .btn-msg{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(192,57,43,0.1);border:1px solid rgba(192,57,43,0.25);border-radius:9px;color:var(--red-h);cursor:pointer;font-family:'Cairo';font-size:0.84rem;font-weight:700;transition:0.18s;text-decoration:none;}
+    .btn-msg:hover{background:rgba(192,57,43,0.18);}
+
+    /* Meta */
+    .profile-meta{padding:4px 0 16px;}
+    .meta-name{font-size:1.35rem;font-weight:900;color:#fff;display:flex;align-items:center;gap:8px;}
+    .verified-icon{flex-shrink:0;}
+    .meta-un{font-size:0.85rem;color:var(--muted);margin-top:2px;}
+    .role-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:999px;font-size:0.7rem;font-weight:700;margin-top:6px;}
     .badge-admin{background:rgba(192,57,43,0.14);color:var(--red-h);border:1px solid rgba(192,57,43,0.22);}
     .badge-member{background:rgba(255,255,255,0.04);color:var(--muted);border:1px solid var(--border);}
-    .av-stats{display:flex;gap:24px;margin-top:14px;}
-    .stat{text-align:center;}
-    .stat-n{font-size:1.2rem;font-weight:800;color:#fff;}
-    .stat-l{font-size:0.75rem;color:var(--muted);}
-    .av-bio{color:#bbb;font-size:0.9rem;line-height:1.7;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
-    .av-gameid{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:0.82rem;margin-top:8px;}
-    .av-gameid svg{flex-shrink:0;}
-    .av-joined{color:#555;font-size:0.78rem;margin-top:6px;}
+    .meta-bio{color:#bbb;font-size:0.9rem;line-height:1.7;margin-top:12px;font-family:'Noto Naskh Arabic',serif;}
+    .meta-info{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px;}
+    .info-item{display:flex;align-items:center;gap:5px;font-size:0.8rem;color:var(--muted);}
+    .info-item strong{color:#aaa;}
+    .meta-stats{display:flex;gap:24px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+    .stat{cursor:default;}
+    .stat-n{font-size:1.1rem;font-weight:800;color:#fff;}
+    .stat-l{font-size:0.74rem;color:var(--muted);}
+
+    /* Tabs */
+    .tabs-bar{display:flex;border-bottom:1px solid var(--border);margin-top:16px;}
+    .tab-btn{flex:1;padding:12px;text-align:center;font-family:'Cairo';font-size:0.88rem;font-weight:700;color:var(--muted);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:0.2s;margin-bottom:-1px;}
+    .tab-btn.active{color:#fff;border-bottom-color:var(--red-h);}
+
+    /* Posts */
+    .posts-tab{padding:16px 0;}
+    .post-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:14px;}
+    .post-img{width:100%;border-radius:10px;max-height:260px;object-fit:cover;margin-bottom:12px;}
+    .post-text{font-family:'Noto Naskh Arabic',serif;color:#ccc;font-size:0.95rem;line-height:1.9;}
+    .post-text h2{font-size:1.1rem;font-weight:800;color:#fff;margin:4px 0;}
+    .post-text blockquote{border-right:3px solid var(--red);padding-right:10px;color:#aaa;font-style:italic;margin:4px 0;}
+    .post-date{font-size:0.74rem;color:var(--muted);margin-top:10px;display:flex;align-items:center;gap:5px;}
+    .post-share{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;transition:0.15s;display:flex;align-items:center;}
+    .post-share:hover{color:#fff;background:rgba(255,255,255,0.06);}
+    .post-empty{text-align:center;padding:50px;color:var(--muted);}
 
     /* Edit form */
-    .edit-card{background:rgba(15,15,16,0.96);border:1px solid var(--border);border-radius:22px;padding:28px;margin-bottom:22px;}
-    .sec-title{font-size:0.92rem;font-weight:800;color:#fff;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+    .edit-section{padding:16px 0;}
     .fg{margin-bottom:14px;}
     .fg label{display:block;margin-bottom:5px;color:#888;font-size:0.82rem;font-weight:600;}
-    .fg input,.fg textarea{width:100%;padding:10px 13px;background:#181818;border:1px solid rgba(255,255,255,0.07);border-radius:9px;color:#fff;font-family:'Cairo';font-size:0.9rem;}
+    .fg input,.fg textarea{width:100%;padding:10px 13px;background:#161617;border:1px solid rgba(255,255,255,0.07);border-radius:9px;color:#fff;font-family:'Cairo';font-size:0.9rem;}
     .fg input:focus,.fg textarea:focus{outline:none;border-color:rgba(255,255,255,0.18);}
     .fg textarea{resize:vertical;min-height:80px;}
     .fg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
@@ -59,180 +87,180 @@
     .btn-save:hover{background:#e8e8e8;}
     .btn-save:disabled{opacity:0.5;cursor:not-allowed;}
 
-    /* Posts */
-    .posts-section{background:rgba(15,15,16,0.96);border:1px solid var(--border);border-radius:22px;overflow:hidden;}
-    .posts-header{padding:18px 24px;border-bottom:1px solid var(--border);font-weight:800;font-size:0.95rem;color:#fff;display:flex;align-items:center;gap:8px;}
-    .post-item{padding:18px 24px;border-bottom:1px solid rgba(255,255,255,0.03);}
-    .post-item:last-child{border-bottom:none;}
-    .post-item:hover{background:rgba(255,255,255,0.02);}
-    .post-content{font-family:'Amiri',serif;color:#ccc;font-size:0.95rem;line-height:1.8;margin-bottom:8px;}
-    .post-content h2{font-size:1.1rem;font-weight:800;color:#fff;margin:4px 0;}
-    .post-content h3{font-size:0.95rem;font-weight:700;color:#ddd;}
-    .post-content blockquote{border-right:3px solid var(--red);padding-right:10px;color:#aaa;font-style:italic;margin:4px 0;}
-    .post-meta{display:flex;align-items:center;gap:10px;font-size:0.75rem;color:var(--muted);}
-    .post-empty{padding:40px;text-align:center;color:var(--muted);}
-
-    /* Not logged */
     .not-logged{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 24px;gap:14px;text-align:center;}
     .not-logged h2{font-size:1.2rem;font-weight:800;color:#fff;}
-    .btn-go{display:inline-block;padding:10px 22px;background:#fff;color:#000;border-radius:9px;font-weight:800;font-size:0.88rem;}
+    .btn-go{display:inline-block;padding:10px 22px;background:#fff;color:#000;border-radius:9px;font-weight:800;font-size:0.88rem;text-decoration:none;}
 
     @keyframes spin{to{transform:rotate(360deg);}}
-    .spin{width:36px;height:36px;border:3px solid #222;border-top-color:var(--red);border-radius:50%;animation:spin 0.9s linear infinite;margin:0 auto 14px;}
-    @media(max-width:580px){.fg-row{grid-template-columns:1fr;}.avatar-row{flex-direction:column;align-items:center;text-align:center;}.av-stats{justify-content:center;}.av-bio{text-align:center;}}
+    .spin{width:34px;height:34px;border:3px solid #222;border-top-color:var(--red);border-radius:50%;animation:spin 0.9s linear infinite;margin:60px auto 14px;}
+    @media(max-width:580px){.fg-row{grid-template-columns:1fr;}.cover-wrap{height:160px;}.avatar-big{width:82px;height:82px;font-size:2rem;}}
   </style>
 </head>
 <body>
+
 <header class="topbar">
   <a href="javascript:history.back()" class="back-btn">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
     رجوع
   </a>
-  <span class="topbar-title">الملف الشخصي</span>
-  <div style="width:70px;"></div>
+  <span class="topbar-title" id="topbarTitle">الملف الشخصي</span>
+  <div style="width:80px;"></div>
 </header>
 
-<div class="wrap" id="wrap">
-  <div style="text-align:center;padding:80px;">
-    <div class="spin"></div>
-    <div style="color:var(--muted);">جارٍ التحميل...</div>
+<!-- Cover -->
+<div class="cover-wrap" id="coverWrap">
+  <div class="cover-placeholder" id="coverPlaceholder">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
   </div>
+  <img id="coverImg" class="cover-img" style="display:none;" alt="">
+  <button class="cover-edit-btn" id="coverEditBtn" onclick="document.getElementById('coverFile').click()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    تغيير الغلاف
+  </button>
+</div>
+
+<div class="profile-section" id="profileSection">
+  <div class="spin"></div>
 </div>
 
 <input type="file" id="avFile" accept="image/*" style="display:none;" onchange="onAvatar(event)">
+<input type="file" id="coverFile" accept=".jpg,.jpeg,image/jpeg" style="display:none;" onchange="onCover(event)">
 
 <script>
 const getToken = () => localStorage.getItem('malines_token')||'';
+const urlParams = new URLSearchParams(location.search);
+const viewUsername = urlParams.get('u');
 let ME = null;
 let newAvBase64 = '';
-// هل نعرض ملف مستخدم آخر؟
-const urlParams = new URLSearchParams(location.search);
-const viewUsername = urlParams.get('u'); // /profile?u=username
+let newCoverBase64 = '';
+let currentTab = 'posts';
+let userPosts = [];
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function fmtDate(s){ if(!s) return ''; return new Date(s).toLocaleDateString('ar-SA',{year:'numeric',month:'long'}); }
+function fmtDate(s){ if(!s) return ''; return new Date(s).toLocaleDateString('ar-SA',{year:'numeric',month:'long',day:'numeric'}); }
+
+function verifiedBadge(size=16){
+  return `<svg class="verified-icon" width="${size}" height="${size}" viewBox="0 0 24 24" fill="#3b9eff" title="موثق"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>`;
+}
 
 async function init(){
   const token = getToken();
-
-  if (viewUsername) {
-    // عرض ملف مستخدم آخر
-    try {
-      const [profileRes, postsRes] = await Promise.all([
-        fetch('/api/profile/' + encodeURIComponent(viewUsername)),
-        fetch('/api/user/' + encodeURIComponent(viewUsername) + '/posts')
+  if(viewUsername){
+    // عرض ملف شخص آخر
+    try{
+      const [pr,ps] = await Promise.all([
+        fetch('/api/profile/'+encodeURIComponent(viewUsername)).then(r=>r.json()),
+        fetch('/api/user/'+encodeURIComponent(viewUsername)+'/posts').then(r=>r.json())
       ]);
-      const profile = await profileRes.json();
-      const posts   = await postsRes.json();
-      if (profile.error) { renderNotLogged(); return; }
-      renderPublicProfile(profile, posts);
-    } catch(e) { renderNotLogged(); }
+      if(pr.error){ renderNotFound(); return; }
+      document.getElementById('topbarTitle').textContent = pr.display_name||pr.username;
+      renderCover(pr.cover||'', false);
+      renderPublic(pr, Array.isArray(ps)?ps:[]);
+    }catch(e){ renderNotFound(); }
     return;
   }
-
-  // ملف المستخدم نفسه
+  // ملفي الشخصي
   if(!token){ renderNotLogged(); return; }
   try{
     const r = await fetch('/api/auth/me',{headers:{'Authorization':'Bearer '+token}});
     if(!r.ok){ renderNotLogged(); return; }
     const u = await r.json();
-    if(!u || u.error){ renderNotLogged(); return; }
+    if(!u||u.error){ renderNotLogged(); return; }
     ME = u;
-    renderMyProfile(u, []);
-    // جلب البيانات الكاملة في الخلفية
+    renderCover(u.cover||'', true);
+    renderMyProfile(u,[]);
+    // جلب كامل في الخلفية
     Promise.all([
       fetch('/api/me',{headers:{'Authorization':'Bearer '+token}}).then(r=>r.ok?r.json():null),
       fetch('/api/user/'+u.username+'/posts').then(r=>r.ok?r.json():[])
-    ]).then(([full, posts]) => {
-      if(full && !full.error){ ME=full; renderMyProfile(full, posts||[]); }
+    ]).then(([full,posts])=>{
+      if(full&&!full.error){ ME=full; renderCover(full.cover||'',true); renderMyProfile(full,Array.isArray(posts)?posts:[]); }
     }).catch(()=>{});
   }catch(e){ renderNotLogged(); }
 }
 
-function renderNotLogged(){
-  document.getElementById('wrap').innerHTML=`<div class="not-logged">
-    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    <h2>المستخدم غير موجود</h2>
-    <p style="color:var(--muted);">أو يجب تسجيل الدخول</p>
-    <a href="/" class="btn-go">الرئيسية</a>
-  </div>`;
+function renderCover(url, editable){
+  const img=document.getElementById('coverImg');
+  const ph=document.getElementById('coverPlaceholder');
+  const btn=document.getElementById('coverEditBtn');
+  if(url){ img.src=url; img.style.display='block'; ph.style.display='none'; }
+  else { img.style.display='none'; ph.style.display='flex'; }
+  if(editable) btn.style.display='flex';
 }
 
-function avatarHtml(user, size=86){
-  const s = `width:${size}px;height:${size}px;`;
-  if(user.avatar) return `<div class="avatar-big" style="${s}cursor:default;"><img src="${esc(user.avatar)}" alt=""></div>`;
-  return `<div class="avatar-big" style="${s}cursor:default;font-size:${size*0.4}px;">${esc((user.display_name||user.username||'?').charAt(0).toUpperCase())}</div>`;
+function renderNotFound(){ document.getElementById('profileSection').innerHTML=`<div class="not-logged"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><h2>المستخدم غير موجود</h2><a href="/" class="btn-go">الرئيسية</a></div>`; }
+function renderNotLogged(){ document.getElementById('profileSection').innerHTML=`<div class="not-logged"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><h2>يجب تسجيل الدخول</h2><a href="/" class="btn-go">الرئيسية</a></div>`; }
+
+function roleBadge(role){ return role==='admin'?`<span class="role-badge badge-admin"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Admin</span>`:`<span class="role-badge badge-member">Member</span>`; }
+
+function avatarInner(user){
+  return user.avatar?`<img src="${esc(user.avatar)}" alt="">`:(esc((user.display_name||user.username||'?').charAt(0).toUpperCase()));
 }
 
-function roleBadge(role){
-  if(role==='admin') return `<span class="role-badge badge-admin"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Admin</span>`;
-  return `<span class="role-badge badge-member"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Member</span>`;
-}
-
-function postsHtml(posts){
-  if(!posts||!posts.length) return `<div class="post-empty">لا توجد منشورات بعد</div>`;
-  return posts.map(p=>`
-    <div class="post-item">
-      <div class="post-content">${p.content}</div>
-      <div class="post-meta">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        ${fmtDate(p.created_at)}
+function renderPublic(user, posts){
+  userPosts=posts;
+  const token=getToken();
+  document.getElementById('profileSection').innerHTML=`
+    <div class="avatar-pull">
+      <div class="avatar-big" style="cursor:default;">${avatarInner(user)}</div>
+      <div class="profile-actions">
+        ${token&&token!==''?`<a href="/chat?with=${esc(user.username)}" class="btn-msg"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>مراسلة</a>`:''}
       </div>
-    </div>`).join('');
-}
-
-function renderPublicProfile(user, posts){
-  document.getElementById('wrap').innerHTML=`
-    <div class="profile-card">
-      <div class="avatar-row">
-        ${avatarHtml(user)}
-        <div class="av-meta">
-          <div class="av-name">${esc(user.display_name||user.username)}</div>
-          <div class="av-un">@${esc(user.username)}</div>
-          ${roleBadge(user.role)}
-          <div class="av-stats">
-            <div class="stat"><div class="stat-n">${posts.length}</div><div class="stat-l">منشور</div></div>
-          </div>
-        </div>
-      </div>
-      ${user.bio?`<div class="av-bio">${esc(user.bio)}</div>`:''}
-      ${user.game_id?`<div class="av-gameid"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>معرّف اللعبة: <strong style="color:#fff;">${esc(user.game_id)}</strong></div>`:''}
-      <div class="av-joined">عضو منذ ${fmtDate(user.created_at)}</div>
-      ${getToken()?`<div style="margin-top:16px;"><a href="/chat?with=${esc(user.username)}" style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:rgba(192,57,43,0.1);border:1px solid rgba(192,57,43,0.22);color:var(--red-h);border-radius:10px;font-size:0.88rem;font-weight:700;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>مراسلة</a></div>`:''}
     </div>
-    <div class="posts-section">
-      <div class="posts-header">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        المنشورات (${posts.length})
+    <div class="profile-meta">
+      <div class="meta-name">${esc(user.display_name||user.username)} ${user.verified?verifiedBadge():''}</div>
+      <div class="meta-un">@${esc(user.username)}</div>
+      ${roleBadge(user.role)}
+      ${user.bio?`<div class="meta-bio">${esc(user.bio)}</div>`:''}
+      <div class="meta-info">
+        ${user.game_id?`<div class="info-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg><strong>${esc(user.game_id)}</strong></div>`:''}
+        <div class="info-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>منذ ${fmtDate(user.created_at)}</div>
       </div>
-      ${postsHtml(posts)}
-    </div>`;
+      <div class="meta-stats">
+        <div class="stat"><div class="stat-n">${posts.length}</div><div class="stat-l">منشور</div></div>
+      </div>
+    </div>
+    <div class="tabs-bar">
+      <button class="tab-btn active" onclick="switchTab('posts')">المنشورات</button>
+    </div>
+    <div class="posts-tab" id="postsTab">${renderPosts(posts)}</div>`;
 }
 
 function renderMyProfile(user, posts){
-  document.getElementById('wrap').innerHTML=`
-    <div class="profile-card">
-      <div class="avatar-row">
-        <div class="avatar-big" id="avBig" onclick="document.getElementById('avFile').click()" style="cursor:pointer;" title="تغيير الصورة">
-          ${user.avatar?`<img src="${esc(user.avatar)}" alt=""><div class="av-overlay"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>`
-          :`${esc((user.display_name||user.username||'?').charAt(0).toUpperCase())}<div class="av-overlay"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>`}
-        </div>
-        <div class="av-meta">
-          <div class="av-name">${esc(user.display_name||user.username)}</div>
-          <div class="av-un">@${esc(user.username)}</div>
-          ${roleBadge(user.role)}
-          <div class="av-stats">
-            <div class="stat"><div class="stat-n">${posts.length}</div><div class="stat-l">منشور</div></div>
-          </div>
-        </div>
+  userPosts=posts;
+  document.getElementById('topbarTitle').textContent = user.display_name||user.username;
+  document.getElementById('profileSection').innerHTML=`
+    <div class="avatar-pull">
+      <div class="avatar-big" id="avBig" onclick="document.getElementById('avFile').click()" title="تغيير الصورة">
+        ${avatarInner(user)}
+        <div class="av-overlay"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
       </div>
-      ${user.bio?`<div class="av-bio">${esc(user.bio)}</div>`:''}
-      ${user.game_id?`<div class="av-gameid"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>معرّف اللعبة: <strong style="color:#fff;">${esc(user.game_id)}</strong></div>`:''}
-      <div class="av-joined">عضو منذ ${fmtDate(user.created_at)}</div>
+      <div class="profile-actions">
+        <button class="btn-edit" onclick="switchTab('edit')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          تعديل
+        </button>
+      </div>
     </div>
-
-    <div class="edit-card">
-      <div class="sec-title">تعديل الملف الشخصي</div>
+    <div class="profile-meta">
+      <div class="meta-name">${esc(user.display_name||user.username)} ${user.verified?verifiedBadge():''}</div>
+      <div class="meta-un">@${esc(user.username)}</div>
+      ${roleBadge(user.role)}
+      ${user.bio?`<div class="meta-bio">${esc(user.bio)}</div>`:''}
+      <div class="meta-info">
+        ${user.game_id?`<div class="info-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg><strong>${esc(user.game_id)}</strong></div>`:''}
+        <div class="info-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>منذ ${fmtDate(user.created_at)}</div>
+      </div>
+      <div class="meta-stats">
+        <div class="stat"><div class="stat-n">${posts.length}</div><div class="stat-l">منشور</div></div>
+      </div>
+    </div>
+    <div class="tabs-bar">
+      <button class="tab-btn active" id="tabPosts" onclick="switchTab('posts')">المنشورات</button>
+      <button class="tab-btn" id="tabEdit" onclick="switchTab('edit')">تعديل الملف</button>
+    </div>
+    <div class="posts-tab" id="postsTab">${renderPosts(posts)}</div>
+    <div class="edit-section" id="editTab" style="display:none;">
       <div class="alert alert-err" id="pErr"></div>
       <div class="alert alert-ok"  id="pOk"></div>
       <div class="fg-row">
@@ -244,26 +272,62 @@ function renderMyProfile(user, posts){
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         حفظ التغييرات
       </button>
-    </div>
-
-    <div class="posts-section">
-      <div class="posts-header">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        منشوراتي (${posts.length})
-      </div>
-      ${postsHtml(posts)}
     </div>`;
 }
 
+function renderPosts(posts){
+  if(!posts||!posts.length) return `<div class="post-empty"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div style="margin-top:10px;">لا توجد منشورات بعد</div></div>`;
+  return posts.map(p=>`
+    <div class="post-card">
+      ${p.image?`<img class="post-img" src="${esc(p.image)}" loading="lazy" onerror="this.style.display='none'">`:''}
+      <div class="post-text">${p.content||''}</div>
+      <div class="post-date">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        ${fmtDate(p.created_at)}
+        <button class="post-share" onclick="sharePost(${p.id})" title="مشاركة الرابط" style="margin-right:auto;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </button>
+      </div>
+    </div>`).join('');
+}
+
+function switchTab(tab){
+  currentTab=tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  const postsTab=document.getElementById('postsTab');
+  const editTab=document.getElementById('editTab');
+  if(tab==='posts'){
+    document.getElementById('tabPosts')?.classList.add('active');
+    if(postsTab) postsTab.style.display='block';
+    if(editTab) editTab.style.display='none';
+  } else {
+    document.getElementById('tabEdit')?.classList.add('active');
+    if(postsTab) postsTab.style.display='none';
+    if(editTab) editTab.style.display='block';
+  }
+}
+
+function sharePost(id){
+  const url=window.location.origin+'/records?p='+id;
+  if(navigator.clipboard) navigator.clipboard.writeText(url).then(()=>alert('تم نسخ الرابط'));
+  else prompt('الرابط:',url);
+}
+
+// Avatar & Cover
 function onAvatar(e){
   const f=e.target.files[0]; if(!f) return;
   const r=new FileReader();
-  r.onload=ev=>{
-    newAvBase64=ev.target.result;
-    const el=document.getElementById('avBig');
-    if(el) el.innerHTML=`<img src="${newAvBase64}" alt=""><div class="av-overlay"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>`;
-  };
+  r.onload=ev=>{ newAvBase64=ev.target.result; const el=document.getElementById('avBig'); if(el) el.innerHTML=`<img src="${newAvBase64}" alt=""><div class="av-overlay"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>`; };
   r.readAsDataURL(f);
+}
+
+function onCover(e){
+  const f=e.target.files[0]; if(!f) return;
+  if(!f.type.match('image/jpeg')){ alert('يُقبل JPG/JPEG فقط للغلاف'); return; }
+  const r=new FileReader();
+  r.onload=ev=>{ newCoverBase64=ev.target.result; renderCover(newCoverBase64,true); };
+  r.readAsDataURL(f);
+  e.target.value='';
 }
 
 async function save(){
@@ -276,18 +340,21 @@ async function save(){
   const token=getToken();
   try{
     let avatarUrl=ME?.avatar||'';
+    let coverUrl=ME?.cover||'';
     if(newAvBase64){
       const up=await fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({image:newAvBase64})});
-      const ud=await up.json();
-      if(ud.url) avatarUrl=ud.url;
+      const ud=await up.json(); if(ud.url) avatarUrl=ud.url;
     }
-    const r=await fetch('/api/profile',{method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({display_name,bio,game_id,avatar:avatarUrl})});
+    if(newCoverBase64){
+      const up=await fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({image:newCoverBase64})});
+      const ud=await up.json(); if(ud.url) coverUrl=ud.url;
+    }
+    const r=await fetch('/api/profile',{method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({display_name,bio,game_id,avatar:avatarUrl,cover:coverUrl})});
     const d=await r.json();
     if(d.success){
-      const stored=localStorage.getItem('malines_user');
-      if(stored){ try{ const u=JSON.parse(stored); u.avatar=avatarUrl; u.display_name=display_name; localStorage.setItem('malines_user',JSON.stringify(u)); }catch(e){} }
-      okEl.textContent='تم الحفظ'; okEl.style.display='block';
-      newAvBase64='';
+      try{ const u=JSON.parse(localStorage.getItem('malines_user')||'{}'); u.avatar=avatarUrl; u.display_name=display_name; localStorage.setItem('malines_user',JSON.stringify(u)); }catch(e){}
+      okEl.textContent='تم الحفظ بنجاح'; okEl.style.display='block';
+      newAvBase64=''; newCoverBase64='';
     } else { errEl.textContent=d.error||'فشل الحفظ'; errEl.style.display='block'; }
   }catch(e){ errEl.textContent='تعذر الاتصال'; errEl.style.display='block'; }
   finally{
@@ -295,6 +362,7 @@ async function save(){
     btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> حفظ التغييرات`;
   }
 }
+
 init();
 </script>
 </body>

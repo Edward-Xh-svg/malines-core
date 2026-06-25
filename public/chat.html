@@ -137,7 +137,13 @@
   </div>
   <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
-    <div class="sidebar-head">المحادثات والأعضاء</div>
+    <div class="sidebar-head" style="display:flex;align-items:center;justify-content:space-between;">
+      المحادثات والأعضاء
+      <button onclick="openCreateGroup()" style="background:rgba(192,57,43,0.1);border:1px solid rgba(192,57,43,0.2);color:var(--red-h);padding:5px 10px;border-radius:7px;cursor:pointer;font-family:Cairo;font-size:0.75rem;font-weight:700;display:flex;align-items:center;gap:5px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        جروب
+      </button>
+    </div>
     <div class="user-list" id="userList">
       <div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">جارٍ التحميل...</div>
     </div>
@@ -148,7 +154,7 @@
 
 <script>
 const getToken = () => localStorage.getItem('malines_token')||'';
-const EMOJIS = ['❤️','😆','😢','😠','👍','🫠','🙂','😚'];
+const EMOJIS = ['❤️','😄','😢','😠','👍'];
 let ME = null;
 let currentPeer = null;
 let allUsers = [];
@@ -263,7 +269,15 @@ async function openChat(username){
   // بناء منطقة الرسائل
   document.getElementById('chatMain').innerHTML=`
     <div class="msgs-area" id="msgsArea"></div>
+    <div id="chatImgBar" style="display:none;padding:6px 12px;background:rgba(10,10,10,0.8);border-top:1px solid var(--border);flex-shrink:0;display:none;align-items:center;gap:8px;">
+      <img id="chatImgThumb" style="height:48px;border-radius:7px;object-fit:cover;">
+      <button onclick="removeChatImg()" style="background:rgba(0,0,0,0.7);border:none;color:#fff;border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:0.7rem;">✕</button>
+    </div>
     <div class="input-area">
+      <button class="btn-attach" onclick="document.getElementById('chatImgFile').click()" title="إرفاق صورة" style="width:38px;height:38px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#aaa;transition:0.18s;flex-shrink:0;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      </button>
+      <input type="file" id="chatImgFile" accept=".jpg,.jpeg,image/jpeg" style="display:none;" onchange="onChatImg(event)">
       <textarea class="msg-input" id="msgInput" placeholder="اكتب رسالة..." rows="1" onkeydown="onKey(event)" oninput="autoResize(this)"></textarea>
       <button class="send-btn" id="sendBtn" onclick="sendMsg()">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
@@ -303,7 +317,7 @@ function renderMsgs(msgs,scroll=true){
       ${!isMine?`<div class="msg-av ${isLast?'':'invisible'}">${av}</div>`:''}
       <div class="bubble-wrap">
         <div class="bubble" id="bubble-${m.id}" onclick="toggleMsgReactPicker(${m.id},this)">
-          ${esc(m.content)}
+          ${m.image?`<img src="${m.image}" style="max-width:100%;border-radius:10px;display:block;margin-bottom:4px;max-height:180px;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">`:''}${esc(m.content)}
           <div class="msg-react-picker" id="picker-${m.id}">
             ${EMOJIS.map(e=>`<button class="r-emoji ${rc?.userReaction===e?'active':''}" onclick="reactMsg(event,${m.id},'${e}')">${e}</button>`).join('')}
           </div>
@@ -357,14 +371,28 @@ async function reactMsg(e,msgId,emoji){
   }
 }
 
+let chatImgBase64='';
+function onChatImg(e){
+  const f=e.target.files[0]; if(!f) return;
+  if(!f.type.match('image/jpeg')){ alert('JPG/JPEG فقط'); return; }
+  const r=new FileReader(); r.onload=ev=>{ chatImgBase64=ev.target.result; document.getElementById('chatImgThumb').src=chatImgBase64; const bar=document.getElementById('chatImgBar'); bar.style.display='flex'; }; r.readAsDataURL(f); e.target.value='';
+}
+function removeChatImg(){ chatImgBase64=''; document.getElementById('chatImgBar').style.display='none'; }
+
 async function sendMsg(){
   const input=document.getElementById('msgInput');
-  if(!input||!input.value.trim()) return;
-  const content=input.value.trim();
+  const content=input?.value.trim()||'';
+  if(!content&&!chatImgBase64) return;
   input.value=''; input.style.height='';
   document.getElementById('sendBtn').disabled=true;
   try{
-    await apiFetch('/api/messages/'+encodeURIComponent(currentPeer),'POST',{content});
+    let imageUrl='';
+    if(chatImgBase64){
+      const up=await apiFetch('/api/upload','POST',{image:chatImgBase64});
+      if(up.url) imageUrl=up.url;
+      removeChatImg();
+    }
+    await apiFetch('/api/messages/'+encodeURIComponent(currentPeer),'POST',{content,image:imageUrl});
     await loadMsgs(currentPeer);
   }catch(e){}
   document.getElementById('sendBtn').disabled=false;
@@ -386,6 +414,79 @@ function toggleSidebar(force){
   const open=force!==undefined?force:!isOpen;
   sb.classList.toggle('open',open);
   ov.classList.toggle('show',open);
+}
+</script>
+<!-- Create Group Modal -->
+<div id="createGroupModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;">
+  <div style="background:#111;border:1px solid #232325;border-radius:20px;padding:28px;width:100%;max-width:420px;max-height:85vh;overflow-y:auto;">
+    <div style="font-weight:800;font-size:1.05rem;color:#fff;margin-bottom:20px;">إنشاء مجموعة جديدة</div>
+    <div style="margin-bottom:14px;">
+      <label style="display:block;color:#888;font-size:0.82rem;margin-bottom:5px;">اسم المجموعة *</label>
+      <input id="cgName" type="text" style="width:100%;padding:10px 12px;background:#1a1a1a;border:1px solid rgba(255,255,255,0.07);border-radius:9px;color:#fff;font-family:Cairo;font-size:0.88rem;" placeholder="اسم المجموعة">
+    </div>
+    <div style="margin-bottom:14px;">
+      <label style="display:block;color:#888;font-size:0.82rem;margin-bottom:8px;">إضافة أعضاء</label>
+      <div id="memberSelect" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;"></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
+      <button onclick="document.getElementById('createGroupModal').style.display='none'" style="padding:9px 16px;background:rgba(255,255,255,0.05);border:1px solid #232325;border-radius:8px;color:#ccc;cursor:pointer;font-family:Cairo;">إلغاء</button>
+      <button onclick="createGroup()" style="padding:9px 16px;background:#fff;border:none;border-radius:8px;color:#000;font-weight:800;cursor:pointer;font-family:Cairo;">إنشاء</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Groups ──
+async function openCreateGroup(){
+  document.getElementById('createGroupModal').style.display='flex';
+  const users=await api('/api/users');
+  const others=Array.isArray(users)?users.filter(u=>u.username!==ME?.username):[];
+  document.getElementById('memberSelect').innerHTML=others.map(u=>`
+    <label style="display:flex;align-items:center;gap:9px;padding:7px 10px;background:rgba(255,255,255,0.03);border-radius:8px;cursor:pointer;">
+      <input type="checkbox" value="${u.id}" style="accent-color:#c0392b;">
+      <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(145deg,#c0392b,#8e2a1f);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.78rem;color:#fff;overflow:hidden;flex-shrink:0;">
+        ${u.avatar?`<img src="${u.avatar}" style="width:100%;height:100%;object-fit:cover;">`:((u.display_name||u.username||'?').charAt(0).toUpperCase())}
+      </div>
+      <span style="font-size:0.84rem;color:#ddd;">${u.display_name||u.username}</span>
+    </label>`).join('');
+}
+
+async function createGroup(){
+  const name=document.getElementById('cgName').value.trim();
+  if(!name){ alert('اسم المجموعة مطلوب'); return; }
+  const checked=[...document.querySelectorAll('#memberSelect input:checked')].map(i=>Number(i.value));
+  const d=await api('/api/groups','POST',{name,members:checked});
+  if(d.success||d.id){
+    document.getElementById('createGroupModal').style.display='none';
+    window.location='/group?g='+d.id;
+  }
+}
+
+// إضافة الجروبات في السايدبار
+const _origRenderSidebar=renderSidebar;
+async function renderSidebar(){
+  _origRenderSidebar();
+  try{
+    const groups=await api('/api/groups');
+    if(!Array.isArray(groups)||!groups.length) return;
+    const list=document.getElementById('userList');
+    if(!list) return;
+    const groupsHtml=`<div style="padding:8px 16px 4px;font-size:0.72rem;color:#6b6b6b;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">المجموعات</div>`+
+      groups.map(g=>{
+        const av=g.avatar?`<img src="${g.avatar}" style="width:100%;height:100%;object-fit:cover;">`:(g.name||'?').charAt(0).toUpperCase();
+        return `<div class="user-item" onclick="window.location='/group?g='+${g.id}" style="cursor:pointer;">
+          <div class="u-av">${av}</div>
+          <div class="u-info">
+            <div class="u-name" style="display:flex;align-items:center;gap:5px;">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              ${g.name}
+            </div>
+            <div class="u-last">${g.my_role==='admin'?'مدير ':''}مجموعة</div>
+          </div>
+        </div>`;
+      }).join('');
+    list.innerHTML=groupsHtml+list.innerHTML;
+  }catch(e){}
 }
 </script>
 </body>

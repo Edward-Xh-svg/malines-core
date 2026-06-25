@@ -6,7 +6,7 @@
   <link rel="icon" href="malines-fivcon.png" type="image/png">
   <title>المنتدى الدولي | مجتمع مالينز</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root{--black:#050505;--dark:#0a0a0a;--card:#0f0f10;--border:#232325;--text:#e9e9e9;--muted:#8d8d8d;--red:#c0392b;--red-h:#e74c3c;--accent:#d4af37;}
     *{margin:0;padding:0;box-sizing:border-box;}
@@ -74,7 +74,7 @@
     .btn-icon:hover{background:rgba(255,255,255,0.05);color:#aaa;}
 
     /* Content */
-    .post-text{font-family:'Amiri',serif;line-height:2;color:#ccc;font-size:1rem;white-space:pre-wrap;margin-bottom:16px;}
+    .post-text{font-family:'Noto Naskh Arabic',serif;line-height:2;color:#ccc;font-size:1rem;white-space:pre-wrap;margin-bottom:16px;}
 
     /* Reactions */
     .reactions-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
@@ -134,7 +134,7 @@
     .btn-submit{width:100%;padding:12px;background:#fff;color:#000;font-weight:800;border:none;border-radius:9px;cursor:pointer;font-family:'Cairo';font-size:0.92rem;transition:0.2s;margin-top:4px;}
     .btn-submit:hover{background:#e5e5e5;}
     .btn-submit:disabled{opacity:0.5;cursor:not-allowed;}
-    .post-editor{width:100%;min-height:150px;max-height:340px;overflow-y:auto;padding:13px;background:#1a1a1a;border:1px solid rgba(255,255,255,0.07);border-radius:12px;color:#fff;font-family:'Amiri',serif;font-size:1rem;line-height:1.8;outline:none;}
+    .post-editor{width:100%;min-height:150px;max-height:340px;overflow-y:auto;padding:13px;background:#1a1a1a;border:1px solid rgba(255,255,255,0.07);border-radius:12px;color:#fff;font-family:'Noto Naskh Arabic',serif;font-size:1rem;line-height:1.8;outline:none;}
     .post-editor:focus{border-color:rgba(255,255,255,0.2);}
     .post-editor[placeholder]:empty:before{content:attr(placeholder);color:#555;pointer-events:none;}
     .post-editor h2{font-size:1.3rem;font-weight:800;color:#fff;margin:8px 0 4px;}
@@ -162,8 +162,8 @@
 
 <header class="topbar">
   <div class="topbar-left">
-    <img src="malines-icon.png" class="topbar-logo" onerror="this.style.display='none'" alt="">
-    <span class="topbar-title">المنتدى الدولي</span>
+    <img src="hostaka.jpg" class="topbar-logo" style="width:auto;height:38px;border-radius:6px;object-fit:contain;" onerror="this.style.display='none'" alt="Malines">
+    
   </div>
   <div class="topbar-right">
     <!-- زر التوثيق - يظهر فقط للمسجلين غير الموثقين -->
@@ -257,32 +257,34 @@
     <div class="modal-t">منشور جديد</div>
     <div class="err" id="postErr"></div>
     <!-- شريط التنسيق -->
-    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
-      <button class="fmt-btn" onclick="fmt('bold')" title="غامق">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg>
+    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center;">
+      <button class="fmt-btn" onclick="fmt('bold')" title="غامق"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg></button>
+      <button class="fmt-btn" onclick="fmt('italic')" title="مائل"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg></button>
+      <button class="fmt-btn" onclick="fmt('underline')" title="تسطير"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"/><line x1="4" y1="21" x2="20" y2="21"/></svg></button>
+      <div style="width:1px;background:var(--border);margin:0 4px;height:20px;"></div>
+      <button class="fmt-btn" onclick="fmtBlock('h2')" title="عنوان">H1</button>
+      <button class="fmt-btn" onclick="fmtBlock('h3')" title="عنوان فرعي">H2</button>
+      <div style="width:1px;background:var(--border);margin:0 4px;height:20px;"></div>
+      <button class="fmt-btn" onclick="fmtList('ul')" title="قائمة"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
+      <button class="fmt-btn" onclick="fmtLine()" title="فاصل"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+      <button class="fmt-btn" onclick="fmtQuote()" title="اقتباس"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg></button>
+      <div style="flex:1;"></div>
+      <!-- زر إرفاق صورة JPG -->
+      <button class="fmt-btn" onclick="document.getElementById('postImgFile').click()" title="إرفاق صورة JPG" style="gap:5px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        صورة
       </button>
-      <button class="fmt-btn" onclick="fmt('italic')" title="مائل">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg>
-      </button>
-      <button class="fmt-btn" onclick="fmt('underline')" title="تسطير">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"/><line x1="4" y1="21" x2="20" y2="21"/></svg>
-      </button>
-      <div style="width:1px;background:var(--border);margin:0 4px;"></div>
-      <button class="fmt-btn" onclick="fmtBlock('h2')" title="عنوان كبير">H1</button>
-      <button class="fmt-btn" onclick="fmtBlock('h3')" title="عنوان صغير">H2</button>
-      <div style="width:1px;background:var(--border);margin:0 4px;"></div>
-      <button class="fmt-btn" onclick="fmtList('ul')" title="قائمة نقطية">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-      </button>
-      <button class="fmt-btn" onclick="fmtLine()" title="فاصل أفقي">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      </button>
-      <button class="fmt-btn" onclick="fmtQuote()" title="اقتباس">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
-      </button>
+      <input type="file" id="postImgFile" accept=".jpg,.jpeg,image/jpeg" style="display:none;" onchange="onPostImg(event)">
     </div>
     <div class="fg">
       <div id="postEditor" class="post-editor" contenteditable="true" dir="auto" placeholder="اكتب منشورك هنا..."></div>
+    </div>
+    <!-- معاينة الصورة -->
+    <div id="postImgPreviewWrap" style="display:none;margin-bottom:12px;position:relative;">
+      <img id="postImgPreview" style="max-width:100%;max-height:220px;object-fit:cover;border-radius:10px;border:1px solid var(--border);">
+      <button onclick="removePostImg()" style="position:absolute;top:6px;left:6px;background:rgba(0,0,0,0.7);border:none;color:#fff;border-radius:50%;width:26px;height:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
     <div class="modal-footer">
       <button class="btn-ghost" onclick="closeModal('postModal')">إلغاء</button>
@@ -322,6 +324,9 @@ const REACTIONS = [
 ];
 
 // ── Init ──
+// فتح منشور محدد من URL مثل /records?p=123
+const urlPostId = new URLSearchParams(location.search).get('p');
+
 (async function init() {
   if (TOKEN) {
     try {
@@ -347,6 +352,13 @@ const REACTIONS = [
   }
   await loadPosts();
   if (ME && TOKEN) loadUnread();
+  // فتح منشور محدد
+  if(urlPostId){
+    setTimeout(()=>{
+      const el=document.getElementById('post-'+urlPostId);
+      if(el){ el.scrollIntoView({behavior:'smooth',block:'center'}); el.style.border='1px solid rgba(212,175,55,0.4)'; setTimeout(()=>el.style.border='',3000); }
+    },600);
+  }
 })();
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -572,11 +584,14 @@ function renderPost(p){
           </div>
         </div>
         <div class="pub-actions">
+          <button class="btn-icon" onclick="sharePost(${p.id})" title="مشاركة الرابط">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </button>
           ${ME && p.user_id && p.user_id!=ME?.id ? `<button class="btn-icon" onclick="location.href='/chat?with=${esc(p.publisher)}'" title="مراسلة">${SVG.comment}</button>` : ''}
           ${canDel ? `<button class="btn-icon" onclick="delPost(${p.id})" title="حذف">${SVG.delete}</button>` : ''}
         </div>
       </div>
-      <div class="post-text post-html" style="font-family:'Amiri',serif;line-height:2;color:#ccc;font-size:1rem;margin-bottom:16px;">${p.content}</div>
+      <div class="post-text post-html" style="font-family:'Noto Naskh Arabic',serif;line-height:2;color:#ccc;font-size:1rem;margin-bottom:16px;">${p.content}</div>
       <div class="reactions-row">
         ${reactionHtml}
         <button class="react-btn" onclick="toggleComments(${p.id})" id="cmtToggle-${p.id}">
@@ -593,6 +608,12 @@ function renderPost(p){
 
 function goProfile(username){ window.location = '/profile?u=' + encodeURIComponent(username); }
 
+function sharePost(id){
+  const url = window.location.origin + '/records?p=' + id;
+  if(navigator.clipboard){ navigator.clipboard.writeText(url).then(()=>showToast('تم نسخ الرابط')); }
+  else { prompt('انسخ الرابط:',url); }
+}
+
 // ── Search ──
 document.getElementById('searchInput').addEventListener('input', function(){
   const q = this.value.trim().toLowerCase();
@@ -600,7 +621,38 @@ document.getElementById('searchInput').addEventListener('input', function(){
 });
 
 // ── Post ──
-function openPostModal(){ if(!ME){openAuth();return;} const ed=document.getElementById('postEditor'); if(ed) ed.innerHTML=''; document.getElementById('postErr').style.display='none'; document.getElementById('postModal').classList.add('show'); setTimeout(()=>document.getElementById('postEditor')?.focus(),100); }
+let postImgBase64 = '';
+
+function openPostModal(){ 
+  if(!ME){openAuth();return;} 
+  const ed=document.getElementById('postEditor'); 
+  if(ed) ed.innerHTML=''; 
+  document.getElementById('postErr').style.display='none';
+  document.getElementById('postImgPreviewWrap').style.display='none';
+  postImgBase64='';
+  document.getElementById('postModal').classList.add('show'); 
+  setTimeout(()=>document.getElementById('postEditor')?.focus(),100); 
+}
+
+function onPostImg(e){
+  const f=e.target.files[0]; 
+  if(!f) return;
+  if(!f.type.match('image/jpeg')){ showToast('يُقبل JPG/JPEG فقط','error'); return; }
+  if(f.size > 5*1024*1024){ showToast('الصورة أكبر من 5MB','error'); return; }
+  const r=new FileReader();
+  r.onload=ev=>{
+    postImgBase64=ev.target.result;
+    document.getElementById('postImgPreview').src=postImgBase64;
+    document.getElementById('postImgPreviewWrap').style.display='block';
+  };
+  r.readAsDataURL(f);
+  e.target.value='';
+}
+
+function removePostImg(){
+  postImgBase64='';
+  document.getElementById('postImgPreviewWrap').style.display='none';
+}
 
 // ── دوال التنسيق ──
 function fmt(cmd){ document.execCommand(cmd, false, null); document.getElementById('postEditor')?.focus(); }
@@ -635,10 +687,16 @@ async function submitPost(){
   const editor = document.getElementById('postEditor');
   const content = editor?.innerHTML?.trim();
   const errEl = document.getElementById('postErr'); errEl.style.display='none';
-  if(!content || content==='<br>'){ errEl.textContent='المحتوى مطلوب'; errEl.style.display='block'; return; }
+  if((!content || content==='<br>') && !postImgBase64){ errEl.textContent='المحتوى أو الصورة مطلوبان'; errEl.style.display='block'; return; }
   const btn=document.getElementById('postBtn'); btn.disabled=true; btn.textContent='...';
   try {
-    const d=await apiFetch('/api/records','POST',{content});
+    let imageUrl='';
+    if(postImgBase64){
+      const up=await apiFetch('/api/upload','POST',{image:postImgBase64});
+      if(up.url) imageUrl=up.url;
+      else { errEl.textContent='فشل رفع الصورة'; errEl.style.display='block'; btn.disabled=false; btn.textContent='نشر'; return; }
+    }
+    const d=await apiFetch('/api/records','POST',{content:content||'',image:imageUrl});
     if(d.success){ closeModal('postModal'); await loadPosts(); }
     else { errEl.textContent=d.error||'فشل النشر'; errEl.style.display='block'; }
   } catch(e){ errEl.textContent='تعذر الاتصال'; errEl.style.display='block'; }
