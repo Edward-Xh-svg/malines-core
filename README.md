@@ -305,12 +305,7 @@ PUT  /api/admin/users/:id/role        (Admin) { role: 'user'|'admin' }
 DEL  /api/admin/users/:id             (Admin)
 ```
 
----
 
-## Admin Credentials
-```
-Email:    misha@malines.nc
-Password: 60dbedfd4f3247bfa11fc32bb2acd9
 ```
 These are set/reset automatically on every server start in `initDB()`.
 
