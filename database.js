@@ -200,6 +200,8 @@ async function initDB() {
     "ALTER TABLE group_messages ADD COLUMN image TEXT DEFAULT ''",
     // verify_requests
     "CREATE TABLE IF NOT EXISTS verify_requests (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, username TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending', created_at TEXT NOT NULL DEFAULT (datetime('now')), UNIQUE(user_id))",
+    // groups theme column migration
+    "ALTER TABLE groups ADD COLUMN theme TEXT DEFAULT 'default'",
   ];
   for (const sql of migrations) {
     try { await db.execute(sql); } catch(e) { /* العمود موجود مسبقاً — تجاهل */ }
