@@ -95,6 +95,7 @@
 
     @media(max-width:680px){.settings-panel{width:100%;}}
   </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -119,7 +120,9 @@
     </div>
     <div id="imgPreviewBar" style="display:none;" class="img-preview-bar">
       <img id="imgPreviewThumb" src="" alt="">
-      <button class="img-rm" onclick="removeImg()">✕</button>
+      <button class="img-rm" onclick="removeImg()">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
       <span style="font-size:0.78rem;color:var(--muted);">صورة مرفقة</span>
     </div>
     <div class="input-area">
@@ -153,14 +156,14 @@ const getToken = ()=> localStorage.getItem('malines_token')||'';
 const gid = new URLSearchParams(location.search).get('g');
 const EMOJIS = ['❤️','😄','😢','😠','👍'];
 const THEMES = [
-  {name:'default', colors:['#c0392b','#8e2a1f']},
-  {name:'ocean',   colors:['#1a6b8a','#0d3d52']},
-  {name:'forest',  colors:['#2d6a4f','#1b4332']},
-  {name:'purple',  colors:['#6c3483','#4a235a']},
-  {name:'gold',    colors:['#b7950b','#7d6608']},
-  {name:'pink',    colors:['#c0392b','#922b21']},
-  {name:'teal',    colors:['#148f77','#0e6655']},
-  {name:'slate',   colors:['#566573','#2c3e50']},
+  {name:'default', color:'#c0392b'},
+  {name:'orange',  color:'#e67e22'},
+  {name:'yellow',  color:'#f1c40f'},
+  {name:'green',   color:'#2ecc71'},
+  {name:'emerald', color:'#1abc9c'},
+  {name:'blue',    color:'#3498db'},
+  {name:'purple',  color:'#9b59b6'},
+  {name:'pink',    color:'#e91e63'},
 ];
 
 let ME = null, GROUP = null, MEMBERS = [], myImgBase64 = '', pollTimer = null, settingsOpen = false;
@@ -168,6 +171,37 @@ let ME = null, GROUP = null, MEMBERS = [], myImgBase64 = '', pollTimer = null, s
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function fmtTime(s){ if(!s) return ''; return new Date(s).toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'}); }
 function fmtDay(s){ if(!s) return ''; const d=new Date(s), t=new Date(); const diff=Math.floor((t-d)/86400000); if(diff===0) return 'اليوم'; if(diff===1) return 'أمس'; return d.toLocaleDateString('ar-SA',{month:'short',day:'numeric'}); }
+
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+function lightenHex(hex, pct) {
+  const num = parseInt(hex.slice(1), 16);
+  let r = (num >> 16) & 255, g = (num >> 8) & 255, b = num & 255;
+  r = Math.min(255, Math.floor(r + (255 - r) * pct));
+  g = Math.min(255, Math.floor(g + (255 - g) * pct));
+  b = Math.min(255, Math.floor(b + (255 - b) * pct));
+  return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+}
+function darkenHex(hex, pct) {
+  const num = parseInt(hex.slice(1), 16);
+  let r = (num >> 16) & 255, g = (num >> 8) & 255, b = num & 255;
+  r = Math.floor(r * (1 - pct));
+  g = Math.floor(g * (1 - pct));
+  b = Math.floor(b * (1 - pct));
+  return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+}
+function applyTheme(themeName) {
+  const t = THEMES.find(x => x.name === themeName) || THEMES[0];
+  const root = document.documentElement;
+  root.style.setProperty('--red', t.color);
+  root.style.setProperty('--red-h', lightenHex(t.color, 0.25));
+  root.style.setProperty('--mine-bg', hexToRgba(t.color, 0.18));
+  root.style.setProperty('--mine-border', hexToRgba(t.color, 0.28));
+}
 
 async function api(url,method='GET',body=null){
   const opts={method,headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()}};
@@ -195,6 +229,7 @@ async function loadGroup(){
     const d=await api('/api/groups/'+gid);
     if(d.error){ location.href='/chat'; return; }
     GROUP=d; MEMBERS=d.members||[];
+    applyTheme(GROUP.theme || 'default');
     const av=document.getElementById('groupAv');
     av.innerHTML=d.avatar?`<img src="${esc(d.avatar)}" alt="">`:(d.name||'?').charAt(0).toUpperCase();
     document.getElementById('groupName').textContent=d.name||'مجموعة';
@@ -221,7 +256,7 @@ function renderMsgs(msgs){
     if(day!==lastDay){ html+=`<div class="date-div"><span>${day}</span></div>`; lastDay=day; }
     const next=msgs[i+1]; const isLast=!next||next.user_id!=m.user_id;
     const av=m.from_avatar?`<img src="${esc(m.from_avatar)}" alt="">`:m.from_name.charAt(0).toUpperCase();
-    return html+=`<div class="msg-row ${isMine?'mine':'theirs'}">
+    html+=`<div class="msg-row ${isMine?'mine':'theirs'}">
       ${!isMine?`<div class="msg-av ${isLast?'':'hidden'}" onclick="window.location='/profile?u='+encodeURIComponent('${esc(m.from_name)}')">${av}</div>`:''}
       <div class="bubble-col">
         ${!isMine&&isLast?`<div class="msg-sender">${esc(m.from_name)}</div>`:''}
@@ -302,7 +337,7 @@ function renderSettings(){
     <div class="sp-section">
       <div class="sp-label">الثيم</div>
       <div class="theme-grid">
-        ${THEMES.map(t=>`<div class="theme-dot ${GROUP?.theme===t.name?'active':''}" style="background:linear-gradient(135deg,${t.colors[0]},${t.colors[1]});" onclick="setTheme('${t.name}')" title="${t.name}"></div>`).join('')}
+        ${THEMES.map(t=>`<div class="theme-dot ${GROUP?.theme===t.name?'active':''}" style="background:linear-gradient(135deg,${t.color},${darkenHex(t.color,0.25)});" onclick="setTheme('${t.name}')" title="${t.name}"></div>`).join('')}
       </div>
     </div>
     <div class="sp-section">
@@ -341,7 +376,9 @@ async function saveGroupInfo(){
 
 async function setTheme(theme){
   await api('/api/groups/'+gid,'PUT',{name:GROUP?.name,description:GROUP?.description||'',avatar:GROUP?.avatar||'',theme});
-  GROUP.theme=theme; renderSettings();
+  GROUP.theme=theme;
+  applyTheme(theme);
+  renderSettings();
 }
 
 async function kickMember(uid){
